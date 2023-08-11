@@ -1,6 +1,8 @@
 import axios from 'axios';
+import jwtDecode from 'jwt-decode';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import Cookies from 'js-cookie';
 
 const Login = () => {
   const [emailInput, setEmailInput] = useState('');
@@ -8,11 +10,14 @@ const Login = () => {
   const [message, setMessage] = useState('');
   const router = useRouter();
 
+  /**
+   * 로그인 요청 보내는 함수
+   * @param e
+   */
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     try {
-      // axios를 사용하여 로그인 요청 보내기
       const response = await axios.post(
         'http://localhost:8000/api/login',
         {
@@ -21,10 +26,14 @@ const Login = () => {
         },
         { withCredentials: true },
       );
-
-      // 로그인 성공시 처리 로직(레디렉션 등)을 추가하세요.
       router.push('/');
-      console.log(response.data);
+      const { data } = response;
+      const decoded = jwtDecode(data.access_key);
+      const accessExpirationDate = new Date(decoded.exp * 1000); // 1시간
+
+      Cookies.set('ACCESS_KEY', data.access_key, {
+        expires: accessExpirationDate,
+      });
     } catch (error) {
       setMessage(error.response?.data?.message || 'An error occurred');
     }
@@ -58,11 +67,11 @@ const Login = () => {
             required
           />
         </div>
+        {message && <p className="font-[#ff0000]">{message}</p>}
         <button className="mt-2 border-2 px-[2rem]" type="submit">
           로그인
         </button>
       </form>
-      {message && <p>{message}</p>}
     </div>
   );
 };
