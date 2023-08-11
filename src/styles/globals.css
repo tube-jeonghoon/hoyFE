@@ -24,3 +24,19 @@ body,
   font-style: normal;
   font-display: swap;
 }
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+  width: 6px; /* 스크롤바 폭 */
+  height: 6px; /* 스크롤바 높이 */
+  background: #F5F5F5; /* 스크롤 트랙 배경색 */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #999; /* 스크롤바 thumb 색상 */
+  border-radius: 5px; /* 스크롤바 thumb 모서리 둥글게 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #666; /* 스크롤바 thumb 마우스 오버 시 색상 */
+}
