@@ -15,8 +15,14 @@ const isCreateWorkspaceModalState = atom({
   default: false,
 });
 
+const isDetailModalState = atom({
+  key: 'isDetailModalState',
+  default: true,
+});
+
 export {
   isCalendarModalState,
   isWorkspaceModalState,
   isCreateWorkspaceModalState,
+  isDetailModalState,
 };

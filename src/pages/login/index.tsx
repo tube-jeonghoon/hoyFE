@@ -19,22 +19,24 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/login',
+        `${process.env.BACKEND_SERVER}/auth/login`,
         {
-          emailInput,
-          passwordInput,
+          email: emailInput,
+          password: passwordInput,
         },
         { withCredentials: true },
       );
       router.push('/');
+      console.log(emailInput, passwordInput);
       const { data } = response;
-      const decoded = jwtDecode(data.access_key);
-      const accessExpirationDate = new Date(decoded.exp * 1000); // 1시간
+      const decoded = jwtDecode(data.access_token);
+      const accessExpirationDate = new Date(decoded.exp * 10000); // 10시간
 
-      Cookies.set('ACCESS_KEY', data.access_key, {
+      Cookies.set('ACCESS_KEY', data.access_token, {
         expires: accessExpirationDate,
       });
     } catch (error) {
+      console.log(emailInput, passwordInput);
       setMessage(error.response?.data?.message || 'An error occurred');
     }
   };

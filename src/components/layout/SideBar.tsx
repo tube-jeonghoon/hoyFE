@@ -41,7 +41,7 @@ const SideBar = () => {
   };
 
   return (
-    <div className="my-[2.5rem] mx-[1.5rem]">
+    <div className="my-[2.5rem] mx-[1.5rem] flex flex-col gap-[2rem] items-stretch">
       <div className="team-logo flex items-center relative">
         <div className="w-[2.5rem]">
           <Image src="/img/teamImage.png" alt="img" width="40" height="40" />
@@ -55,7 +55,7 @@ const SideBar = () => {
         </button>
         {workspaceVisible && <WorkspaceSelectModal />}
       </div>
-      <div className="sidebar-menu mt-[2rem] text-[0.875rem]">
+      <div className="sidebar-menu text-[0.875rem]">
         <button className="flex items-center p-[0.75rem]">
           <div className="mr-[0.75rem]">
             <Image src="/img/user.png" alt="img" width="24" height="24" />
@@ -87,7 +87,7 @@ const SideBar = () => {
         </button>
       </div>
 
-      <div className="border-[0.1rem] my-[2rem] w-full">{''}</div>
+      <div className="border-[0.1rem] w-full">{''}</div>
 
       <div className="favorite-person-Area">
         <div className="flex items-center justify-between h-[2.5rem] px-[0.75rem] ">
@@ -110,18 +110,15 @@ const SideBar = () => {
           ))}
         </div>
       </div>
-      <div className="border-[0.1rem] my-[2rem] w-full">{''}</div>
+      <div className="border-[0.1rem] w-full">{''}</div>
       <div>
-        <div
-          className="flex items-center justify-between px-[0.75rem] mb-[0.6rem]
-          max-h-[14rem] overflow-y-auto"
-        >
+        <div className="flex items-center justify-between px-[0.75rem] mb-[0.6rem]">
           <div className="font-bold">그룹 보기</div>
           <div className="cursor-pointer">
             <AiOutlinePlus />
           </div>
         </div>
-        <div className="max-h-[14rem] overflow-y-auto">
+        <div className="max-h-[24rem] overflow-y-auto">
           {groupList.map((group, idx) => (
             <div key={idx} className="text-[0.875rem] cursor-pointer">
               <div className="p-[0.75rem]">{group}</div>
