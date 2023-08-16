@@ -2,7 +2,7 @@ import MyCalendar from '@/components/MyCalendar';
 import DetailModal from '@/components/modal/detailModal';
 import { isDetailModalState } from '@/store/atom/modalStatus';
 import { todo } from 'node:test';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import {
   IoSquareOutline,
@@ -13,6 +13,7 @@ import { useRecoilState } from 'recoil';
 import Image from 'next/image';
 import checkBoxIcon from '../../../public/img/checkBox.svg';
 import fillCheckBox from '../../../public/img/fillCheckBox.svg';
+import axios from 'axios';
 
 type Task = {
   id: number;
@@ -140,6 +141,15 @@ const Home = () => {
       },
     }));
   };
+
+  const fetchTodo = async () => {
+    const response = await axios.get('http://hoy.im/api/todos');
+    console.log(response);
+  };
+
+  useEffect(() => {
+    fetchTodo();
+  }, []);
 
   return (
     <div className="w-full">
