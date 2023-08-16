@@ -31,10 +31,7 @@ const GoogleLogin = () => {
 
   const fetchUser = async (user: User) => {
     try {
-      const response = await axios.post(
-        'http://localhost:8000/auth/login',
-        user,
-      );
+      const response = await axios.post('https://hoy.im/api/auth/login', user);
 
       console.log(response);
     } catch (error) {

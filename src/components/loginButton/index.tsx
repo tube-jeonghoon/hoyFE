@@ -6,7 +6,7 @@ import axios from 'axios';
 // const clientId = process.env.GOOGLE_CLIENT_ID ?? '';
 const clientId =
   '174462797558-14770qjh0l6u9nfflhnnpqnbso5hk8cd.apps.googleusercontent.com';
-const serverPath = 'http://localhost:8000';
+const serverPath = 'https://hoy.im/api';
 
 function LoginButton() {
   const [userInfo, setUserInfo] = useState({ givenName: '', imageUrl: '' });
