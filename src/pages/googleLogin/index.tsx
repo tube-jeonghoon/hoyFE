@@ -1,20 +1,59 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import hoyImg from '../../../public/img/hoy.png';
 import googleLoginBtn from '../../../public/img/googleLoginBtn.png';
 import GoogleLoginTest from 'react-google-login';
-import { Router } from 'next/router';
+import axios from 'axios';
+
+interface User {
+  name: string;
+  email: string;
+  imageUrl: string;
+}
 
 const GoogleLogin = () => {
+  const [user, setUser] = useState<User | null>(null);
   const onSuccess = (res: any) => {
-    console.log(res);
+    const fullName = res.profileObj.familyName + res.profileObj.givenName;
+    console.log(res.profileObj);
 
-    Router.push('/home');
+    console.log(fullName);
+    console.log(res.profileObj.imageUrl);
+    console.log(res.profileObj.email);
+
+    setUser({
+      name: fullName,
+      email: res.profileObj.email,
+      imageUrl: res.profileObj.imageUrl,
+    });
+    console.log(user);
+  };
+
+  const fetchUser = async (user: User) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/auth/login',
+        user,
+      );
+
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+      console.log("fetchUser's error");
+    }
   };
 
   const onFailure = (error: any) => {
     console.log(error);
+    console.log('btn failed');
   };
+
+  useEffect(() => {
+    if (user !== null) {
+      fetchUser(user);
+    }
+  }, [user]);
+
   return (
     <div className="w-screen h-screen">
       <div className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2">

@@ -11,7 +11,8 @@ export default function App({ Component, pageProps }: AppProps) {
   if (
     router.pathname === '/login' ||
     router.pathname === '/googleLogin' ||
-    router.pathname === '/firstGroup'
+    router.pathname === '/firstGroup' ||
+    router.pathname === '/searchMember'
   ) {
     return (
       <RecoilRoot>

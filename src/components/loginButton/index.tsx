@@ -20,7 +20,7 @@ function LoginButton() {
         imageUrl: res.profileObj.imageUrl,
       });
 
-      console.log(response);
+      console.log('✨ ➤ onSuccess ➤ response:', response);
 
       if (response.data.success) {
         alert('로그인 성공!'); // Display success alert

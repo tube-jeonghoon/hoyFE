@@ -1,8 +1,18 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import jwtDecode from 'jwt-decode';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
+
+interface DecodedToken {
+  exp: number;
+  // 필요한 다른 속성들도 정의하세요.
+}
+
+interface ErrorResponse {
+  message: string;
+  // 필요한 다른 속성들도 정의하세요.
+}
 
 const Login = () => {
   const [emailInput, setEmailInput] = useState('');
@@ -29,15 +39,18 @@ const Login = () => {
       router.push('/');
       console.log(emailInput, passwordInput);
       const { data } = response;
-      const decoded = jwtDecode(data.access_token);
+      const decoded = jwtDecode<DecodedToken>(data.access_token);
       const accessExpirationDate = new Date(decoded.exp * 10000); // 10시간
 
       Cookies.set('ACCESS_KEY', data.access_token, {
         expires: accessExpirationDate,
       });
     } catch (error) {
-      console.log(emailInput, passwordInput);
-      setMessage(error.response?.data?.message || 'An error occurred');
+      const axiosError = error as AxiosError;
+      setMessage(
+        (axiosError.response?.data as ErrorResponse)?.message ||
+          'An error occurred',
+      );
     }
   };
 
