@@ -143,7 +143,15 @@ const Home = () => {
   };
 
   const fetchTodo = async () => {
-    const response = await axios.get('http://hoy.im/api/todos');
+    const response = await axios.get(
+      'https://hoy.im/api/workspace/1/tasks?date=2023-08-15',
+      {
+        headers: {
+          Authorization:
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY5MjA5OTA2OSwiZXhwIjoxNjk0NTE4MjY5fQ.-oITCr559cGLJDksN2UuDqkWAs4hbmW0qxKWKSDeKrE',
+        },
+      },
+    );
     console.log(response);
   };
 
