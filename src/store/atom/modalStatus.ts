@@ -17,7 +17,7 @@ const isCreateWorkspaceModalState = atom({
 
 const isDetailModalState = atom({
   key: 'isDetailModalState',
-  default: true,
+  default: false,
 });
 
 export {

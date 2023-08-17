@@ -1,92 +1,92 @@
-import axios, { AxiosError } from 'axios';
-import jwtDecode from 'jwt-decode';
+import React, { use, useEffect, useState } from 'react';
+import Image from 'next/image';
+import hoyImg from '../../../public/img/hoy.png';
+import { GoogleLogin } from '@react-oauth/google';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 
-interface DecodedToken {
-  exp: number;
-  // 필요한 다른 속성들도 정의하세요.
-}
-
-interface ErrorResponse {
-  message: string;
-  // 필요한 다른 속성들도 정의하세요.
-}
-
 const Login = () => {
-  const [emailInput, setEmailInput] = useState('');
-  const [passwordInput, setPasswordInput] = useState('');
-  const [message, setMessage] = useState('');
   const router = useRouter();
+  const [userInfo, setUserInfo] = useState({ givenName: '', imageUrl: '' });
 
-  /**
-   * 로그인 요청 보내는 함수
-   * @param e
-   */
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-
-    try {
-      const response = await axios.post(
-        `${process.env.BACKEND_SERVER}/auth/login`,
-        {
-          email: emailInput,
-          password: passwordInput,
-        },
-        { withCredentials: true },
-      );
-      router.push('/');
-      console.log(emailInput, passwordInput);
-      const { data } = response;
-      const decoded = jwtDecode<DecodedToken>(data.access_token);
-      const accessExpirationDate = new Date(decoded.exp * 10000); // 10시간
-
-      Cookies.set('ACCESS_KEY', data.access_token, {
-        expires: accessExpirationDate,
-      });
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      setMessage(
-        (axiosError.response?.data as ErrorResponse)?.message ||
-          'An error occurred',
-      );
-    }
+  const onSuccess = async (res: any) => {
+    console.log('Login success!');
   };
 
+  const onFailure = () => {
+    console.log('Login failed!');
+  };
+
+  // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
+  useEffect(() => {
+    if (Cookies.get('ACCESS_KEY')) {
+      router.push('/home');
+    }
+  }, []);
+
+  useEffect(() => {
+    // 쿼리 파라미터에서 access_token 가져오기
+    const accessToken = router.query.access_token;
+
+    if (typeof accessToken === 'string') {
+      console.log('Access Token:', accessToken);
+      Cookies.set('ACCESS_KEY', accessToken);
+      window.location.href = '/home';
+    }
+  }, [router.query.access_token]);
+
+  // const loginCheck = () => {
+  //   // const accessToken = Cookies.get('ACCESS_KEY');
+  //   const accessToken = cookies.get('ACCESS_KEY');
+
+  //   console.log(accessToken);
+  //   if (accessToken) {
+  //     router.push('/home');
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   loginCheck();
+  // }, []);
+
   return (
-    <div className="max-w-[1440px]">
-      <h1 className="w-full text-[1.6rem] flex justify-center">로그인</h1>
-      <form
-        className="flex flex-col justify-center items-center"
-        onSubmit={handleSubmit}
-      >
-        <div className="flex border boder-2 w-[18rem]">
-          <label htmlFor="email">이메일: </label>
-          <input
-            className="w-[12rem]"
-            type="email"
-            id="email"
-            value={emailInput}
-            onChange={e => setEmailInput(e.target.value)}
-            required
-          />
+    <div className="w-screen h-screen">
+      <div className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2">
+        <div className="">
+          <div className="text-gray-5 text-center leading-[1.6rem] mb-[0.5rem]">
+            <div>very simple, very clear</div>
+            <div>투명한 업무공유의 시작</div>
+          </div>
+          <div className="mb-[3.75rem] flex justify-center">
+            <Image src={hoyImg} alt="hoy" />
+          </div>
+          <div
+            className="flex items-center justify-center mb-[1rem]"
+            id="loginButton"
+          >
+            <GoogleLogin
+              onSuccess={onSuccess}
+              onError={onFailure}
+              ux_mode="redirect"
+              login_uri={`http://localhost:8000/api/auth/google/callback`}
+            />
+
+            {userInfo.imageUrl && (
+              <div>
+                <Image src={userInfo.imageUrl} alt="Profile" />
+                <p>{userInfo.givenName}</p>
+              </div>
+            )}
+          </div>
+          <div className="flex text-[0.75rem] text-gray-4">
+            <div>회원가입 시 hoy의</div>&nbsp;
+            <div className="font-bold">서비스 이용약간</div>
+            <div>과</div>&nbsp;
+            <div className="font-bold">개인정보 보호정책</div>
+            <div>에 동의하게 됩니다.</div>
+          </div>
         </div>
-        <div className="flex border boder-2 w-[18rem]">
-          <label htmlFor="password">비밀번호: </label>
-          <input
-            type="password"
-            id="password"
-            value={passwordInput}
-            onChange={e => setPasswordInput(e.target.value)}
-            required
-          />
-        </div>
-        {message && <p className="font-[#ff0000]">{message}</p>}
-        <button className="mt-2 border-2 px-[2rem]" type="submit">
-          로그인
-        </button>
-      </form>
+      </div>
     </div>
   );
 };

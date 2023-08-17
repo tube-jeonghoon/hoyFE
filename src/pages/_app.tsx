@@ -4,6 +4,10 @@ import SideBar from '@/components/layout/SideBar';
 import NavBar from '@/components/layout/NavBar';
 import { RecoilRoot } from 'recoil';
 import { useRouter } from 'next/router';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const clientId =
+  '207985048710-uut7o2bb4n3i63b0gtgsaubefimn2fsl.apps.googleusercontent.com';
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -15,33 +19,37 @@ export default function App({ Component, pageProps }: AppProps) {
     router.pathname === '/searchMember'
   ) {
     return (
-      <RecoilRoot>
-        <div className="font-pretendard">
-          <Component {...pageProps} />
-        </div>
-      </RecoilRoot>
+      <GoogleOAuthProvider clientId={clientId}>
+        <RecoilRoot>
+          <div className="font-pretendard">
+            <Component {...pageProps} />
+          </div>
+        </RecoilRoot>
+      </GoogleOAuthProvider>
     );
   }
 
   return (
-    <RecoilRoot>
-      <div className="bg-gray-1 h-screen">
-        <div
-          className={`flex font-pretendard max-w-[1440px] mx-auto bg-white h-screen `}
-        >
-          <div className="sidebar w-[16rem] border-r-[0.1rem] border-r-[#EAEEF3]">
-            <SideBar />
-          </div>
-          <div>
-            <div className="w-full">
-              <NavBar />
+    <GoogleOAuthProvider clientId={clientId}>
+      <RecoilRoot>
+        <div className="bg-gray-1">
+          <div
+            className={`flex font-pretendard max-w-[1440px] mx-auto bg-white`}
+          >
+            <div className="sidebar w-[16rem] border-r-[0.1rem] border-r-[#EAEEF3]">
+              <SideBar />
             </div>
-            <div className="mt-[10.5rem]">
-              <Component {...pageProps} />
+            <div>
+              <div className="w-full">
+                <NavBar />
+              </div>
+              <div className="mt-[10.5rem]">
+                <Component {...pageProps} />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </RecoilRoot>
+      </RecoilRoot>
+    </GoogleOAuthProvider>
   );
 }

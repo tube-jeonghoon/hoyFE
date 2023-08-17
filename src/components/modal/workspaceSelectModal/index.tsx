@@ -22,7 +22,7 @@ const WorkspaceSelectModal = () => {
   };
 
   return (
-    <div className="absolute top-[3rem] w-[18rem] z-[99]">
+    <div className="absolute top-[3rem] w-[18rem] z-[101]">
       <div className="w-full p-3 bg-white rounded-xl border">
         <div
           className="px-3 py-2 rounded-lg justify-between items-center gap-2.5 inline-flex

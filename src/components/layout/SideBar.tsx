@@ -25,6 +25,7 @@ const SideBar = () => {
     '권용재',
     '방민석',
     '하정민',
+    '방민석',
   ]);
 
   const [groupList, setGroupList] = useState([
@@ -41,7 +42,7 @@ const SideBar = () => {
   };
 
   return (
-    <div className="my-[2.5rem] mx-[1.5rem] flex flex-col gap-[2rem] items-stretch">
+    <div className="my-[2.5rem] mx-[1.5rem] flex flex-col gap-[2rem]">
       <div className="team-logo flex items-center relative">
         <div className="w-[2.5rem]">
           <Image src="/img/teamImage.png" alt="img" width="40" height="40" />
@@ -55,14 +56,14 @@ const SideBar = () => {
         </button>
         {workspaceVisible && <WorkspaceSelectModal />}
       </div>
-      <div className="sidebar-menu text-[0.875rem]">
+      <div className="sidebar-menu text-[0.875rem] ">
         <button className="flex items-center p-[0.75rem]">
           <div className="mr-[0.75rem]">
             <Image src="/img/user.png" alt="img" width="24" height="24" />
           </div>
           <div>전정훈 (나)</div>
         </button>
-        <button className="flex items-center p-[0.75rem]">
+        <button className="flex items-center p-[0.75rem] ">
           <div className="mr-[0.75rem]">
             <Image
               src="/img/notifications.png"
@@ -73,13 +74,13 @@ const SideBar = () => {
           </div>
           <div>업데이트</div>
         </button>
-        <button className="flex items-center p-[0.75rem]">
+        <button className="flex items-center p-[0.75rem] ">
           <div className="mr-[0.75rem]">
             <Image src="/img/search.png" alt="img" width="24" height="24" />
           </div>
           <div>멤버 찾기</div>
         </button>
-        <button className="flex items-center p-[0.75rem]">
+        <button className="flex items-center p-[0.75rem] ">
           <div className="mr-[0.75rem]">
             <Image src="/img/settings.png" alt="img" width="24" height="24" />
           </div>
@@ -100,7 +101,7 @@ const SideBar = () => {
           {userList.map((user, idx) => (
             <div
               key={idx}
-              className="flex items-center p-[0.75rem] cursor-pointer "
+              className="flex items-center p-[0.75rem] cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem]"
             >
               <div>
                 <Image src="/img/user.png" alt="img" width="24" height="24" />
@@ -120,7 +121,10 @@ const SideBar = () => {
         </div>
         <div className="max-h-[24rem] overflow-y-auto">
           {groupList.map((group, idx) => (
-            <div key={idx} className="text-[0.875rem] cursor-pointer">
+            <div
+              key={idx}
+              className="text-[0.875rem] cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem]"
+            >
               <div className="p-[0.75rem]">{group}</div>
             </div>
           ))}

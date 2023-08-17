@@ -37,6 +37,11 @@ module.exports = {
       fontFamily: {
         pretendard: ['Pretendard', 'sans-serif'],
       },
+      screens: {
+        tablet: '768px',
+        desktop: '1024px',
+        desktopL: '1320px',
+      },
     },
     plugins: [],
   },

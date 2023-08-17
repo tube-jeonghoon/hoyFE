@@ -1,80 +1,52 @@
 import React, { useState } from 'react';
-import GoogleLogin from 'react-google-login';
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
-// import styles from '../styles/LoginButton.css';
-
-// const clientId = process.env.GOOGLE_CLIENT_ID ?? '';
-const clientId =
-  '174462797558-14770qjh0l6u9nfflhnnpqnbso5hk8cd.apps.googleusercontent.com';
-const serverPath = 'https://hoy.im/api';
 
 function LoginButton() {
   const [userInfo, setUserInfo] = useState({ givenName: '', imageUrl: '' });
 
-  const onSuccess = async (res: any) => {
-    console.log(res.profileObj); // 로그인한 사용자 정보 조회
-    try {
-      const response = await axios.post(`${serverPath}/auth/login`, {
-        email: res.profileObj.email,
-        givenName: res.profileObj.givenName,
-        imageUrl: res.profileObj.imageUrl,
-      });
+  // const onSuccess = async (res: any) => {
+  //   console.log('Login success!');
+  // };
 
-      console.log('✨ ➤ onSuccess ➤ response:', response);
+  // const onFailure = () => {
+  //   console.log('Login failed!');
+  // };
 
-      if (response.data.success) {
-        alert('로그인 성공!'); // Display success alert
-        const token = response.data.token;
-        console.log(response);
-        console.log(token);
-
-        // Store the token in local storage
-        // localStorage.setItem('token', token);
-
-        // Session management
-        // const sessionResponse = await axios.get(`${serverPath}/api/users/me`, {
-        //   headers: { Authorization: `Bearer ${token}` },
-        // });
-        // console.log(
-        //   sessionResponse.data.user.name + '님 세션 서버 local에 저장완료!',
-        // );
-
-        // Set the user info
-        // setUserInfo({
-        //   givenName: res.profileObj.givenName,
-        //   imageUrl: res.profileObj.imageUrl,
-        // });
-      } else {
-        // alert('로그인에 실패했습니다.ㅠㅠ'); // Display failure alert
-        console.log(response.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const onFailure = (error: any) => {
-    console.log('Login failed!');
-    console.log(error);
-  };
+  const googleSocialLogin = useGoogleLogin({
+    scope: 'email profile',
+    onSuccess: async ({ code }) => {
+      axios
+        .post('http://localhost:8000/api/auth/google/callback', { code })
+        .then(({ data }) => {
+          console.log(data);
+        });
+    },
+    onError: errorResponse => {
+      console.error(errorResponse);
+    },
+    flow: 'auth-code',
+  });
 
   return (
     <div id="loginButton">
-      <GoogleLogin
-        clientId={clientId}
-        buttonText="구글 로그인"
+      {/* <GoogleLogin
         onSuccess={onSuccess}
-        onFailure={onFailure}
-        cookiePolicy={'single_host_origin'}
-        // className={styles.googleLoginButton}
-      />
+        onError={onFailure}
+        // useOneTap
+        ux_mode="redirect"
+        login_uri={`http://localhost:8000/api/auth/google/callback`}
+        shape="pill"
+      /> */}
 
-      {userInfo.imageUrl && (
+      <button onClick={googleSocialLogin}>Google Button</button>
+
+      {/* {userInfo.imageUrl && (
         <div>
           <img src={userInfo.imageUrl} alt="Profile" />
           <p>{userInfo.givenName}</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

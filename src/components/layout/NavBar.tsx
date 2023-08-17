@@ -20,7 +20,7 @@ const NavBar = () => {
   };
 
   return (
-    <div className="w-full fixed top-0">
+    <div className="w-full fixed top-0 z-[100] bg-white">
       <div className="p-[3.75rem] pb-[2.5rem]">
         <div className="text-gray-5">{userName} 님의 투두리스트</div>
         <div className="flex items-center text-[1.625rem] font-bold relative">

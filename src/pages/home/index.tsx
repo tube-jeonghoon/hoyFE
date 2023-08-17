@@ -14,156 +14,72 @@ import Image from 'next/image';
 import checkBoxIcon from '../../../public/img/checkBox.svg';
 import fillCheckBox from '../../../public/img/fillCheckBox.svg';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/router';
 
-type Task = {
+interface Task {
   id: number;
   title: string;
   userId: number;
   priority: number;
   done: boolean;
-  commentCount?: number;
-  createdDate: string;
-};
+  commentCount: number;
+  scheduleDate: string;
+}
 
-type TodoListType = {
-  [key: string]: {
-    dayOfWeek: string;
-    day: string;
-    dDay: boolean;
-    tasks: Task[];
-  };
+type Todo = {
+  date: string;
+  dayOfWeek: string;
+  day: string;
+  dDay: boolean;
+  tasks: Task[];
 };
 
 const Home = () => {
-  const [todoList, setTodoList] = useState<TodoListType>({
-    '2023-08-07': {
-      dayOfWeek: '월요일',
-      day: '8/7',
-      dDay: false,
-      tasks: [
-        {
-          id: 1,
-          title: '5시 전까지 주간회의록 정리',
-          userId: 1,
-          priority: 0,
-          done: true,
-          commentCount: 2,
-          createdDate: '2023-08-07',
-        },
-        {
-          id: 2,
-          title: '책상 정리',
-          userId: 1,
-          priority: 1,
-          done: true,
-          createdDate: '2023-08-07',
-        },
-        {
-          id: 3,
-          title: '간식 먹기',
-          userId: 2,
-          priority: 0,
-          done: true,
-          createdDate: '2023-08-07',
-        },
-      ],
-    },
-    '2023-08-08': {
-      dayOfWeek: '화요일',
-      day: '8/8',
-      dDay: true,
-      tasks: [
-        {
-          id: 1,
-          title: '월간 회의하기',
-          userId: 1,
-          priority: 0,
-          done: true,
-          commentCount: 2,
-          createdDate: '2023-08-07',
-        },
-        {
-          id: 2,
-          title: '로그인 레이아웃 완성하기',
-          userId: 1,
-          priority: 1,
-          done: false,
-          commentCount: 12,
-          createdDate: '2023-08-07',
-        },
-      ],
-    },
-    '2023-08-09': {
-      dayOfWeek: '수요일',
-      day: '8/9',
-      dDay: false,
-      tasks: [
-        {
-          id: 1,
-          title: '대청소 하기',
-          userId: 1,
-          priority: 1,
-          done: false,
-          createdDate: '2023-08-07',
-        },
-      ],
-    },
-  });
+  const router = useRouter();
+  const [todoList, setTodoList] = useState<Todo[]>([]);
 
   const [isDetailModal, setIstDetailModal] = useRecoilState(isDetailModalState);
   const [inputTitle, setInpuTitle] = useState('');
 
-  const addTask = (date: string, newTask: Omit<Task, 'id'>) => {
-    setTodoList(prev => {
-      const tasksForDate = prev[date]?.tasks || [];
-      const id = tasksForDate.length
-        ? tasksForDate[tasksForDate.length - 1].id + 1
-        : 1;
-      return {
-        ...prev,
-        [date]: {
-          ...prev[date],
-          tasks: [...tasksForDate, { ...newTask, id }],
-        },
-      };
-    });
-  };
-
-  // 할 일의 상태를 변경하는 함수
-  const toggleTask = (date: string, taskId: number) => {
-    setTodoList(prev => ({
-      ...prev,
-      [date]: {
-        ...prev[date],
-        tasks: prev[date].tasks.map(task =>
-          task.id === taskId ? { ...task, done: !task.done } : task,
-        ),
-      },
-    }));
-  };
-
   const fetchTodo = async () => {
-    const response = await axios.get(
-      'https://hoy.im/api/workspace/1/tasks?date=2023-08-15',
-      {
-        headers: {
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY5MjA5OTA2OSwiZXhwIjoxNjk0NTE4MjY5fQ.-oITCr559cGLJDksN2UuDqkWAs4hbmW0qxKWKSDeKrE',
+    try {
+      const response = await axios.get(
+        'https://hoy.im/api/workspace/1/tasks?date=',
+        {
+          headers: {
+            Authorization:
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY5MjA5OTA2OSwiZXhwIjoxNjk0NTE4MjY5fQ.-oITCr559cGLJDksN2UuDqkWAs4hbmW0qxKWKSDeKrE',
+          },
         },
-      },
-    );
-    console.log(response);
+      );
+      console.log(response.data);
+
+      setTodoList(response.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
     fetchTodo();
   }, []);
 
+  // 액세스 토큰을 가지고 있지 않다면 /login 으로 리다이렉팅
+  useEffect(() => {
+    if (!Cookies.get('ACCESS_KEY')) {
+      router.push('/login');
+    }
+  }, []);
+
   return (
     <div className="w-full">
       <div className="todos grid grid-cols-3 px-[5rem] py-[3.75rem]">
-        {Object.entries(todoList).map(([date, data]) => (
-          <div key={date} className="todo mr-[3.12rem] w-[19rem]">
+        {todoList.map(data => (
+          <div
+            key={data.date}
+            className="todo mr-[3.12rem] w-[14rem] desktopL:w-[19rem]"
+          >
             <div className="todo-date flex items-center justify-center mb-[1.125rem] py-[1.125rem]">
               {data.dDay ? (
                 <div className="text-primary-blue mr-[0.5rem] text-[1.125rem] font-bold">
@@ -180,19 +96,7 @@ const Home = () => {
               className="flex items-center mb-[1.12rem] h-[3rem] p-[0.62rem]
               border-b-[0.1rem]"
             >
-              <div
-                className="mr-[0.6rem] text-gray-3 cursor-pointer"
-                onClick={() => {
-                  addTask(date, {
-                    title: inputTitle, // 입력 필드의 값
-                    userId: 1, // 현재 로그인한 사용자의 ID
-                    priority: 0,
-                    done: false,
-                    createdDate: date, // 현재 날짜
-                  });
-                  setInpuTitle('');
-                }}
-              >
+              <div className="mr-[0.6rem] text-gray-3 cursor-pointer">
                 <AiOutlinePlus />
               </div>
               <input
@@ -200,19 +104,6 @@ const Home = () => {
                 className="outline-none text-[0.875rem] text-gray-4 border-gray-4
                 focus:text-black w-full"
                 placeholder="리스트를 작성해 주세요."
-                onChange={e => setInpuTitle(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    addTask(date, {
-                      title: inputTitle, // 입력 필드의 값
-                      userId: 1, // 현재 로그인한 사용자의 ID
-                      priority: 0,
-                      done: false,
-                      createdDate: date, // 현재 날짜
-                    });
-                    setInpuTitle('');
-                  }
-                }}
               />
             </div>
             <div>
@@ -220,10 +111,7 @@ const Home = () => {
                 <div key={task.id} className="todo-list">
                   {task.done ? (
                     <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-                      <div
-                        className="mr-[0.62rem] cursor-pointer text-primary-blue w-[1.5rem]"
-                        onClick={() => toggleTask(date, task.id)}
-                      >
+                      <div className="mr-[0.62rem] cursor-pointer text-primary-blue w-[1.5rem]">
                         <Image src={fillCheckBox} alt="체크박스" />
                       </div>
                       <div className="flex items-center mr-[0.62rem]">
@@ -231,13 +119,15 @@ const Home = () => {
                           <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
                         )}
                       </div>
-                      <div className="w-full text-[0.875rem] text-gray-4 mr-[0.62rem] line-through flex">
-                        {task.title}
-                        {task.commentCount && (
-                          <div className="ml-[0.62rem] text-gray-4">
-                            [{task.commentCount}]
-                          </div>
-                        )}
+                      <div className="w-full text-[0.875rem] text-gray-4 mr-[0.62rem] flex">
+                        <div className="line-through">{task.title}</div>
+                        <div>
+                          {task.commentCount !== 0 && (
+                            <div className="ml-[0.62rem] text-gray-4">
+                              [{task.commentCount}]
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       <div className="cursor-pointer">
@@ -246,10 +136,7 @@ const Home = () => {
                     </div>
                   ) : (
                     <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-                      <div
-                        className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]"
-                        onClick={() => toggleTask(date, task.id)}
-                      >
+                      <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
                         <Image src={checkBoxIcon} alt="체크박스" />
                       </div>
                       <div className="flex items-center mr-[0.62rem]">
@@ -259,7 +146,7 @@ const Home = () => {
                       </div>
                       <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
                         {task.title}
-                        {task.commentCount && (
+                        {task.commentCount !== 0 && (
                           <div className="ml-[0.62rem] text-gray-4">
                             [{task.commentCount}]
                           </div>
