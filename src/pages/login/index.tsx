@@ -20,7 +20,7 @@ const Login = () => {
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
     if (Cookies.get('ACCESS_KEY')) {
-      router.push('/home');
+      // router.push('/home');
     }
   }, []);
 
@@ -35,19 +35,19 @@ const Login = () => {
     }
   }, [router.query.access_token]);
 
-  // const loginCheck = () => {
-  //   // const accessToken = Cookies.get('ACCESS_KEY');
-  //   const accessToken = cookies.get('ACCESS_KEY');
+  const loginCheck = () => {
+    // const accessToken = Cookies.get('ACCESS_KEY');
+    const accessToken = Cookies.get('ACCESS_KEY');
 
-  //   console.log(accessToken);
-  //   if (accessToken) {
-  //     router.push('/home');
-  //   }
-  // };
+    console.log(accessToken);
+    if (accessToken) {
+      router.push('/home');
+    }
+  };
 
-  // useEffect(() => {
-  //   loginCheck();
-  // }, []);
+  useEffect(() => {
+    loginCheck();
+  }, []);
 
   return (
     <div className="w-screen h-screen">

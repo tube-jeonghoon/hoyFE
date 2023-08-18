@@ -56,14 +56,14 @@ const SideBar = () => {
         </button>
         {workspaceVisible && <WorkspaceSelectModal />}
       </div>
-      <div className="sidebar-menu text-[0.875rem] ">
-        <button className="flex items-center p-[0.75rem]">
+      <div className="sidebar-menu text-[0.875rem]">
+        <div className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer">
           <div className="mr-[0.75rem]">
             <Image src="/img/user.png" alt="img" width="24" height="24" />
           </div>
           <div>전정훈 (나)</div>
-        </button>
-        <button className="flex items-center p-[0.75rem] ">
+        </div>
+        <div className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer">
           <div className="mr-[0.75rem]">
             <Image
               src="/img/notifications.png"
@@ -73,19 +73,19 @@ const SideBar = () => {
             />
           </div>
           <div>업데이트</div>
-        </button>
-        <button className="flex items-center p-[0.75rem] ">
+        </div>
+        <div className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer">
           <div className="mr-[0.75rem]">
             <Image src="/img/search.png" alt="img" width="24" height="24" />
           </div>
           <div>멤버 찾기</div>
-        </button>
-        <button className="flex items-center p-[0.75rem] ">
+        </div>
+        <div className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer">
           <div className="mr-[0.75rem]">
             <Image src="/img/settings.png" alt="img" width="24" height="24" />
           </div>
           <div>설정</div>
-        </button>
+        </div>
       </div>
 
       <div className="border-[0.1rem] w-full">{''}</div>

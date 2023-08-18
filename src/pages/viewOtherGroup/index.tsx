@@ -10,6 +10,8 @@ const ViewOtherGroup = () => {
         <OtherTodo />
         <OtherTodo />
         <OtherTodo />
+        <OtherTodo />
+        <OtherTodo />
       </div>
     </div>
   );

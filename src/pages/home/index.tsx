@@ -1,55 +1,38 @@
 import MyCalendar from '@/components/MyCalendar';
 import DetailModal from '@/components/modal/detailModal';
 import { isDetailModalState } from '@/store/atom/modalStatus';
-import { todo } from 'node:test';
 import React, { useEffect, useState } from 'react';
-import { AiOutlinePlus } from 'react-icons/ai';
-import {
-  IoSquareOutline,
-  IoEllipsisVertical,
-  IoCheckbox,
-} from 'react-icons/io5';
-import { useRecoilState } from 'recoil';
-import Image from 'next/image';
-import checkBoxIcon from '../../../public/img/checkBox.svg';
-import fillCheckBox from '../../../public/img/fillCheckBox.svg';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
-
-interface Task {
-  id: number;
-  title: string;
-  userId: number;
-  priority: number;
-  done: boolean;
-  commentCount: number;
-  scheduleDate: string;
-}
-
-type Todo = {
-  date: string;
-  dayOfWeek: string;
-  day: string;
-  dDay: boolean;
-  tasks: Task[];
-};
+import {
+  formattedCurrentDateSelector,
+  formattedBeforeDateSelector,
+  formattedAfterDateSelector,
+} from '@/store/selector/currentTime';
+import { daysInWeek } from 'date-fns/fp';
 
 const Home = () => {
   const router = useRouter();
-  const [todoList, setTodoList] = useState<Todo[]>([]);
+  const [todoList, setTodoList] = useState([]);
 
   const [isDetailModal, setIstDetailModal] = useRecoilState(isDetailModalState);
   const [inputTitle, setInpuTitle] = useState('');
 
+  const beforeDate = useRecoilValue(formattedBeforeDateSelector);
+  const currentDate = useRecoilValue(formattedCurrentDateSelector);
+  const afterDate = useRecoilValue(formattedAfterDateSelector);
+
   const fetchTodo = async () => {
     try {
       const response = await axios.get(
-        'https://hoy.im/api/workspace/1/tasks?date=',
+        // `https://hoy.im/api/workspace/1/tasks?date=${currentDate.formatDate}`,
+        `http://localhost:8000/api/workspace/1/tasks?date=${currentDate.formatDate}`,
         {
           headers: {
             Authorization:
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY5MjA5OTA2OSwiZXhwIjoxNjk0NTE4MjY5fQ.-oITCr559cGLJDksN2UuDqkWAs4hbmW0qxKWKSDeKrE',
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImlhdCI6MTY5MjMyMDAxNSwiZXhwIjoxNjk0NzM5MjE1fQ.VcSUCgqva2CYRfKbcKK-2mMdUda0M4Qulbum6rONadk',
           },
         },
       );
@@ -61,9 +44,57 @@ const Home = () => {
     }
   };
 
+  // const newTodoList = [
+  //   {
+  //     date: '2021-08-01',
+  //     dayOfWeek: '일',
+  //     tasks: [],
+  //   },
+  // ];
+
+  // newTodoList.map(todo => {
+  //   todoList.tasks.filter(task => task.scheduleDate === todo.date);
+  // });
+
+  const [newTodoList, setNewTodoList] = useState([]);
+
+  const fetchDate = () => {
+    setNewTodoList([
+      {
+        date: beforeDate.formatDate,
+        dayOfWeek: beforeDate.dayOfWeek,
+        day: beforeDate.day,
+        tasks: [],
+      },
+      {
+        date: currentDate.formatDate,
+        dayOfWeek: currentDate.dayofWeek,
+        day: currentDate.day,
+        tasks: [],
+      },
+      {
+        date: afterDate.formatDate,
+        dayOfWeek: afterDate.dayOfWeek,
+        day: afterDate.day,
+        tasks: [],
+      },
+    ]);
+  };
+
   useEffect(() => {
     fetchTodo();
+    fetchDate();
+    console.log(newTodoList);
   }, []);
+
+  useEffect(() => {
+    const updatedTodoList = newTodoList.map(day => {
+      // todoList.tasks.filter(task => task.scheduleDate === day.date);
+    });
+    console.log('hi', todoList);
+    console.log(newTodoList);
+    // setNewTodoList(updatedTodoList);
+  }, [todoList, newTodoList]);
 
   // 액세스 토큰을 가지고 있지 않다면 /login 으로 리다이렉팅
   useEffect(() => {
@@ -75,7 +106,14 @@ const Home = () => {
   return (
     <div className="w-full">
       <div className="todos grid grid-cols-3 px-[5rem] py-[3.75rem]">
-        {todoList.map(data => (
+        <div className="before-date">
+          {todoList.map(data => (
+            <div>{data.title}</div>
+          ))}
+        </div>
+        <div className="current-date"></div>
+        <div className="after-date"></div>
+        {/* {todoList.map(data => (
           <div
             key={data.date}
             className="todo mr-[3.12rem] w-[14rem] desktopL:w-[19rem]"
@@ -161,7 +199,7 @@ const Home = () => {
               ))}
             </div>
           </div>
-        ))}
+        ))} */}
       </div>
       {isDetailModal && <DetailModal />}
     </div>
