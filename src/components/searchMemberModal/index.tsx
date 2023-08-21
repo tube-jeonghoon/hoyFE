@@ -4,13 +4,26 @@ import { RxCross2 } from 'react-icons/rx';
 import Image from 'next/image';
 import defaultUser from '../../../public/img/defaultUser.png';
 import star from '../../../public/img/star.svg';
+import { useRecoilState } from 'recoil';
+import { isSearchMemberModalState } from '@/store/atom/modalStatus';
 
-const SearchMember = () => {
+const SearchMemberModal = () => {
+  const [searchMemeberVisible, setSearchMemeberVisible] = useRecoilState(
+    isSearchMemberModalState,
+  );
+
+  const handleOverlayClick = (e: any) => {
+    if (e.target === e.currentTarget) {
+      setSearchMemeberVisible(false);
+    }
+  };
+
   return (
     <div>
       <div
-        className="absolute z-[99] top-0 left-0 w-[100vw] h-[100vh]
+        className="absolute z-[101] top-0 left-0 w-[100vw] h-[100vh]
         bg-black bg-opacity-10"
+        onClick={handleOverlayClick}
       >
         <div
           className="bg-white top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2
@@ -79,4 +92,4 @@ const SearchMember = () => {
   );
 };
 
-export default SearchMember;
+export default SearchMemberModal;

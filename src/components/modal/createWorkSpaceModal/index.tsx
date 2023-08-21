@@ -16,7 +16,7 @@ const CreateWorkSpaceModal = () => {
 
   return (
     <div
-      className={`modalContainer fixed inset-0 flex items-center justify-center z-[100] ${
+      className={`modalContainer fixed inset-0 flex items-center justify-center z-[101] ${
         createWorkspaceVisible ? 'visible' : 'hidden'
       }`}
     >

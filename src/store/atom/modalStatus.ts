@@ -20,9 +20,15 @@ const isDetailModalState = atom({
   default: false,
 });
 
+const isSearchMemberModalState = atom({
+  key: 'isSearchMemberModalState',
+  default: false,
+});
+
 export {
   isCalendarModalState,
   isWorkspaceModalState,
   isCreateWorkspaceModalState,
   isDetailModalState,
+  isSearchMemberModalState,
 };

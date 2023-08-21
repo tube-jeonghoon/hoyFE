@@ -16,7 +16,8 @@ export default function App({ Component, pageProps }: AppProps) {
     router.pathname === '/login' ||
     router.pathname === '/googleLogin' ||
     router.pathname === '/firstGroup' ||
-    router.pathname === '/searchMember'
+    router.pathname === '/searchMember' ||
+    router.pathname === '/settings'
   ) {
     return (
       <GoogleOAuthProvider clientId={clientId}>
@@ -36,7 +37,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <div
             className={`flex font-pretendard max-w-[1440px] mx-auto bg-white`}
           >
-            <div className="sidebar w-[16rem] border-r-[0.1rem] border-r-[#EAEEF3]">
+            <div className="sidebar w-[16rem] border-r-[0.1rem] border-r-[#EAEEF3] h-screen">
               <SideBar />
             </div>
             <div>

@@ -9,7 +9,7 @@ const formattedCurrentDateSelector = selector({
   get: ({ get }) => {
     const currentDate = get(currentDateState);
     const formatDate = format(currentDate, 'yyyy-MM-dd');
-    const dayofWeek = format(currentDate, 'EEE', {
+    const dayofWeek = format(currentDate, 'EEEE', {
       locale: ko,
     });
     const day = format(currentDate, 'M/d');
@@ -25,7 +25,7 @@ const formattedBeforeDateSelector = selector({
     const currentDate = get(currentDateState);
     const prevDate = subDays(currentDate, 1);
     const formatDate = format(prevDate, 'yyyy-MM-dd');
-    const dayOfWeek = format(prevDate, 'EEE', { locale: ko });
+    const dayOfWeek = format(prevDate, 'EEEE', { locale: ko });
     const day = format(prevDate, 'M/d');
     return { formatDate, dayOfWeek, day };
   },
@@ -38,7 +38,7 @@ const formattedAfterDateSelector = selector({
     const currentDate = get(currentDateState);
     const nextDate = addDays(currentDate, 1);
     const formatDate = format(nextDate, 'yyyy-MM-dd');
-    const dayOfWeek = format(nextDate, 'EEE', { locale: ko });
+    const dayOfWeek = format(nextDate, 'EEEE', { locale: ko });
     const day = format(nextDate, 'M/d');
     return { formatDate, dayOfWeek, day };
   },
