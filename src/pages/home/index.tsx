@@ -146,12 +146,12 @@ const Home = () => {
   }, [todoList]);
 
   // 액세스 토큰을 가지고 있지 않다면 /login 으로 리다이렉팅
-  useEffect(() => {
-    setIsLogin(Cookies.get('ACCESS_KEY') ? true : false);
-    if (!Cookies.get('ACCESS_KEY')) {
-      router.push('/login');
-    }
-  }, [isLogin]);
+  // useEffect(() => {
+  //   setIsLogin(Cookies.get('ACCESS_KEY') ? true : false);
+  //   if (!Cookies.get('ACCESS_KEY')) {
+  //     router.push('/login');
+  //   }
+  // }, [isLogin]);
 
   return (
     <div className="w-full">
