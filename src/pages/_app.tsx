@@ -37,11 +37,11 @@ export default function App({ Component, pageProps }: AppProps) {
           <div
             className={`flex font-pretendard max-w-[1440px] mx-auto bg-white`}
           >
-            <div className="sidebar w-[16rem] border-r-[0.1rem] border-r-[#EAEEF3] h-screen">
+            <div className="sidebar w-[16rem] border-r-[0.1rem] border-r-gray-[#EAEEF3] h-screen">
               <SideBar />
             </div>
-            <div>
-              <div className="w-full">
+            <div className="nav-bar">
+              <div className="w-[73.25rem]">
                 <NavBar />
               </div>
               <div className="mt-[10.5rem]">

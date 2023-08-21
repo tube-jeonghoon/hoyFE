@@ -27,7 +27,7 @@ const SearchMemberModal = () => {
       >
         <div
           className="bg-white top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2
-            absolute w-[23.875rem] rounded-[0.75rem]"
+              absolute w-[23.875rem] rounded-[0.75rem]"
         >
           <div className="contes-area">
             <div className="p-[2rem] flex flex-col gap-[1.5rem]">

@@ -101,7 +101,7 @@ const SideBar = () => {
         </div>
       </div>
 
-      <div className="border-[0.1rem] w-full">{''}</div>
+      <div className="border-b-[1px] w-full">{''}</div>
 
       <div className="favorite-person-Area">
         <div className="flex items-center justify-between h-[2.5rem] px-[0.75rem] ">
@@ -124,7 +124,7 @@ const SideBar = () => {
           ))}
         </div>
       </div>
-      <div className="border-[0.1rem] w-full">{''}</div>
+      <div className="border-b-[1px] w-full">{''}</div>
       <div>
         <div className="flex items-center justify-between px-[0.75rem] mb-[0.6rem]">
           <div className="font-bold">그룹 보기</div>
@@ -132,7 +132,7 @@ const SideBar = () => {
             <AiOutlinePlus />
           </div>
         </div>
-        <div className="max-h-[24rem] overflow-y-auto">
+        <div className="max-h-[24rem] h-[15rem] overflow-y-auto">
           {groupList.map((group, idx) => (
             <div
               key={idx}

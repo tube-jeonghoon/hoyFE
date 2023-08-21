@@ -20,8 +20,8 @@ const NavBar = () => {
   };
 
   return (
-    <div className="w-full fixed top-0 z-[100] bg-white">
-      <div className="p-[3.75rem] pb-[2.5rem]">
+    <div className="w-[73.25rem] fixed top-0 z-[100] bg-white">
+      <div className="p-[3.75rem] pb-[2.5rem] w-full">
         <div className="text-gray-5">{userName} 님의 투두리스트</div>
         <div className="flex items-center text-[1.625rem] font-bold relative">
           <div>2023년 8월</div>
@@ -35,7 +35,7 @@ const NavBar = () => {
           )}
         </div>
       </div>
-      <div className="border-[0.015rem] border-[#F7F8FA]">{''}</div>
+      <div className="border-b-[1px] border-b-gray-[#EAEEF3]">{''}</div>
     </div>
   );
 };
