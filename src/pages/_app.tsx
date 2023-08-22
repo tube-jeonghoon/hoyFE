@@ -1,7 +1,7 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import SideBar from '@/components/layout/SideBar';
-import NavBar from '@/components/layout/NavBar';
+import Header from '@/components/layout/Header';
 import { RecoilRoot } from 'recoil';
 import { useRouter } from 'next/router';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -17,7 +17,6 @@ export default function App({ Component, pageProps }: AppProps) {
 
   if (
     router.pathname === '/login' ||
-    router.pathname === '/googleLogin' ||
     router.pathname === '/firstGroup' ||
     router.pathname === '/searchMember' ||
     router.pathname === '/settings'
@@ -47,8 +46,8 @@ export default function App({ Component, pageProps }: AppProps) {
                 <SideBar />
               </div>
               <div className="nav-bar">
-                <div className="desktop:w-[50rem] desktopL:w-[73.25rem]">
-                  <NavBar />
+                <div className="desktop:w-[50rem] desktopL:w-[72.5rem]">
+                  <Header />
                 </div>
                 <div className="mt-[10.5rem]">
                   <Component {...pageProps} />

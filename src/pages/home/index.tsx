@@ -333,8 +333,8 @@ const Home = () => {
   // }, [isLogin]);
 
   return (
-    <div className="w-full">
-      <div className="todos grid grid-cols-3 px-[5rem] py-[3.75rem]">
+    <div className="px-[5rem] py-[3.75rem] overflow-y-auto h-[48rem]">
+      <div className="todos grid grid-cols-3 ">
         {newTodoList.map(todo => (
           <div
             className="todo mr-[3.12rem] desktop:w-[11.5rem] desktopL:w-[19rem]"

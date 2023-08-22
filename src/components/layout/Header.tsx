@@ -9,7 +9,7 @@ const DynamicMyCalendar = dynamic(() => import('@/components/MyCalendar'), {
   ssr: false,
 });
 
-const NavBar = () => {
+const Header = () => {
   const [userName, setUserName] = useState('전정훈');
   const [calendarVisible, setCalendarVisible] =
     useRecoilState(isCalendarModalState);
@@ -35,9 +35,9 @@ const NavBar = () => {
           )}
         </div>
       </div>
-      <div className="border-b-[1px] border-b-gray-[#EAEEF3]">{''}</div>
+      <div className="w-full border-b-[1px] border-b-gray-[#EAEEF3]">{''}</div>
     </div>
   );
 };
 
-export default NavBar;
+export default Header;
