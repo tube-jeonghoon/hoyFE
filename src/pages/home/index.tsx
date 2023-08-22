@@ -17,7 +17,7 @@ import { IoEllipsisVertical } from 'react-icons/io5';
 import checkBoxIcon from '../../../public/img/checkBox.svg';
 import fillCheckBox from '../../../public/img/fillCheckBox.svg';
 import loginState from '@/store/atom/loginState';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 interface Todo {
   id: number;
@@ -55,6 +55,7 @@ interface currentDate {
 
 const Home = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [newTodoList, setNewTodoList] = useState<NewTodoItem[]>([]);
   const [isLogin, setIsLogin] = useRecoilState(loginState);
@@ -70,9 +71,7 @@ const Home = () => {
   const fetchTodo = async () => {
     try {
       const response = await axios.get(
-        // `https://hoy.im/api/workspace/1/tasks?date=2023-08-19`,
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks?date=${currentDate.formatDate}`,
-        // `http://localhost:8000/api/workspace/1/tasks?date=${currentDate.formatDate}`,
         {
           headers: {
             Authorization:
@@ -80,6 +79,8 @@ const Home = () => {
           },
         },
       );
+
+      console.log(response.data);
 
       const sortedData = response.data.sort((a: Todo, b: Todo) => {
         // status를 확인하여 true가 false보다 먼저 오도록 정렬
@@ -164,10 +165,6 @@ const Home = () => {
     ]);
   };
 
-  /**
-   * 할일 추가
-   * @param taskItem
-   */
   const addTask = async (taskItem: NewTask) => {
     try {
       const res = await axios.post(
@@ -183,14 +180,124 @@ const Home = () => {
           },
         },
       );
-      console.log(`item 추가 완료`);
       console.log(res);
-      setInputTitles(prevTitles => ({
+      return (prevTitles: any) => ({
         ...prevTitles,
         [taskItem.date]: '',
-      }));
+      });
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const addMutation = useMutation(addTask, {
+    onError: error => {
+      console.log(error);
+    },
+    onSuccess: (data, variables) => {
+      setNewTodoList(prev => {
+        const targetDate = variables.date;
+
+        // 새로운 할 일 추가
+        const updatedList = prev.map(item => {
+          if (item.date === targetDate) {
+            return {
+              ...item,
+              tasks: [
+                ...item.tasks,
+                {
+                  id: data.id,
+                  title:
+                    variables.title[
+                      variables.date as keyof typeof variables.title
+                    ],
+                  scheduleDate: targetDate,
+                  status: false, // 기본값
+                  // 다른 필드도 추가할 수 있습니다.
+                },
+              ],
+            };
+          }
+          return item;
+        });
+
+        // 해당 할 일의 날짜에 따라 정렬
+        const sortedList = updatedList.map(item => {
+          if (item.date === targetDate) {
+            const sortedTasks = item.tasks.sort((a: Todo, b: Todo) => {
+              // status를 확인하여 true가 false보다 먼저 오도록 정렬
+              if (a.status !== b.status) {
+                return a.status ? 1 : -1;
+              }
+
+              // priority를 확인하여 1인 경우가 다른 경우보다 먼저 오도록 정렬
+              if (a.priority !== b.priority) {
+                return a.priority === 1 ? -1 : b.priority === 1 ? 1 : 0;
+              }
+
+              return (
+                // createdAt 기준으로 정렬
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+              );
+            });
+            return {
+              ...item,
+              tasks: sortedTasks,
+            };
+          }
+          return item;
+        });
+
+        console.log('✨ ➤ Home ➤ sortedList:', sortedList);
+        return sortedList;
+      });
+
+      // 입력 필드 초기화
+      setInputTitles(prevTitles => ({
+        ...prevTitles,
+        [variables.date as keyof typeof prevTitles]: '',
+      }));
+      console.log(`useMutation 진입`, data);
+    },
+  });
+
+  const toggleTaskCompletion = async (taskId: number) => {
+    try {
+      // 본문을 담지 않는 PUT 요청
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks/${taskId}/status`,
+        {},
+        {
+          headers: {
+            Authorization:
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY5MjI2MDEyNSwiZXhwIjoxNjk0Njc5MzI1fQ.O1tvy5xyIWYCXCZd8k873eN2Nu4TaWze9zQm8OVkZ7Q',
+          },
+        },
+      );
+
+      // 상태 업데이트
+      setNewTodoList(prev => {
+        return prev.map(item => {
+          return {
+            ...item,
+            tasks: item.tasks.map(task => {
+              if (task.id === taskId) {
+                return {
+                  ...task,
+                  status: !task.status, // 상태를 토글합니다.
+                };
+              }
+              return task;
+            }),
+          };
+        });
+      });
+      // console.log(res);
+      return res;
+    } catch (error) {
+      console.log(taskId);
+      console.error('완료 표시에서 에러 발생', error);
     }
   };
 
@@ -241,12 +348,16 @@ const Home = () => {
             >
               <div
                 className="mr-[0.6rem] text-gray-3 cursor-pointer"
-                onClick={() =>
-                  addTask({
-                    title: inputTitles,
-                    date: todo.date,
-                  })
-                }
+                onClick={() => {
+                  const title = inputTitles[todo.date];
+                  console.log(title);
+                  console.log(todo.date);
+                  if (title) {
+                    const newTask = { title: inputTitles, date: todo.date };
+                    console.log(newTask);
+                    addMutation.mutate(newTask);
+                  }
+                }}
               >
                 <AiOutlinePlus />
               </div>
@@ -268,7 +379,10 @@ const Home = () => {
               <div key={task.id} className="todo-list">
                 {task.status ? (
                   <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-                    <div className="mr-[0.62rem] cursor-pointer text-primary-blue w-[1.5rem]">
+                    <div
+                      className="mr-[0.62rem] cursor-pointer text-primary-blue w-[1.5rem]"
+                      onClick={() => toggleTaskCompletion(task.id)}
+                    >
                       <Image src={fillCheckBox} alt="체크박스" />
                     </div>
                     <div className="flex items-center mr-[0.62rem]">
@@ -293,7 +407,10 @@ const Home = () => {
                   </div>
                 ) : (
                   <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-                    <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
+                    <div
+                      className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]"
+                      onClick={() => toggleTaskCompletion(task.id)}
+                    >
                       <Image src={checkBoxIcon} alt="체크박스" />
                     </div>
                     <div className="flex items-center mr-[0.62rem]">
@@ -303,11 +420,12 @@ const Home = () => {
                     </div>
                     <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
                       {task.title}
-                      {task.commentCount !== 0 && (
-                        <div className="ml-[0.62rem] text-gray-4">
-                          [{task.commentCount}]
-                        </div>
-                      )}
+                      {task.commentCount !== 0 ||
+                        (undefined && (
+                          <div className="ml-[0.62rem] text-gray-4">
+                            [{task.commentCount}]
+                          </div>
+                        ))}
                     </div>
                     <div className="cursor-pointer">
                       <IoEllipsisVertical />
