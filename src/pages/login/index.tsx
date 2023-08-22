@@ -13,7 +13,10 @@ const Login = () => {
   const fetchUniqueToken = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const uniqueToken = urlParams.get('uniqueToken');
-    console.log(uniqueToken);
+    if (uniqueToken != null) {
+      localStorage.setItem('uniqueToken', uniqueToken);
+      console.log(uniqueToken);
+    }
   };
 
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
