@@ -8,14 +8,7 @@ import Cookies from 'js-cookie';
 const Login = () => {
   const router = useRouter();
   const [userInfo, setUserInfo] = useState({ givenName: '', imageUrl: '' });
-
-  const onSuccess = async (res: any) => {
-    console.log('Login success!');
-  };
-
-  const onFailure = () => {
-    console.log('Login failed!');
-  };
+  const [loginResponse, setLoginResponse] = useState(null);
 
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
@@ -25,13 +18,18 @@ const Login = () => {
   }, []);
 
   useEffect(() => {
+    const uniqueToken = router.query.uniqueToken;
+    console.log(uniqueToken);
+  }, []);
+
+  useEffect(() => {
     // 쿼리 파라미터에서 access_token 가져오기
     const accessToken = router.query.access_token;
 
     if (typeof accessToken === 'string') {
       console.log('Access Token:', accessToken);
       Cookies.set('ACCESS_KEY', accessToken);
-      window.location.href = '/home';
+      // window.location.href = '/home';
     }
   }, [router.query.access_token]);
 
@@ -46,7 +44,7 @@ const Login = () => {
   };
 
   useEffect(() => {
-    loginCheck();
+    // loginCheck();
   }, []);
 
   return (
@@ -65,10 +63,14 @@ const Login = () => {
             id="loginButton"
           >
             <GoogleLogin
-              onSuccess={onSuccess}
-              onError={onFailure}
+              onSuccess={credentialResponse => {
+                console.log(credentialResponse);
+              }}
+              onError={() => {
+                console.log('Login Failed');
+              }}
               ux_mode="redirect"
-              login_uri={`http://localhost:8000/api/auth/google/callback`}
+              login_uri={`https://hoy.im/api/auth/google/callback`}
             />
 
             {userInfo.imageUrl && (
