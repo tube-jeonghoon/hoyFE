@@ -10,11 +10,21 @@ const Login = () => {
   const [userInfo, setUserInfo] = useState({ givenName: '', imageUrl: '' });
   const [loginResponse, setLoginResponse] = useState(null);
 
+  const fetchUniqueToken = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uniqueToken = urlParams.get('uniqueToken');
+    console.log(uniqueToken);
+  };
+
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
     if (Cookies.get('ACCESS_KEY')) {
       // router.push('/home');
     }
+  }, []);
+
+  useEffect(() => {
+    fetchUniqueToken();
   }, []);
 
   useEffect(() => {
