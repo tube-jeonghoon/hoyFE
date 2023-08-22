@@ -80,7 +80,7 @@ const Home = () => {
         },
       );
 
-      console.log(response.data);
+      // console.log(response.data);
 
       const sortedData = response.data.sort((a: Todo, b: Todo) => {
         // status를 확인하여 true가 false보다 먼저 오도록 정렬
@@ -100,7 +100,7 @@ const Home = () => {
       });
 
       setTodoList(sortedData);
-      console.log('✨ ➤ fetchTodo ➤ sortedData:', sortedData);
+      // console.log('✨ ➤ fetchTodo ➤ sortedData:', sortedData);
 
       setNewTodoList(prev => {
         // console.log('✨ ➤ Home ➤ prev:', prev);
@@ -128,7 +128,7 @@ const Home = () => {
             ...todo,
             tasks:
               response.data.tasks?.filter(
-                (task: any) => task.scheduleDate === todo.date,
+                (task: Todo) => task.scheduleDate === todo.date,
               ) || [],
           };
         });
@@ -180,11 +180,8 @@ const Home = () => {
           },
         },
       );
-      console.log(res);
-      return (prevTitles: any) => ({
-        ...prevTitles,
-        [taskItem.date]: '',
-      });
+
+      return res.data;
     } catch (error) {
       console.error(error);
     }
@@ -195,6 +192,8 @@ const Home = () => {
       console.log(error);
     },
     onSuccess: (data, variables) => {
+      if (!data) return;
+
       setNewTodoList(prev => {
         const targetDate = variables.date;
 
@@ -213,7 +212,12 @@ const Home = () => {
                     ],
                   scheduleDate: targetDate,
                   status: false, // 기본값
-                  // 다른 필드도 추가할 수 있습니다.
+                  priority: 0, // 기본값 설정, 필요한 값으로 변경
+                  updatedAt: '', // 기본값 설정, 필요한 값으로 변경
+                  createdAt: '', // 기본값 설정, 필요한 값으로 변경
+                  commentCount: 0, // 기본값 설정
+                  dueDate: '', // 기본값 설정, 필요한 값으로 변경
+                  deletedAt: '', // 기본값 설정, 필요한 값으로 변경
                 },
               ],
             };
@@ -304,7 +308,7 @@ const Home = () => {
   useEffect(() => {
     fetchDate();
     fetchTodo();
-  }, []);
+  }, [currentDate]);
 
   useEffect(() => {
     const updatedTodoList = newTodoList.map(day => {
