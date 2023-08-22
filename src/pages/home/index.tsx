@@ -17,8 +17,9 @@ import { IoEllipsisVertical } from 'react-icons/io5';
 import checkBoxIcon from '../../../public/img/checkBox.svg';
 import fillCheckBox from '../../../public/img/fillCheckBox.svg';
 import loginState from '@/store/atom/loginState';
+import { useQuery } from 'react-query';
 
-type Todo = {
+interface Todo {
   id: number;
   title: string;
   scheduleDate: string;
@@ -29,21 +30,27 @@ type Todo = {
   commentCount: number;
   dueDate: string;
   deletedAt: string;
-};
+}
 
-type NewTodoItem = {
+interface NewTodoItem {
   date: string;
   dayOfWeek: string;
   day: string;
   tasks: Todo[]; // 이미 이전에 Todo 타입을 정의해두었습니다.
-};
+}
 
 interface NewTask {
   workspaceId?: number;
-  title: string;
+  title: Record<string, string>;
   date: string;
   priority?: number;
   status?: boolean;
+}
+
+interface currentDate {
+  dayofWeek: string;
+  day: string;
+  formatDate: string;
 }
 
 const Home = () => {
@@ -51,13 +58,10 @@ const Home = () => {
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [newTodoList, setNewTodoList] = useState<NewTodoItem[]>([]);
   const [isLogin, setIsLogin] = useRecoilState(loginState);
-  const [addNewTask, setaddNewTask] = useState<NewTask>({
-    title: '',
-    date: '',
-  });
+  const [addNewTask, setaddNewTask] = useState<NewTask>();
 
   const [isDetailModal, setIstDetailModal] = useRecoilState(isDetailModalState);
-  const [inputTitle, setInpuTitle] = useState('');
+  const [inputTitles, setInputTitles] = useState<Record<string, string>>({});
 
   const beforeDate = useRecoilValue(formattedBeforeDateSelector);
   const currentDate = useRecoilValue(formattedCurrentDateSelector);
@@ -77,9 +81,28 @@ const Home = () => {
         },
       );
 
-      setTodoList(response.data);
+      const sortedData = response.data.sort((a: Todo, b: Todo) => {
+        // status를 확인하여 true가 false보다 먼저 오도록 정렬
+        if (a.status !== b.status) {
+          return a.status ? 1 : -1;
+        }
+
+        // priority를 확인하여 1인 경우가 다른 경우보다 먼저 오도록 정렬
+        if (a.priority !== b.priority) {
+          return a.priority === 1 ? -1 : b.priority === 1 ? 1 : 0;
+        }
+
+        return (
+          // createdAt 기준으로 정렬
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      });
+
+      setTodoList(sortedData);
+      console.log('✨ ➤ fetchTodo ➤ sortedData:', sortedData);
+
       setNewTodoList(prev => {
-        console.log('✨ ➤ Home ➤ prev:', prev);
+        // console.log('✨ ➤ Home ➤ prev:', prev);
         return [
           {
             date: beforeDate.formatDate,
@@ -110,6 +133,9 @@ const Home = () => {
         });
       });
       console.log(newTodoList);
+      console.log(`data fetch 완료`);
+
+      return response.data;
     } catch (error) {
       console.error(error);
     }
@@ -138,14 +164,17 @@ const Home = () => {
     ]);
   };
 
-  const addTask = async () => {
+  /**
+   * 할일 추가
+   * @param taskItem
+   */
+  const addTask = async (taskItem: NewTask) => {
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks`,
         {
-          title: '할일 목록추가하기',
-          date: '2023-08-20',
-          priority: 1,
+          title: taskItem.title[taskItem.date as keyof typeof taskItem.title],
+          date: taskItem.date,
         },
         {
           headers: {
@@ -154,6 +183,12 @@ const Home = () => {
           },
         },
       );
+      console.log(`item 추가 완료`);
+      console.log(res);
+      setInputTitles(prevTitles => ({
+        ...prevTitles,
+        [taskItem.date]: '',
+      }));
     } catch (error) {
       console.error(error);
     }
@@ -174,7 +209,7 @@ const Home = () => {
         tasks: filteredTasks,
       };
     });
-    console.log(updatedTodoList);
+    // console.log(updatedTodoList);
     setNewTodoList(updatedTodoList);
   }, [todoList]);
 
@@ -191,7 +226,7 @@ const Home = () => {
       <div className="todos grid grid-cols-3 px-[5rem] py-[3.75rem]">
         {newTodoList.map(todo => (
           <div
-            className="todo mr-[3.12rem] w-[14rem] desktopL:w-[19rem]"
+            className="todo mr-[3.12rem] desktop:w-[11.5rem] desktopL:w-[19rem]"
             key={todo.date}
           >
             <div className="todo-date flex items-center justify-center mb-[1.125rem] py-[1.125rem]">
@@ -206,7 +241,12 @@ const Home = () => {
             >
               <div
                 className="mr-[0.6rem] text-gray-3 cursor-pointer"
-                onClick={() => addTask()}
+                onClick={() =>
+                  addTask({
+                    title: inputTitles,
+                    date: todo.date,
+                  })
+                }
               >
                 <AiOutlinePlus />
               </div>
@@ -215,6 +255,13 @@ const Home = () => {
                 className="outline-none text-[0.875rem] text-gray-4 border-gray-4
                 focus:text-black w-full"
                 placeholder="리스트를 작성해 주세요."
+                onChange={e => {
+                  setInputTitles({
+                    ...inputTitles,
+                    [todo.date]: e.target.value,
+                  });
+                }}
+                value={inputTitles[todo.date] || ''}
               />
             </div>
             {todo.tasks.map(task => (

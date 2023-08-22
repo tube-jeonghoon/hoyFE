@@ -54,14 +54,16 @@ const SideBar = () => {
   return (
     <div className="my-[2.5rem] mx-[1.5rem] flex flex-col gap-[2rem]">
       <div className="team-logo flex items-center relative">
-        <div className="w-[2.5rem]">
+        <div className="desktop:w-[1.5rem] desktopL:w-[2.5rem]">
           <Image src="/img/teamImage.png" alt="img" width="40" height="40" />
         </div>
         <button
           onClick={toggleWorkspace}
           className="ml-[0.3rem] flex items-center"
         >
-          <div className="mx-[0.62rem] font-bold">TEAMSPARTA</div>
+          <div className="mx-[0.62rem] desktop:text-[0.8rem] desktopL:text-[1rem] font-bold">
+            TEAMSPARTA
+          </div>
           <VscChevronDown />
         </button>
         {workspaceVisible && <WorkspaceSelectModal />}
