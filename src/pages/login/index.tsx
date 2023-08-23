@@ -57,20 +57,6 @@ const Login = () => {
     }
   };
 
-  const createStateToken = () => {
-    const uniqueToken = crypto.getRandomValues(new Uint32Array(10)).join('');
-    console.log(uniqueToken);
-    // localStorage.setItem('uniqueToken', uniqueToken);
-    return uniqueToken;
-  };
-
-  const createLoginUri = () => {
-    const uniqueToken = createStateToken();
-    console.log(uniqueToken);
-    console.log(`https://hoy.im/api/auth/google/callback?state=${uniqueToken}`);
-    return `https://hoy.im/api/auth/google/callback?state=${uniqueToken}`;
-  };
-
   useEffect(() => {
     // loginCheck();
   }, []);
@@ -98,7 +84,7 @@ const Login = () => {
                 console.log('Login Failed');
               }}
               ux_mode="redirect"
-              login_uri={createLoginUri()}
+              login_uri={`https://hoy.im/api/auth/google/callback`}
             />
 
             {userInfo.imageUrl && (

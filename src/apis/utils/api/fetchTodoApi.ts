@@ -10,8 +10,7 @@ export const fetchTodoApi = async ({ currentDate }: FetchTodoApiParams) => {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks?date=${currentDate}`,
       {
         headers: {
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY5MjI2MDEyNSwiZXhwIjoxNjk0Njc5MzI1fQ.O1tvy5xyIWYCXCZd8k873eN2Nu4TaWze9zQm8OVkZ7Q',
+          Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
         },
       },
     );

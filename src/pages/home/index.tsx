@@ -18,6 +18,7 @@ import checkBoxIcon from '../../../public/img/checkBox.svg';
 import fillCheckBox from '../../../public/img/fillCheckBox.svg';
 import loginState from '@/store/atom/loginState';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import detailState from '@/store/atom/detailState';
 
 interface Todo {
   id: number;
@@ -61,8 +62,11 @@ const Home = () => {
   const [isLogin, setIsLogin] = useRecoilState(loginState);
   const [addNewTask, setaddNewTask] = useState<NewTask>();
 
-  const [isDetailModal, setIstDetailModal] = useRecoilState(isDetailModalState);
+  const [isDetailModal, setIstDetailModal] =
+    useRecoilState<number>(detailState);
   const [inputTitles, setInputTitles] = useState<Record<string, string>>({});
+  const [isDetailModalOpen, setIsDetailModalOpen] =
+    useRecoilState(isDetailModalState);
 
   const beforeDate = useRecoilValue(formattedBeforeDateSelector);
   const currentDate = useRecoilValue(formattedCurrentDateSelector);
@@ -74,8 +78,7 @@ const Home = () => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks?date=${currentDate.formatDate}`,
         {
           headers: {
-            Authorization:
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY5MjI2MDEyNSwiZXhwIjoxNjk0Njc5MzI1fQ.O1tvy5xyIWYCXCZd8k873eN2Nu4TaWze9zQm8OVkZ7Q',
+            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
@@ -175,8 +178,7 @@ const Home = () => {
         },
         {
           headers: {
-            Authorization:
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY5MjI2MDEyNSwiZXhwIjoxNjk0Njc5MzI1fQ.O1tvy5xyIWYCXCZd8k873eN2Nu4TaWze9zQm8OVkZ7Q',
+            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
@@ -274,8 +276,7 @@ const Home = () => {
         {},
         {
           headers: {
-            Authorization:
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY5MjI2MDEyNSwiZXhwIjoxNjk0Njc5MzI1fQ.O1tvy5xyIWYCXCZd8k873eN2Nu4TaWze9zQm8OVkZ7Q',
+            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
@@ -302,6 +303,25 @@ const Home = () => {
     } catch (error) {
       console.log(taskId);
       console.error('완료 표시에서 에러 발생', error);
+    }
+  };
+
+  const detailModal = (taskId: number) => {
+    setIsDetailModalOpen(true);
+    setIstDetailModal(taskId);
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    date: string,
+  ) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const title = inputTitles[date];
+      if (title) {
+        const newTask = { title: inputTitles, date: date };
+        addMutation.mutate(newTask);
+      }
     }
   };
 
@@ -376,6 +396,7 @@ const Home = () => {
                     [todo.date]: e.target.value,
                   });
                 }}
+                onKeyDown={e => handleKeyDown(e, todo.date)}
                 value={inputTitles[todo.date] || ''}
               />
             </div>
@@ -405,9 +426,15 @@ const Home = () => {
                       </div>
                     </div>
 
-                    <div className="cursor-pointer">
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => detailModal(task.id)}
+                    >
                       <IoEllipsisVertical />
                     </div>
+                    {isDetailModalOpen && isDetailModal === task.id && (
+                      <DetailModal taskId={task.id} />
+                    )}
                   </div>
                 ) : (
                   <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
@@ -431,9 +458,15 @@ const Home = () => {
                           </div>
                         ))}
                     </div>
-                    <div className="cursor-pointer">
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => detailModal(task.id)}
+                    >
                       <IoEllipsisVertical />
                     </div>
+                    {isDetailModalOpen && isDetailModal === task.id && (
+                      <DetailModal taskId={task.id} />
+                    )}
                   </div>
                 )}
               </div>
@@ -443,7 +476,6 @@ const Home = () => {
         <div className="current-date"></div>
         <div className="after-date"></div>
       </div>
-      {isDetailModal && <DetailModal />}
     </div>
   );
 };
