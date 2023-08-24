@@ -84,7 +84,7 @@ const Home = () => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
         {
           headers: {
-            Authorization: `${accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       );
@@ -122,13 +122,17 @@ const Home = () => {
   const fetchTodo = async () => {
     try {
       const accessToken = Cookies.get('ACCESS_KEY');
-      // console.log('101번쨰', currentWorkSpace.workspace_id);
+      console.log('현재 선택된 workspaceID ✨', currentWorkSpace.workspace_id);
+      console.log(
+        'fetchTodo 요청 날리는 API ✨ ',
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks?date=${currentDate.formatDate}`,
+      );
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks?date=${currentDate.formatDate}`,
         {
           headers: {
-            // Authorization: `${accessToken}`,
-            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${accessToken}`,
+            // Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
@@ -183,13 +187,17 @@ const Home = () => {
           };
         });
       });
-      console.log(newTodoList);
+      console.log('서버에서 받아온 tasks 목록 ✨', todoList);
+      console.log(
+        '서버에서 받아온 데이터를 요일과 함께 패치한 데이터 ✨',
+        newTodoList,
+      );
       console.log(`data fetch 완료`);
-
+      //
       return response.data;
     } catch (error) {
       console.error(error);
-    }
+    } //
   };
 
   const addTask = async (taskItem: NewTask) => {
@@ -203,18 +211,18 @@ const Home = () => {
         },
         {
           headers: {
-            // Authorization: `${accessToken}`,
-            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${accessToken}`,
+            // Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
-
+      //
       return res.data;
     } catch (error) {
       console.error(error);
     }
   };
-
+  //
   const addMutation = useMutation(addTask, {
     onError: error => {
       console.log(error);
@@ -303,12 +311,12 @@ const Home = () => {
         {},
         {
           headers: {
-            // Authorization: `${accessToken}`,
-            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${accessToken}`,
+            // Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
-
+      //
       // 상태 업데이트
       setNewTodoList(prev => {
         return prev.map(item => {
@@ -379,7 +387,7 @@ const Home = () => {
   //   if (!Cookies.get('ACCESS_KEY')) {
   //     router.push('/login');
   //   }
-  // }, [isLogin]);
+  // }, [isLogin])
 
   return (
     <div className="px-[5rem] py-[3.75rem] overflow-y-auto h-[48rem]">

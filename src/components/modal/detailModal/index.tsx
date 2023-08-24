@@ -12,6 +12,7 @@ import { useMutation } from 'react-query';
 import { useRecoilState } from 'recoil';
 import { isDetailModalState } from '@/store/atom/modalStatus';
 import Cookie from 'js-cookie';
+import { currentWorkspace } from '@/store/atom/userStatusState';
 
 interface DetailProps {
   taskId: number;
@@ -30,19 +31,24 @@ const DetailModal = (Props: DetailProps) => {
     nickname: '',
     imgUrl: '',
   });
+  const [currentWorkSpace, setCurrentWorkSpace] =
+    useRecoilState(currentWorkspace);
   const [isDetailModalOpen, setIsDetailModalOpen] =
     useRecoilState(isDetailModalState);
 
-  const mutation = useMutation((taskId: number) =>
-    axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks/${taskId}`,
+  const mutation = useMutation(taskId => {
+    // accessToken을 Cookie에서 가져옵니다.
+    const accessToken = Cookie.get('ACCESS_KEY');
+
+    return axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}`,
       {
         headers: {
-          Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       },
-    ),
-  );
+    );
+  });
 
   const deleteTask = async (taskId: number) => {
     const userConfirmed = window.confirm('정말로 이 글을 삭제하시겠습니까?');
@@ -51,12 +57,12 @@ const DetailModal = (Props: DetailProps) => {
       return;
     }
     try {
-      const accessToken = Cookie.get('accessToken');
+      const accessToken = Cookie.get('ACCESS_KEY');
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks/${taskId}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}`,
         {
           headers: {
-            Authorization: `${accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       );

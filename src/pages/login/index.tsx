@@ -36,6 +36,7 @@ const Login = () => {
             Authorization: `Bearer ${accessToken}`,
         }}
         )
+        localStorage.removeItem('uniqueToken');
       }
     } catch (error) {
       console.error('Error sending invitation acceptance:', error);
@@ -123,7 +124,7 @@ const Login = () => {
                 console.log('Login Failed');
               }}
               ux_mode="redirect"
-              login_uri={`https://api.hoy.im/api/auth/google/callback`}
+              login_uri={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google/callback`}
             />
 
             {userInfo.imageUrl && (

@@ -65,18 +65,17 @@ const SideBar = () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
-        { 
+        {
           headers: {
-            // Authorization: `${accessToken}`,
-            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${accessToken}`,
+            // Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
-
       setWorkspaceList(res.data);
-      console.log(res.data);
+      console.log('받아온 워크스페이스 리스트 ', res.data);
       setCurrentWorkSpace(res.data[0]);
-      console.log(res.data[0]);
+      console.log('기본 선택된 워크스페이스', res.data[0]);
     } catch (error) {
       console.error(error);
     }
@@ -102,24 +101,29 @@ const SideBar = () => {
   useEffect(() => {
     fechWorkSpaceData();
     fetchUserData();
-    console.log(`Sidebar 컴포넌트`);
   }, []);
 
   return (
     <div className="my-[2.5rem] mx-[1.5rem] flex flex-col gap-[2rem]">
-      <div className="team-logo flex items-center relative">
-        <div className="desktop:w-[1.5rem] desktopL:w-[2.5rem]">
-          <Image src="/img/teamImage.png" alt="img" width="40" height="40" />
-        </div>
-        <button
-          onClick={toggleWorkspace}
-          className="ml-[0.3rem] flex items-center"
-        >
+      <div
+        className="team-logo flex items-center justify-between relative
+        cursor-pointer rounded-[0.5rem]"
+        onClick={toggleWorkspace}
+      >
+        <div className="flex items-center gap-[0.62rem]">
+          <div className="desktop:w-[1.5rem] desktopL:w-[2.5rem]">
+            <Image src="/img/teamImage.png" alt="img" width="40" height="40" />
+          </div>
           <div className="mx-[0.62rem] desktop:text-[0.8rem] desktopL:text-[1rem] font-bold">
             {currentWorkSpace.workspace_name}
           </div>
+        </div>
+        <div
+          onClick={toggleWorkspace}
+          className="ml-[0.3rem] flex items-center"
+        >
           <VscChevronDown />
-        </button>
+        </div>
         {workspaceVisible && <WorkspaceSelectModal />}
       </div>
       <div className="sidebar-menu text-[0.875rem]">
