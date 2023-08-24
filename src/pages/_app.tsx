@@ -9,7 +9,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { useState } from 'react';
 
 const clientId =
-  '207985048710-enhd3as0g4aj0euv9usn5ljdqoaejmap.apps.googleusercontent.com';
+  '207985048710-cg6c5mhn2flslptc06jpjkbl8181bjfr.apps.googleusercontent.com';
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
