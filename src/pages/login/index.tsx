@@ -33,7 +33,7 @@ const Login = () => {
           email,
         }, {
           headers: {
-            Authorization: `${accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
         }}
         )
       }
