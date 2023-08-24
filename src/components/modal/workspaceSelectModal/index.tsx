@@ -7,6 +7,13 @@ import React from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { useRecoilState } from 'recoil';
 import CreateWorkSpaceModal from '../createWorkSpaceModal';
+import workspaceListState from '@/store/atom/workspaceListState';
+
+// interface WorkspaceList {
+//   id: number;
+//   workspace_name: string;
+//   workspace_imgUrl: string;
+// }
 
 const WorkspaceSelectModal = () => {
   const [createWorkspaceVisible, setCreateWorkspaceVisible] = useRecoilState(
@@ -16,6 +23,8 @@ const WorkspaceSelectModal = () => {
     isWorkspaceModalState,
   );
 
+  const [workspaceList, setWorkspaceList] = useRecoilState(workspaceListState);
+
   const handleCreateWorkspace = () => {
     setWorkspaceVisible(false);
     setCreateWorkspaceVisible(true);
@@ -24,28 +33,26 @@ const WorkspaceSelectModal = () => {
   return (
     <div className="absolute top-[3rem] w-[18rem] z-[101]">
       <div className="w-full p-3 bg-white rounded-xl border">
-        <div
-          className="px-3 py-2 rounded-lg justify-between items-center gap-2.5 inline-flex
-        cursor-pointer w-full hover:bg-gray-2"
-        >
-          <div className="justify-start items-center gap-2.5 flex ">
-            <Image src="/img/teamImage.png" alt="img" width="40" height="40" />
-            <div className="text-neutral-600 text-base font-bold leading-relaxed cursor-pointer">
-              TEAMSPARTA
+        {workspaceList.map(workspace => (
+          <div
+            key={workspace.id}
+            className="px-3 py-2 rounded-lg justify-start items-center gap-2.5 inline-flex
+            cursor-pointer w-full hover:bg-gray-2"
+          >
+            <div className="justify-start items-center gap-2.5 flex hover:bg-gray-2">
+              <Image
+                src="/img/teamImage.png"
+                alt="img"
+                width="40"
+                height="40"
+              />
+              <div className="text-neutral-600 text-base leading-relaxed">
+                {workspace.workspace_name}
+              </div>
             </div>
           </div>
-        </div>
-        <div
-          className="px-3 py-2 rounded-lg justify-start items-center gap-2.5 inline-flex
-        cursor-pointer w-full hover:bg-gray-2"
-        >
-          <div className="justify-start items-center gap-2.5 flex hover:bg-gray-2">
-            <Image src="/img/teamImage.png" alt="img" width="40" height="40" />
-            <div className="text-neutral-600 text-base leading-relaxed">
-              TEAMPLUTO
-            </div>
-          </div>
-        </div>
+        ))}
+
         <div className="h-14 px-3 py-2 hover:bg-gray-2 rounded-lg flex-col justify-start items-start gap-2.5 flex">
           <div
             onClick={handleCreateWorkspace}

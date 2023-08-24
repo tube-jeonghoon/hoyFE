@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { VscChevronDown } from 'react-icons/vsc';
 import { AiOutlinePlus, AiFillStar } from 'react-icons/ai';
 import Image from 'next/image';
@@ -12,9 +12,15 @@ import WorkspaceSelectModal from '../modal/workspaceSelectModal';
 import CreateWorkSpaceModal from '../modal/createWorkSpaceModal';
 import SearchMemberModal from '../searchMemberModal';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+import workspaceListState from '@/store/atom/workspaceListState';
+import { currentWorkspace } from '@/store/atom/userStatusState';
+import Cookies from 'js-cookie';
 
 const SideBar = () => {
   const router = useRouter();
+  const userName = '전정훈';
+  const [accessToken, setAccessToken] = useState('');
   const [workspaceVisible, setWorkspaceVisible] = useRecoilState(
     isWorkspaceModalState,
   );
@@ -24,6 +30,9 @@ const SideBar = () => {
   const [searchMemeberVisible, setSearchMemeberVisible] = useRecoilState(
     isSearchMemberModalState,
   );
+  const [workspaceList, setWorkspaceList] = useRecoilState(workspaceListState);
+  const [currentWorkSpace, setCurrentWorkSpace] =
+    useRecoilState(currentWorkspace);
 
   const [userList, setUserList] = useState([
     '전정훈',
@@ -51,6 +60,49 @@ const SideBar = () => {
     setSearchMemeberVisible(!searchMemeberVisible);
   };
 
+  const fechWorkSpaceData = async () => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
+        {
+          headers: {
+            Authorization: `${accessToken}`,
+          },
+        },
+      );
+
+      setWorkspaceList(res.data);
+      console.log(res.data);
+      setCurrentWorkSpace(res.data[0]);
+      console.log(res.data[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/1/current-user`,
+        {
+          headers: {
+            Authorization: `${accessToken}`,
+          },
+        },
+      );
+
+      console.log(res.data);
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    fechWorkSpaceData();
+    fetchUserData();
+    console.log(`Sidebar 컴포넌트`);
+  }, []);
+
   return (
     <div className="my-[2.5rem] mx-[1.5rem] flex flex-col gap-[2rem]">
       <div className="team-logo flex items-center relative">
@@ -62,7 +114,7 @@ const SideBar = () => {
           className="ml-[0.3rem] flex items-center"
         >
           <div className="mx-[0.62rem] desktop:text-[0.8rem] desktopL:text-[1rem] font-bold">
-            TEAMSPARTA
+            {currentWorkSpace.workspace_name}
           </div>
           <VscChevronDown />
         </button>
@@ -76,7 +128,10 @@ const SideBar = () => {
           <div className="mr-[0.75rem]">
             <Image src="/img/user.png" alt="img" width="24" height="24" />
           </div>
-          <div>전정훈 (나)</div>
+          <div className="flex gap-[0.2rem]">
+            <div>{userName}</div>
+            <div>(나)</div>
+          </div>
         </div>
         <div className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer">
           <div className="mr-[0.75rem]">
@@ -89,12 +144,16 @@ const SideBar = () => {
           </div>
           <div>업데이트</div>
         </div>
-        <div className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer">
+        <div
+          className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer"
+          onClick={toggleSearchMember}
+        >
           <div className="mr-[0.75rem]">
             <Image src="/img/search.png" alt="img" width="24" height="24" />
           </div>
           <div>멤버 찾기</div>
         </div>
+        {searchMemeberVisible && <SearchMemberModal />}
         <div className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer">
           <div className="mr-[0.75rem]">
             <Image src="/img/settings.png" alt="img" width="24" height="24" />
@@ -108,7 +167,7 @@ const SideBar = () => {
       <div className="favorite-person-Area">
         <div className="flex items-center justify-between h-[2.5rem] px-[0.75rem] ">
           <div className="font-bold">자주 찾는 멤버</div>
-          <div className="cursor-pointer" onClick={toggleSearchMember}>
+          <div className="cursor-pointer">
             <AiOutlinePlus />
           </div>
         </div>
@@ -146,7 +205,6 @@ const SideBar = () => {
         </div>
       </div>
       {createWorkspaceVisible && <CreateWorkSpaceModal />}
-      {searchMemeberVisible && <SearchMemberModal />}
     </div>
   );
 };

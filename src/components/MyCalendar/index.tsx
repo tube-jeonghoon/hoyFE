@@ -6,16 +6,18 @@ import { ko } from 'date-fns/locale';
 import { useRecoilState } from 'recoil';
 import selectedDateState from '@/store/atom/selectedDateState';
 import { isCalendarModalState } from '@/store/atom/modalStatus';
+import currentDateState from '@/store/atom/currentDateState';
 
 const MyCalendar = () => {
-  const [selectedDate, setSelectedDate] = useRecoilState(selectedDateState);
+  const [selectedDate, setSelectedDate] = useRecoilState(currentDateState);
   const [calendarVisible, setCalendarVisible] =
     useRecoilState(isCalendarModalState);
 
   const handleSelectedDate = (value: any) => {
-    const formattedDate = format(value, 'yyyy-MM-dd');
-    setSelectedDate(formattedDate);
+    setSelectedDate(value);
     setCalendarVisible(!calendarVisible);
+    console.log(`선택된 날짜 : ${value}`);
+    console.log(`선택된 날짜 : ${selectedDate}`);
   };
 
   return (

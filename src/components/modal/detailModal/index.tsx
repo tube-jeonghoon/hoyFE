@@ -11,6 +11,7 @@ import axios from 'axios';
 import { useMutation } from 'react-query';
 import { useRecoilState } from 'recoil';
 import { isDetailModalState } from '@/store/atom/modalStatus';
+import Cookie from 'js-cookie';
 
 interface DetailProps {
   taskId: number;
@@ -50,11 +51,12 @@ const DetailModal = (Props: DetailProps) => {
       return;
     }
     try {
+      const accessToken = Cookie.get('accessToken');
       await axios.delete(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks/${taskId}`,
         {
           headers: {
-            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            Authorization: `${accessToken}`,
           },
         },
       );

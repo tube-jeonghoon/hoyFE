@@ -5,7 +5,6 @@ import { isDetailModalState } from '@/store/atom/modalStatus';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
 import {
   formattedCurrentDateSelector,
@@ -17,8 +16,11 @@ import { IoEllipsisVertical } from 'react-icons/io5';
 import checkBoxIcon from '../../../public/img/checkBox.svg';
 import fillCheckBox from '../../../public/img/fillCheckBox.svg';
 import loginState from '@/store/atom/loginState';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import detailState from '@/store/atom/detailState';
+import selectedDateState from '@/store/atom/selectedDateState';
+import { currentWorkspace } from '@/store/atom/userStatusState';
+import Cookies from 'js-cookie';
 
 interface Todo {
   id: number;
@@ -61,6 +63,9 @@ const Home = () => {
   const [newTodoList, setNewTodoList] = useState<NewTodoItem[]>([]);
   const [isLogin, setIsLogin] = useRecoilState(loginState);
   const [addNewTask, setaddNewTask] = useState<NewTask>();
+  const [selectedDate, setSelectedDate] = useRecoilState(selectedDateState);
+  const [currentWorkSpace, setCurrentWorkSpace] =
+    useRecoilState(currentWorkspace);
 
   const [isDetailModal, setIstDetailModal] =
     useRecoilState<number>(detailState);
@@ -72,13 +77,34 @@ const Home = () => {
   const currentDate = useRecoilValue(formattedCurrentDateSelector);
   const afterDate = useRecoilValue(formattedAfterDateSelector);
 
-  const fetchTodo = async () => {
+  const fechWorkSpaceData = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks?date=${currentDate.formatDate}`,
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
         {
           headers: {
-            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            Authorization: `${accessToken}`,
+          },
+        },
+      );
+
+      setCurrentWorkSpace(res.data[0]);
+      // console.log(res.data[0].workspace_id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchTodo = async () => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      console.log('101번쨰', currentWorkSpace.workspace_id);
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks?date=${currentDate.formatDate}`,
+        {
+          headers: {
+            Authorization: `${accessToken}`,
           },
         },
       );
@@ -178,7 +204,7 @@ const Home = () => {
         },
         {
           headers: {
-            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            Authorization: `${accessToken}`,
           },
         },
       );
@@ -271,12 +297,13 @@ const Home = () => {
   const toggleTaskCompletion = async (taskId: number) => {
     try {
       // 본문을 담지 않는 PUT 요청
+      const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks/${taskId}/status`,
         {},
         {
           headers: {
-            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            Authorization: `${accessToken}`,
           },
         },
       );
@@ -326,6 +353,7 @@ const Home = () => {
   };
 
   useEffect(() => {
+    fechWorkSpaceData();
     fetchDate();
     fetchTodo();
   }, [currentDate]);

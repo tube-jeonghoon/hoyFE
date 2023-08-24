@@ -19,6 +19,25 @@ const Login = () => {
     }
   };
 
+  const sendInvitationAcceptance = async () => {
+    const uniqueToken = localStorage.getItem('uniqueToken');
+    const email = router.query.email;
+    if (uniqueToken && email) {
+      try {
+        await fetch('/workspace/accept-invitation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ uniqueToken, email }),
+        });
+        localStorage.removeItem('uniqueToken');
+      } catch (error) {
+        console.error('Error sending invitation acceptance:', error);
+      }
+    }
+  };
+
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
     if (Cookies.get('ACCESS_KEY')) {
@@ -43,6 +62,9 @@ const Login = () => {
     if (typeof accessToken === 'string') {
       console.log('Access Token:', accessToken);
       Cookies.set('ACCESS_KEY', accessToken);
+
+      sendInvitationAcceptance();
+
       // window.location.href = '/home';
     }
   }, [router.query.access_token]);
@@ -84,7 +106,7 @@ const Login = () => {
                 console.log('Login Failed');
               }}
               ux_mode="redirect"
-              login_uri={`https://hoy.im/api/auth/google/callback`}
+              login_uri={`https://api.hoy.im/api/auth/google/callback`}
             />
 
             {userInfo.imageUrl && (
