@@ -196,6 +196,7 @@ const Home = () => {
 
   const addTask = async (taskItem: NewTask) => {
     try {
+      const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks`,
         {
