@@ -65,9 +65,10 @@ const SideBar = () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
-        {
+        { 
           headers: {
-            Authorization: `${accessToken}`,
+            // Authorization: `${accessToken}`,
+            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
@@ -88,7 +89,8 @@ const SideBar = () => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/1/current-user`,
         {
           headers: {
-            Authorization: `${accessToken}`,
+            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            // Authorization: `${accessToken}`,
           },
         },
       );

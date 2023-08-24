@@ -96,15 +96,39 @@ const Home = () => {
     }
   };
 
+  const fetchDate = () => {
+    setNewTodoList(prev => [
+      {
+        date: beforeDate.formatDate,
+        dayOfWeek: beforeDate.dayOfWeek,
+        day: beforeDate.day,
+        tasks: [],
+      },
+      {
+        date: currentDate.formatDate,
+        dayOfWeek: currentDate.dayofWeek,
+        day: currentDate.day,
+        tasks: [],
+      },
+      {
+        date: afterDate.formatDate,
+        dayOfWeek: afterDate.dayOfWeek,
+        day: afterDate.day,
+        tasks: [],
+      },
+    ]);
+  };
+
   const fetchTodo = async () => {
     try {
       const accessToken = Cookies.get('ACCESS_KEY');
-      console.log('101번쨰', currentWorkSpace.workspace_id);
+      // console.log('101번쨰', currentWorkSpace.workspace_id);
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks?date=${currentDate.formatDate}`,
         {
           headers: {
-            Authorization: `${accessToken}`,
+            // Authorization: `${accessToken}`,
+            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
@@ -129,10 +153,7 @@ const Home = () => {
       });
 
       setTodoList(sortedData);
-      // console.log('✨ ➤ fetchTodo ➤ sortedData:', sortedData);
-
       setNewTodoList(prev => {
-        // console.log('✨ ➤ Home ➤ prev:', prev);
         return [
           {
             date: beforeDate.formatDate,
@@ -171,29 +192,6 @@ const Home = () => {
     }
   };
 
-  const fetchDate = () => {
-    setNewTodoList(prev => [
-      {
-        date: beforeDate.formatDate,
-        dayOfWeek: beforeDate.dayOfWeek,
-        day: beforeDate.day,
-        tasks: [],
-      },
-      {
-        date: currentDate.formatDate,
-        dayOfWeek: currentDate.dayofWeek,
-        day: currentDate.day,
-        tasks: [],
-      },
-      {
-        date: afterDate.formatDate,
-        dayOfWeek: afterDate.dayOfWeek,
-        day: afterDate.day,
-        tasks: [],
-      },
-    ]);
-  };
-
   const addTask = async (taskItem: NewTask) => {
     try {
       const accessToken = Cookies.get('ACCESS_KEY');
@@ -205,7 +203,8 @@ const Home = () => {
         },
         {
           headers: {
-            Authorization: `${accessToken}`,
+            // Authorization: `${accessToken}`,
+            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );
@@ -304,7 +303,8 @@ const Home = () => {
         {},
         {
           headers: {
-            Authorization: `${accessToken}`,
+            // Authorization: `${accessToken}`,
+            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
           },
         },
       );

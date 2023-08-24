@@ -4,6 +4,7 @@ import hoyImg from '../../../public/img/hoy.png';
 import { GoogleLogin } from '@react-oauth/google';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
 const Login = () => {
   const router = useRouter();
@@ -22,21 +23,37 @@ const Login = () => {
   const sendInvitationAcceptance = async () => {
     const uniqueToken = localStorage.getItem('uniqueToken');
     const email = router.query.email;
-    if (uniqueToken && email) {
-      try {
-        await fetch('/workspace/accept-invitation', {
-          method: 'POST',
+    const accessToken = Cookies.get('ACCESS_KEY');
+    console.log("✨ ➤ sendInvitationAcceptance ➤ uniqueToken:", uniqueToken);
+    console.log("✨ ➤ sendInvitationAcceptance ➤ email:", email);
+    try {
+      if (uniqueToken && email) {
+        await axios.post('https://api.hoy.im/api/workspace/accept-invitation', {
+          uniqueToken,
+          email,
+        }, {
           headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ uniqueToken, email }),
-        });
-        localStorage.removeItem('uniqueToken');
-      } catch (error) {
-        console.error('Error sending invitation acceptance:', error);
+            Authorization: `${accessToken}`,
+        }}
+        )
       }
+    } catch (error) {
+      console.error('Error sending invitation acceptance:', error);
     }
-  };
+    // if (uniqueToken && email) {
+    //   try {
+    //     await fetch('https://api.hoy.im/workspace/accept-invitation', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({ uniqueToken, email }),
+    //     });
+    //     localStorage.removeItem('uniqueToken');
+    //   } catch (error) {
+    //     console.error('Error sending invitation acceptance:', error);
+    //   }
+    }
 
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
@@ -99,8 +116,8 @@ const Login = () => {
             id="loginButton"
           >
             <GoogleLogin
-              onSuccess={credentialResponse => {
-                console.log(credentialResponse);
+              onSuccess={() => {
+                console.log('Login Success');
               }}
               onError={() => {
                 console.log('Login Failed');
