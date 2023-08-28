@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { VscChevronDown } from 'react-icons/vsc';
 import { AiOutlinePlus, AiFillStar } from 'react-icons/ai';
 import Image from 'next/image';
-import { useRecoilState, useRecoilStateLoadable } from 'recoil';
+import { useRecoilState } from 'recoil';
 import {
+  isCreateGroupModalState,
   isCreateWorkspaceModalState,
   isSearchMemberModalState,
   isWorkspaceModalState,
@@ -14,13 +15,32 @@ import SearchMemberModal from '../searchMemberModal';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import workspaceListState from '@/store/atom/workspaceListState';
-import { currentWorkspace } from '@/store/atom/userStatusState';
+import {
+  currentGroupState,
+  currentUserDataState,
+  currentHeaderNameState,
+  currentWorkspaceState,
+} from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
+import CreateGroupModal from '../modal/createGroupModal';
+
+interface GroupList {
+  id: number;
+  name: string;
+  memberCount: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
+}
 
 const SideBar = () => {
   const router = useRouter();
   const userName = '전정훈';
-  const [accessToken, setAccessToken] = useState('');
+  const [currentUserData, setCurrentUserData] =
+    useRecoilState(currentUserDataState);
+  const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
+    currentHeaderNameState,
+  );
   const [workspaceVisible, setWorkspaceVisible] = useRecoilState(
     isWorkspaceModalState,
   );
@@ -30,9 +50,14 @@ const SideBar = () => {
   const [searchMemeberVisible, setSearchMemeberVisible] = useRecoilState(
     isSearchMemberModalState,
   );
+  const [createGroupModalVisible, setCreateGroupModalVisible] = useRecoilState(
+    isCreateGroupModalState,
+  );
   const [workspaceList, setWorkspaceList] = useRecoilState(workspaceListState);
-  const [currentWorkSpace, setCurrentWorkSpace] =
-    useRecoilState(currentWorkspace);
+  const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
+    currentWorkspaceState,
+  );
+  const [currentGroup, setCurrentGroup] = useRecoilState(currentGroupState);
 
   const [userList, setUserList] = useState([
     '전정훈',
@@ -43,14 +68,7 @@ const SideBar = () => {
     '방민석',
   ]);
 
-  const [groupList, setGroupList] = useState([
-    '디자인팀 (4)',
-    '개발팀 (6)',
-    '기획팀 (3)',
-    '스튜디오 (2)',
-    '데브캠프 (7)',
-    '운영팀 (7)',
-  ]);
+  const [groupList, setGroupList] = useState([]);
 
   const toggleWorkspace = () => {
     setWorkspaceVisible(!workspaceVisible);
@@ -58,6 +76,10 @@ const SideBar = () => {
 
   const toggleSearchMember = () => {
     setSearchMemeberVisible(!searchMemeberVisible);
+  };
+
+  const toggleCreateGroupModal = () => {
+    setCreateGroupModalVisible(!createGroupModalVisible);
   };
 
   const fechWorkSpaceData = async () => {
@@ -81,26 +103,64 @@ const SideBar = () => {
     }
   };
 
+  const fetchGroupListData = async () => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/group`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      console.log('fetchGroupListData', res.data);
+      setGroupList(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const fetchUserData = async () => {
     try {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/1/current-user`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/current-user`,
         {
           headers: {
-            Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
-            // Authorization: `${accessToken}`,
+            // Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       );
 
       console.log(res.data);
-    } catch (error) {}
+      setCurrentUserData(res.data);
+      setCurrentHeaderName(res.data.nickname);
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  const userDataHandler = () => {
+    fetchUserData();
+    router.push('/home');
+  };
+
+  const fetchGroupState = (id: number, name: string): void => {
+    setCurrentGroup(id);
+    setCurrentHeaderName(name);
+    router.push('/viewOtherGroup');
+  };
+
+  useEffect(() => {
+    // console.log(currentGroup);
+  }, [currentGroup]);
 
   useEffect(() => {
     fechWorkSpaceData();
     fetchUserData();
+    fetchGroupListData();
   }, []);
 
   return (
@@ -114,7 +174,7 @@ const SideBar = () => {
           <div className="desktop:w-[1.5rem] desktopL:w-[2.5rem]">
             <Image src="/img/teamImage.png" alt="img" width="40" height="40" />
           </div>
-          <div className="mx-[0.62rem] desktop:text-[0.8rem] desktopL:text-[1rem] font-bold">
+          <div className="text-black mx-[0.62rem] desktop:text-[0.8rem] desktopL:text-[1rem] font-bold">
             {currentWorkSpace.workspace_name}
           </div>
         </div>
@@ -126,16 +186,23 @@ const SideBar = () => {
         </div>
         {workspaceVisible && <WorkspaceSelectModal />}
       </div>
-      <div className="sidebar-menu text-[0.875rem]">
+      <div className="sidebar-menu text-[0.875rem] text-black">
         <div
           className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer"
-          onClick={() => router.push('/home')}
+          onClick={userDataHandler}
         >
           <div className="mr-[0.75rem]">
-            <Image src="/img/user.png" alt="img" width="24" height="24" />
+            {currentUserData.imgUrl && (
+              <Image
+                src={currentUserData.imgUrl}
+                alt="img"
+                width="24"
+                height="24"
+              />
+            )}
           </div>
           <div className="flex gap-[0.2rem]">
-            <div>{userName}</div>
+            <div>{currentUserData.nickname}</div>
             <div>(나)</div>
           </div>
         </div>
@@ -172,7 +239,7 @@ const SideBar = () => {
 
       <div className="favorite-person-Area">
         <div className="flex items-center justify-between h-[2.5rem] px-[0.75rem] ">
-          <div className="font-bold">자주 찾는 멤버</div>
+          <div className="font-bold text-black">자주 찾는 멤버</div>
           <div className="cursor-pointer">
             <AiOutlinePlus />
           </div>
@@ -194,18 +261,23 @@ const SideBar = () => {
       <div className="border-b-[1px] w-full">{''}</div>
       <div>
         <div className="flex items-center justify-between px-[0.75rem] mb-[0.6rem]">
-          <div className="font-bold">그룹 보기</div>
-          <div className="cursor-pointer">
+          <div className="font-bold text-black">그룹 보기</div>
+          <div className="cursor-pointer" onClick={toggleCreateGroupModal}>
             <AiOutlinePlus />
           </div>
+          {createGroupModalVisible && <CreateGroupModal />}
         </div>
         <div className="max-h-[24rem] h-[15rem] overflow-y-auto">
-          {groupList.map((group, idx) => (
+          {groupList?.map((group: GroupList) => (
             <div
-              key={idx}
-              className="text-[0.875rem] cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem]"
+              key={group.id}
+              className="cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem] text-black"
+              onClick={() => fetchGroupState(group.id, group.name)}
             >
-              <div className="p-[0.75rem]">{group}</div>
+              <div className="p-[0.75rem] leading-[1.4rem] text-[0.875rem] flex items-center gap-[0.1rem] ">
+                <div>{group.name}</div>
+                <div className="tracking-[0.1rem]">({group.memberCount})</div>
+              </div>
             </div>
           ))}
         </div>

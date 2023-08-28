@@ -12,7 +12,7 @@ import { useMutation } from 'react-query';
 import { useRecoilState } from 'recoil';
 import { isDetailModalState } from '@/store/atom/modalStatus';
 import Cookie from 'js-cookie';
-import { currentWorkspace } from '@/store/atom/userStatusState';
+import { currentWorkspaceState } from '@/store/atom/userStatusState';
 
 interface DetailProps {
   taskId: number;
@@ -31,8 +31,9 @@ const DetailModal = (Props: DetailProps) => {
     nickname: '',
     imgUrl: '',
   });
-  const [currentWorkSpace, setCurrentWorkSpace] =
-    useRecoilState(currentWorkspace);
+  const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
+    currentWorkspaceState,
+  );
   const [isDetailModalOpen, setIsDetailModalOpen] =
     useRecoilState(isDetailModalState);
 
@@ -127,8 +128,8 @@ const DetailModal = (Props: DetailProps) => {
             {title}
           </div>
           <div className="flex justify-between">
-            <div className="flex gap-[0.62rem] items-center">
-              <div className="text-gray-4 cursor-pointer">
+            <div className="flex gap-[0.62rem] items-center cursor-pointer">
+              <div className="text-gray-4">
                 <Image src={checkBoxIcon} alt="체크박스" />
               </div>
               <div className="text-black text-[0.875rem] leading-[1.4rem]">
@@ -198,7 +199,7 @@ const DetailModal = (Props: DetailProps) => {
               </div>
               <div
                 className="bg-gray-2 rounded-[6.25rem] w-[2rem] h-[2rem]
-              flex justify-center items-center p-[0.5rem]"
+              flex justify-center items-center p-[0.5rem] cursor-pointer"
               >
                 <Image src={sendMsg} alt="전송" />
               </div>

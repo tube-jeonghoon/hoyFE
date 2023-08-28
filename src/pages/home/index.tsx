@@ -19,7 +19,7 @@ import loginState from '@/store/atom/loginState';
 import { useMutation, useQueryClient } from 'react-query';
 import detailState from '@/store/atom/detailState';
 import selectedDateState from '@/store/atom/selectedDateState';
-import { currentWorkspace } from '@/store/atom/userStatusState';
+import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
 
 interface Todo {
@@ -64,8 +64,9 @@ const Home = () => {
   const [isLogin, setIsLogin] = useRecoilState(loginState);
   const [addNewTask, setaddNewTask] = useState<NewTask>();
   const [selectedDate, setSelectedDate] = useRecoilState(selectedDateState);
-  const [currentWorkSpace, setCurrentWorkSpace] =
-    useRecoilState(currentWorkspace);
+  const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
+    currentWorkspaceState,
+  );
 
   const [isDetailModal, setIstDetailModal] =
     useRecoilState<number>(detailState);
@@ -433,7 +434,7 @@ const Home = () => {
                     [todo.date]: e.target.value,
                   });
                 }}
-                onKeyDown={e => handleKeyDown(e, todo.date)}
+                onKeyPress={e => handleKeyDown(e, todo.date)}
                 value={inputTitles[todo.date] || ''}
               />
             </div>

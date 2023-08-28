@@ -24,18 +24,22 @@ const Login = () => {
     const uniqueToken = localStorage.getItem('uniqueToken');
     const email = router.query.email;
     const accessToken = Cookies.get('ACCESS_KEY');
-    console.log("✨ ➤ sendInvitationAcceptance ➤ uniqueToken:", uniqueToken);
-    console.log("✨ ➤ sendInvitationAcceptance ➤ email:", email);
+    console.log('✨ ➤ sendInvitationAcceptance ➤ uniqueToken:', uniqueToken);
+    console.log('✨ ➤ sendInvitationAcceptance ➤ email:', email);
     try {
       if (uniqueToken && email) {
-        await axios.post('https://api.hoy.im/api/workspace/accept-invitation', {
-          uniqueToken,
-          email,
-        }, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-        }}
-        )
+        await axios.post(
+          'https://api.hoy.im/api/workspace/accept-invitation',
+          {
+            uniqueToken,
+            email,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
         localStorage.removeItem('uniqueToken');
       }
     } catch (error) {
@@ -54,7 +58,7 @@ const Login = () => {
     //   } catch (error) {
     //     console.error('Error sending invitation acceptance:', error);
     //   }
-    }
+  };
 
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
@@ -88,7 +92,6 @@ const Login = () => {
   }, [router.query.access_token]);
 
   const loginCheck = () => {
-    // const accessToken = Cookies.get('ACCESS_KEY');
     const accessToken = Cookies.get('ACCESS_KEY');
 
     console.log(accessToken);
@@ -98,7 +101,7 @@ const Login = () => {
   };
 
   useEffect(() => {
-    // loginCheck();
+    loginCheck();
   }, []);
 
   return (

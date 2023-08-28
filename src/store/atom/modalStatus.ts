@@ -27,7 +27,7 @@ const isSearchMemberModalState = atom({
 
 const isCreateGroupModalState = atom({
   key: 'isCreateGroupModalState',
-  default: true,
+  default: false,
 });
 
 export {

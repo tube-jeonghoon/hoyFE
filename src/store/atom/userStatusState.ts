@@ -6,12 +6,36 @@ interface CurrentWorkspace {
   workspace_name: string;
 }
 
-const currentWorkspace = atom<CurrentWorkspace>({
-  key: 'currentWorkspaceId',
+const currentUserDataState = atom({
+  key: 'currentUserDataState',
+  default: {
+    userId: 0,
+    nickname: '',
+    imgUrl: '',
+  },
+});
+
+const currentHeaderNameState = atom<string>({
+  key: 'currentHeaderNameState',
+  default: '',
+});
+
+const currentWorkspaceState = atom<CurrentWorkspace>({
+  key: 'currentWorkspaceState',
   default: {
     workspace_id: 1,
     workspace_name: '',
   },
 });
 
-export { currentWorkspace };
+const currentGroupState = atom<number>({
+  key: 'currentGroupState',
+  default: 1,
+});
+
+export {
+  currentUserDataState,
+  currentHeaderNameState,
+  currentWorkspaceState,
+  currentGroupState,
+};

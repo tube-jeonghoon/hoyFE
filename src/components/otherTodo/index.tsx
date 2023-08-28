@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 import userProfile from '../../../public/img/userProfile.png';
@@ -7,6 +7,8 @@ import checkBoxIcon from '../../../public/img/checkBox.svg';
 import { IoEllipsisVertical } from 'react-icons/io5';
 
 const OtherTodo = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+
   return (
     <div className="card flex flex-col gap-[0.62rem] w-[19rem]">
       <div className="flex items-center justify-between">
@@ -18,12 +20,12 @@ const OtherTodo = () => {
             하정민
           </div>
         </div>
-        <div className="w-[1.5rem] text-black">
+        <div className="w-[1.5rem] text-black cursor-pointer">
           <Image src={star} alt="즐겨찾기" />
         </div>
       </div>
       <div className="flex items-center px-[0.75rem] justify-between">
-        <div className="text-gray-4">
+        <div className="text-gray-4 cursor-pointer">
           <MdKeyboardArrowLeft />
         </div>
         <div className="flex items-center gap-[0.25rem]">
@@ -34,7 +36,7 @@ const OtherTodo = () => {
             8/24
           </div>
         </div>
-        <div className="text-gray-4">
+        <div className="text-gray-4 cursor-pointer">
           <MdKeyboardArrowRight />
         </div>
       </div>

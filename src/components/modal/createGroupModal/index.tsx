@@ -2,13 +2,14 @@ import { isCreateGroupModalState } from '@/store/atom/modalStatus';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Image from 'next/image';
-import cancelImg from '../../../public/img/cancel.svg';
-import searchImg from '../../../public/img/search.png';
-import membercheckImg from '../../../public/img/memberCheck.svg';
-import fillMemberCheckImg from '../../../public/img/fillMemberCheck.svg';
-import userImg from '../../../public/img/defaultUser.png';
+import cancelImg from '../../../../public/img/cancel.svg';
+import searchImg from '../../../../public/img/search.png';
+import membercheckImg from '../../../../public/img/memberCheck.svg';
+import fillMemberCheckImg from '../../../../public/img/fillMemberCheck.svg';
+import userImg from '../../../../public/img/defaultUser.png';
 import axios from 'axios';
 import Cookie from 'js-cookie';
+import { currentWorkspaceState } from '@/store/atom/userStatusState';
 
 interface Member {
   userId: number;
@@ -20,15 +21,18 @@ const CreateGroupModal = () => {
   const [createGroupVisible, setCreateGroupVisible] = useRecoilState(
     isCreateGroupModalState,
   );
-  const [groupName, setGroupName] = useState('');
   const [workspaceMembers, setWorkspaceMembers] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
+  const [groupTitle, setGroupTitle] = useState('');
+  const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
+    currentWorkspaceState,
+  );
 
   const fetchUser = async () => {
     try {
       const accessToken = Cookie.get('ACCESS_KEY');
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/3/group/available-users`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/group/available-users`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -41,6 +45,36 @@ const CreateGroupModal = () => {
       return res;
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const createGroup = async () => {
+    const accessToken = Cookie.get('ACCESS_KEY');
+    const memberIds = selectedMembers.map(member => member.userId);
+
+    const paylaod = {
+      name: groupTitle,
+      memberIds,
+    };
+    console.log(paylaod);
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/group`,
+        paylaod,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      console.log(res.data);
+      setCreateGroupVisible(false);
+      // 상태 추적을 sidebar에서 못해서 임시 방편으로 새로고침
+      window.location.href = '/home';
+    } catch (error) {
+      console.error('그룹 만들기가 실패하였습니다. ❌', error);
     }
   };
 
@@ -62,7 +96,7 @@ const CreateGroupModal = () => {
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [createGroupVisible]);
 
   return (
     <div
@@ -90,12 +124,12 @@ const CreateGroupModal = () => {
                     className="focus:outline-none w-full"
                     type="text"
                     placeholder="팀 이름"
-                    value={groupName}
-                    onChange={e => setGroupName(e.target.value)}
+                    value={groupTitle}
+                    onChange={e => setGroupTitle(e.target.value)}
                   />
                   <div
                     className="cursor-pointer"
-                    onClick={() => setGroupName('')}
+                    onClick={() => setGroupTitle('')}
                   >
                     <Image src={cancelImg} alt="취소" />
                   </div>
@@ -107,7 +141,7 @@ const CreateGroupModal = () => {
                     멤버 추가
                   </div>
                   <div className="text-gray-5 font-semibold leading-[1.6rem]">
-                    6명
+                    {selectedMembers.length}명
                   </div>
                 </div>
                 <div className="flex gap-[0.38rem] flex-wrap">
@@ -191,6 +225,7 @@ const CreateGroupModal = () => {
                 <div
                   className="border-[1px] rounded-[0.75rem] px-[2rem] py-[0.5rem] h-[3rem] w-[9.5rem]
                   flex items-center justify-center bg-primary-blue cursor-pointer text-white text-[0.875rem]"
+                  onClick={createGroup}
                 >
                   완료
                 </div>
