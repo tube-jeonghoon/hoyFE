@@ -128,7 +128,7 @@ const Home = () => {
         'fetchTodo 요청 날리는 API ✨ ',
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks?date=${currentDate.formatDate}`,
       );
-      const response = await axios.get(
+      const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks?date=${currentDate.formatDate}`,
         {
           headers: {
@@ -140,7 +140,7 @@ const Home = () => {
 
       // console.log(response.data);
 
-      const sortedData = response.data.sort((a: Todo, b: Todo) => {
+      const sortedData = res.data.sort((a: Todo, b: Todo) => {
         // status를 확인하여 true가 false보다 먼저 오도록 정렬
         if (a.status !== b.status) {
           return a.status ? 1 : -1;
@@ -182,7 +182,7 @@ const Home = () => {
           return {
             ...todo,
             tasks:
-              response.data.tasks?.filter(
+              res.data.tasks?.filter(
                 (task: Todo) => task.scheduleDate === todo.date,
               ) || [],
           };
@@ -194,11 +194,11 @@ const Home = () => {
         newTodoList,
       );
       console.log(`data fetch 완료`);
-      //
-      return response.data;
+
+      return res.data;
     } catch (error) {
       console.error(error);
-    } //
+    }
   };
 
   const addTask = async (taskItem: NewTask) => {

@@ -25,7 +25,7 @@ const Header = () => {
   const [isCustomViewOptionBtnVisible, setIsCustomViewOptionBtnVisible] =
     useState(false);
 
-  const showVerticalSettingIcon = router.pathname === '/viewOtherGroup';
+  const showVerticalSettingIcon = router.pathname === '/viewGroup';
 
   const toggleCalendar = () => {
     setCalendarVisible(!calendarVisible);

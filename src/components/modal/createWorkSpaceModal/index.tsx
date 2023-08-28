@@ -1,12 +1,99 @@
 import { isCreateWorkspaceModalState } from '@/store/atom/modalStatus';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Image from 'next/image';
-
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import pica from 'pica';
 const CreateWorkSpaceModal = () => {
   const [createWorkspaceVisible, setCreateWorkspaceVisible] = useRecoilState(
     isCreateWorkspaceModalState,
   );
+  const fileInputRef = useRef(null);
+  const workspaceNameRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [fileName, setFileName] = useState(null);
+  const [fileError, setFileError] = useState(null);
+
+  const handleImageUpload = async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+    // 파일 유형 확인
+    if (!file.type.startsWith('image/')) {
+      setFileError('이미지 파일만 업로드 가능합니다.');
+      return;
+    } else {
+      setFileError(null);
+    }
+    const targetSize = 300;
+    const reader = new FileReader();
+
+    reader.onload = async e => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = targetSize;
+        canvas.height = targetSize;
+        // Pica 리사이징
+        await pica().resize(img, canvas);
+        // 상태에 파일 저장
+        canvas.toBlob(async resizedBlob => {
+          setSelectedFile(
+            new File([resizedBlob], file.name, { type: 'image/jpeg' }),
+          );
+          // 파일 미리보기 URL과 파일 이름 설정
+          const previewUrl = URL.createObjectURL(file);
+          setFilePreview(previewUrl);
+          setFileName(file.name);
+        });
+      };
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCreateWorkspace = async () => {
+    const formData = new FormData();
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+    }
+
+    // 워크스페이스 이름 등의 정보를 formData에 추가
+    const workspaceName = workspaceNameRef.current?.value;
+    if (workspaceName) {
+      formData.append('name', workspaceName);
+    }
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      console.log('Workspace created', response.data);
+      setCreateWorkspaceVisible(false);
+      setSelectedFile(null);
+      // Blob URL 해제
+      if (filePreview) {
+        URL.revokeObjectURL(filePreview);
+        setFilePreview(null); // 미리보기 및 파일이름 상태 초기화
+        setFileName(null);
+      }
+    } catch (error) {
+      console.error('Error creating workspace:', error);
+    }
+  };
+
+  const handleAddButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   const handleOverlayClick = (e: any) => {
     if (e.target === e.currentTarget) {
@@ -38,6 +125,7 @@ const CreateWorkSpaceModal = () => {
                 <div className="font-bold leading-[1.6rem] mb-[1rem]">이름</div>
                 <div className="w-full h-12 px-3 py-1 bg-white rounded-lg border border-zinc-200 justify-start items-center gap-2.5 inline-flex">
                   <input
+                    ref={workspaceNameRef}
                     className="grow shrink basis-0 h-[22px] text-gray-400 text-sm font-medium
                     leading-snug focus:text-black focus:outline-none bg-transparent "
                     placeholder="워크스페이스 이름을 입력하세요."
@@ -48,16 +136,32 @@ const CreateWorkSpaceModal = () => {
                 <div className="font-bold mb-[1rem]">사진</div>
                 <div className="flex">
                   <div className="mr-[1.5rem]">
-                    <Image
-                      src="/img/empty_workspace.png"
-                      width={60}
-                      height={60}
-                      alt="이미지"
-                    />
+                    {filePreview ? (
+                      <Image
+                        src={filePreview}
+                        width={60}
+                        height={60}
+                        alt="선택된 이미지"
+                      />
+                    ) : (
+                      <Image
+                        src="/img/empty_workspace.png"
+                        width={60}
+                        height={60}
+                        alt="이미지"
+                      />
+                    )}
                   </div>
                   <div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: 'none' }}
+                      onChange={handleImageUpload}
+                    />
                     <div className="flex mb-[0.6rem]">
                       <div
+                        onClick={handleAddButtonClick}
                         className="border-[1px] px-[0.75rem] py-[0.25rem] rounded-[0.5rem]
                       text-[0.875rem] font-bold leading-[1.4rem] mr-[0.8rem] cursor-pointer"
                       >
@@ -71,7 +175,10 @@ const CreateWorkSpaceModal = () => {
                       </div>
                     </div>
                     <div className="text-[0.7rem] leading-[1.2rem] text-gray-4">
-                      워크스페이스의 대표사진으로 전체공개입니다.
+                      {fileError ||
+                        (fileName
+                          ? fileName
+                          : '워크스페이스의 대표사진으로 전체공개입니다.')}
                     </div>
                   </div>
                 </div>
@@ -85,6 +192,7 @@ const CreateWorkSpaceModal = () => {
                   취소
                 </div>
                 <div
+                  onClick={handleCreateWorkspace}
                   className="w-[10rem] h-[3rem] font-bold leading-[1.6rem] border-[1px] rounded-[0.5rem]
                     py-[0.25rem] px-[0.75rem] flex items-center justify-center bg-gray-3 text-white
                     cursor-pointer hover:bg-primary-blue"
@@ -99,5 +207,4 @@ const CreateWorkSpaceModal = () => {
     </div>
   );
 };
-
 export default CreateWorkSpaceModal;

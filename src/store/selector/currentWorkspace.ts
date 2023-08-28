@@ -13,7 +13,7 @@ export const firstWorkspaceSelector = selector<CurrentWorkspace | null>({
   get: async () => {
     try {
       const accessToken = Cookie.get('accessToken');
-      const response = await axios.get(
+      const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
         {
           headers: {
@@ -21,8 +21,8 @@ export const firstWorkspaceSelector = selector<CurrentWorkspace | null>({
           },
         },
       );
-      console.log(response.data);
-      const workspaces = response.data;
+      console.log(res.data);
+      const workspaces = res.data;
       if (workspaces && workspaces.length > 0) {
         return workspaces[0];
       }

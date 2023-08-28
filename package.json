@@ -25,6 +25,7 @@
     "jwt-decode": "^3.1.2",
     "next": "13.4.12",
     "next-auth": "^4.22.4",
+    "pica": "^9.0.1",
     "postcss": "8.4.27",
     "react": "18.2.0",
     "react-calendar": "^4.6.0",

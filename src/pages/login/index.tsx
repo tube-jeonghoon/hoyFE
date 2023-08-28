@@ -87,7 +87,7 @@ const Login = () => {
 
       sendInvitationAcceptance();
 
-      // window.location.href = '/home';
+      window.location.href = '/home';
     }
   }, [router.query.access_token]);
 

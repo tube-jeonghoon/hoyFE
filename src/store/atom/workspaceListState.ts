@@ -1,7 +1,7 @@
 import { atom } from 'recoil';
 
 interface WorkspaceList {
-  id: number;
+  workspace_id: number;
   workspace_name: string;
   workspace_imgUrl: string;
 }

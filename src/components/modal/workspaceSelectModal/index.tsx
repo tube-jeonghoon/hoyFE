@@ -8,14 +8,18 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { useRecoilState } from 'recoil';
 import CreateWorkSpaceModal from '../createWorkSpaceModal';
 import workspaceListState from '@/store/atom/workspaceListState';
+import { currentWorkspaceState } from '@/store/atom/userStatusState';
 
-// interface WorkspaceList {
-//   id: number;
-//   workspace_name: string;
-//   workspace_imgUrl: string;
-// }
+interface WorkspaceList {
+  workspace_id: number;
+  workspace_name: string;
+  workspace_imgUrl: string;
+}
 
 const WorkspaceSelectModal = () => {
+  const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
+    currentWorkspaceState,
+  );
   const [createWorkspaceVisible, setCreateWorkspaceVisible] = useRecoilState(
     isCreateWorkspaceModalState,
   );
@@ -25,27 +29,78 @@ const WorkspaceSelectModal = () => {
 
   const [workspaceList, setWorkspaceList] = useRecoilState(workspaceListState);
 
+  const closeModal = () => {
+    setWorkspaceSelectVisible(false);
+    console.log(`들어옴`);
+  };
+
+  const handleClickOutside = (e: any) => {
+    if (e.target.classList.contains('modal-overlay')) {
+      closeModal();
+    }
+  };
+
   const handleCreateWorkspace = () => {
     setWorkspaceSelectVisible(false);
     setCreateWorkspaceVisible(true);
   };
 
+  const changeCurrentWorkspaceHandler = (
+    workspaceId: number,
+    workspaceName: string,
+    workspaceUrl: string,
+  ) => {
+    console.log(`클릭됌`);
+    console.log(workspaceId);
+    console.log(workspaceName);
+    console.log(workspaceUrl);
+    const newCurrentWorkspace = {
+      workspace_id: workspaceId,
+      workspace_name: workspaceName,
+      workspace_url: workspaceUrl,
+    };
+    setCurrentWorkSpace(newCurrentWorkspace);
+  };
+
   return (
-    <div className="absolute top-[3rem] w-[18rem] z-[101]">
+    <div
+      className={`absolute top-[3rem] w-[18rem] z-[101] modal-overlay ${
+        workspaceSelectVisible ? 'active' : ''
+      }`}
+      onClick={handleClickOutside}
+    >
       <div className="w-full p-3 bg-white rounded-xl border">
         {workspaceList.map(workspace => (
           <div
-            key={workspace.id}
+            key={workspace.workspace_id}
             className="px-3 py-2 rounded-lg justify-start items-center gap-2.5 inline-flex
             cursor-pointer w-full hover:bg-gray-2"
+            // onClick={() => changeCurrentWorkspaceHandler(workspace.id)}
+            onClick={() =>
+              changeCurrentWorkspaceHandler(
+                workspace.workspace_id,
+                workspace.workspace_name,
+                workspace.workspace_imgUrl,
+              )
+            }
           >
             <div className="justify-start items-center gap-2.5 flex hover:bg-gray-2">
-              <Image
-                src="/img/teamImage.png"
-                alt="img"
-                width="40"
-                height="40"
-              />
+              {workspace.workspace_imgUrl === null ? (
+                <Image
+                  src="/img/teamImage.png"
+                  alt="img"
+                  width="40"
+                  height="40"
+                />
+              ) : (
+                <Image
+                  src={workspace.workspace_imgUrl}
+                  alt="img"
+                  width="40"
+                  height="40"
+                />
+              )}
+
               <div className="text-neutral-600 text-base leading-relaxed">
                 {workspace.workspace_name}
               </div>

@@ -82,7 +82,7 @@ const SideBar = () => {
     setCreateGroupModalVisible(!createGroupModalVisible);
   };
 
-  const fechWorkSpaceData = async () => {
+  const fetchWorkSpaceData = async () => {
     try {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
@@ -150,7 +150,7 @@ const SideBar = () => {
   const fetchGroupState = (id: number, name: string): void => {
     setCurrentGroup(id);
     setCurrentHeaderName(name);
-    router.push('/viewOtherGroup');
+    router.push('/viewGroup');
   };
 
   useEffect(() => {
@@ -158,7 +158,7 @@ const SideBar = () => {
   }, [currentGroup]);
 
   useEffect(() => {
-    fechWorkSpaceData();
+    fetchWorkSpaceData();
     fetchUserData();
     fetchGroupListData();
   }, []);

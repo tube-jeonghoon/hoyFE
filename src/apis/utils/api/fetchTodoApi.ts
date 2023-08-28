@@ -1,22 +1,28 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
-interface FetchTodoApiParams {
+interface FetchCustomViewTodoApi {
+  userId: number;
   currentDate: string;
 }
 
-export const fetchTodoApi = async ({ currentDate }: FetchTodoApiParams) => {
+export const fetchCustomViewTodoApi = async ({
+  userId,
+  currentDate,
+}: FetchCustomViewTodoApi) => {
+  const accessToken = Cookies.get('ACCESS_KEY');
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks?date=${currentDate}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/tasks/member/${userId}?date=${currentDate}`,
       {
         headers: {
-          Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       },
     );
 
     return response.data;
   } catch (error) {
-    throw error;
+    console.error(error);
   }
 };

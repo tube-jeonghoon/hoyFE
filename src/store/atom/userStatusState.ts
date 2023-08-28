@@ -25,12 +25,13 @@ const currentWorkspaceState = atom<CurrentWorkspace>({
   default: {
     workspace_id: 1,
     workspace_name: '',
+    workspace_imgUrl: '',
   },
 });
 
 const currentGroupState = atom<number>({
   key: 'currentGroupState',
-  default: 1,
+  default: 0,
 });
 
 export {
