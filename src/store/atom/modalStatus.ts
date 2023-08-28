@@ -5,8 +5,8 @@ const isCalendarModalState = atom({
   default: false,
 });
 
-const isWorkspaceModalState = atom({
-  key: 'isWorkspaceModalState',
+const isSelectWorkspaceModalState = atom({
+  key: 'isSelectWorkspaceModalState',
   default: false,
 });
 
@@ -32,7 +32,7 @@ const isCreateGroupModalState = atom({
 
 export {
   isCalendarModalState,
-  isWorkspaceModalState,
+  isSelectWorkspaceModalState,
   isCreateWorkspaceModalState,
   isDetailModalState,
   isSearchMemberModalState,

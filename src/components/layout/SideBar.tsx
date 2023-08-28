@@ -7,7 +7,7 @@ import {
   isCreateGroupModalState,
   isCreateWorkspaceModalState,
   isSearchMemberModalState,
-  isWorkspaceModalState,
+  isSelectWorkspaceModalState,
 } from '@/store/atom/modalStatus';
 import WorkspaceSelectModal from '../modal/workspaceSelectModal';
 import CreateWorkSpaceModal from '../modal/createWorkSpaceModal';
@@ -41,8 +41,8 @@ const SideBar = () => {
   const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
     currentHeaderNameState,
   );
-  const [workspaceVisible, setWorkspaceVisible] = useRecoilState(
-    isWorkspaceModalState,
+  const [workspaceSelectVisible, setWorkspaceSelectVisible] = useRecoilState(
+    isSelectWorkspaceModalState,
   );
   const [createWorkspaceVisible, setCreateWorkspaceVisible] = useRecoilState(
     isCreateWorkspaceModalState,
@@ -70,8 +70,8 @@ const SideBar = () => {
 
   const [groupList, setGroupList] = useState([]);
 
-  const toggleWorkspace = () => {
-    setWorkspaceVisible(!workspaceVisible);
+  const toggleWorkspaceSelect = () => {
+    setWorkspaceSelectVisible(!workspaceSelectVisible);
   };
 
   const toggleSearchMember = () => {
@@ -168,7 +168,7 @@ const SideBar = () => {
       <div
         className="team-logo flex items-center justify-between relative
         cursor-pointer rounded-[0.5rem]"
-        onClick={toggleWorkspace}
+        onClick={toggleWorkspaceSelect}
       >
         <div className="flex items-center gap-[0.62rem]">
           <div className="desktop:w-[1.5rem] desktopL:w-[2.5rem]">
@@ -179,12 +179,12 @@ const SideBar = () => {
           </div>
         </div>
         <div
-          onClick={toggleWorkspace}
+          // onClick={toggleWorkspaceSelect}
           className="ml-[0.3rem] flex items-center"
         >
           <VscChevronDown />
         </div>
-        {workspaceVisible && <WorkspaceSelectModal />}
+        {workspaceSelectVisible && <WorkspaceSelectModal />}
       </div>
       <div className="sidebar-menu text-[0.875rem] text-black">
         <div

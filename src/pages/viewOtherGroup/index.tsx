@@ -7,13 +7,14 @@ import star from '../../../public/img/star.svg';
 import checkBoxIcon from '../../../public/img/checkBox.svg';
 import { IoEllipsisVertical } from 'react-icons/io5';
 import axios from 'axios';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   currentHeaderNameState,
   currentWorkspaceState,
   currentGroupState,
 } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
+import { formattedCurrentDateSelector } from '@/store/selector/currentTime';
 
 interface ViewUserGroupList {
   userId: number;
@@ -22,6 +23,7 @@ interface ViewUserGroupList {
 }
 
 const ViewOtherGroup = () => {
+  const selectedDay = useRecoilValue(formattedCurrentDateSelector);
   const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
     currentHeaderNameState,
   );
@@ -32,6 +34,7 @@ const ViewOtherGroup = () => {
   const [viewGroupUserList, setViewGroupUserList] = useState<
     ViewUserGroupList[]
   >([]);
+
   const fetchGroupMember = async () => {
     try {
       const accessToken = Cookies.get('ACCESS_KEY');
@@ -89,10 +92,10 @@ const ViewOtherGroup = () => {
               </div>
               <div className="flex items-center gap-[0.25rem]">
                 <div className="text-black text-[0.875rem] font-bold leading-[1.4rem]">
-                  목요일
+                  {selectedDay.dayofWeek}
                 </div>
                 <div className="text-gray-5 text-[0.75rem] leading-[1.4rem]">
-                  8/24
+                  {selectedDay.day}
                 </div>
               </div>
               <div className="text-gray-4 cursor-pointer">
@@ -132,228 +135,6 @@ const ViewOtherGroup = () => {
             </div>
           </div>
           <div className="h-[20rem] overflow-y-auto">
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                5시 전까지 주간회의록 정리
-                <div className="ml-[0.62rem] text-gray-4">[12]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
-            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-              <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
-                <Image src={checkBoxIcon} alt="체크박스" />
-              </div>
-              <div className="flex items-center mr-[0.62rem]">
-                <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-              </div>
-              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                코드 리뷰하기
-                <div className="ml-[0.62rem] text-gray-4">[5]</div>
-              </div>
-              <div className="cursor-pointer">
-                <IoEllipsisVertical />
-              </div>
-            </div>
             <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
               <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
                 <Image src={checkBoxIcon} alt="체크박스" />

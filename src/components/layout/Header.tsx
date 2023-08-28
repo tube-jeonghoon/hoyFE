@@ -8,20 +8,32 @@ import { isCalendarModalState } from '@/store/atom/modalStatus';
 import { currentHeaderNameState } from '@/store/atom/userStatusState';
 import Image from 'next/image';
 import verticalSetting from '../../../public/img/verticalSetting.svg';
+import { useRouter } from 'next/router';
+import CustomViewOptionBtn from '../customViewOptionBtn';
 const DynamicMyCalendar = dynamic(() => import('@/components/MyCalendar'), {
   ssr: false,
 });
 
 const Header = () => {
+  const router = useRouter();
   const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
     currentHeaderNameState,
   );
   const [calendarVisible, setCalendarVisible] =
     useRecoilState(isCalendarModalState);
   const [selectedDate, setSelectedDate] = useRecoilState(selectedDateState);
+  const [isCustomViewOptionBtnVisible, setIsCustomViewOptionBtnVisible] =
+    useState(false);
+
+  const showVerticalSettingIcon = router.pathname === '/viewOtherGroup';
 
   const toggleCalendar = () => {
     setCalendarVisible(!calendarVisible);
+  };
+
+  const toggleCustomViewOptionBtn = () => {
+    console.log('toggleCustomViewOptionBtn');
+    setIsCustomViewOptionBtnVisible(!isCustomViewOptionBtnVisible);
   };
 
   return (
@@ -29,12 +41,18 @@ const Header = () => {
       <div className="p-[3.75rem] pb-[2.5rem] w-full">
         <div className="flex gap-[0.38rem] items-center">
           <div className="text-gray-5">{currentHeaderName} 님의 투두리스트</div>
-          <div
-            className="w-[1.25rem] h-[1.25rem] cursor-pointer focus:bg-gray-2 hover:bg-gray-2
+          {showVerticalSettingIcon && (
+            <div>
+              <div
+                className="w-[1.25rem] h-[1.25rem] cursor-pointer focus:bg-gray-2 hover:bg-gray-2
             p-[0.12rem] rounded-[0.5rem]"
-          >
-            <Image src={verticalSetting} alt="세로선" />
-          </div>
+                onClick={toggleCustomViewOptionBtn}
+              >
+                <Image src={verticalSetting} alt="세로선" />
+              </div>
+              {isCustomViewOptionBtnVisible && <CustomViewOptionBtn />}
+            </div>
+          )}
         </div>
         <div className="flex items-center text-[1.625rem] font-bold relative">
           <div>2023년 8월</div>
