@@ -44,8 +44,20 @@ const formattedAfterDateSelector = selector({
   },
 });
 
+// 캘린더에 쓸 날짜
+const formattedCalendarDateSelector = selector({
+  key: 'formattedCalendarDateSelector',
+  get: ({ get }) => {
+    const currentDate = get(currentDateState);
+    const formatDate = format(currentDate, 'yyyy년 MM월');
+
+    return formatDate;
+  },
+});
+
 export {
   formattedCurrentDateSelector,
   formattedBeforeDateSelector,
   formattedAfterDateSelector,
+  formattedCalendarDateSelector,
 };

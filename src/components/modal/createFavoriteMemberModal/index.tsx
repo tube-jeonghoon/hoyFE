@@ -3,13 +3,17 @@ import { BiSearch } from 'react-icons/bi';
 import { RxCross2 } from 'react-icons/rx';
 import Image from 'next/image';
 import defaultUser from '../../../public/img/defaultUser.png';
-import star from '../../../public/img/star.svg';
-import fillStar from '../../../public/img/fillStar.svg';
+import star from '../../../../public/img/star.svg';
+import fillStar from '../../../../public/img/fillStar.svg';
 import { useRecoilState } from 'recoil';
-import { isSearchMemberModalState } from '@/store/atom/modalStatus';
+import {
+  isCreateMemberModalState,
+  isSearchMemberModalState,
+} from '@/store/atom/modalStatus';
 import axios from 'axios';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
+import favoriteUserListState from '@/store/atom/favoriteUserListState';
 
 interface SearchMemberList {
   userId: number;
@@ -18,20 +22,51 @@ interface SearchMemberList {
   flag?: boolean;
 }
 
-const SearchMemberModal = () => {
+interface FavoriteUserList {
+  userId: number;
+  nickname: string;
+  imgUrl: string;
+}
+
+const CreateFavoriteMemberModal = () => {
   const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
-  const [searchMemeberVisible, setSearchMemeberVisible] = useRecoilState(
-    isSearchMemberModalState,
+  const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
+    currentWorkspaceState,
+  );
+  const [createMemeberVisible, setCreateMemeberVisible] = useRecoilState(
+    isCreateMemberModalState,
   );
   const [searchMemberList, setSearchMemberList] = useState<SearchMemberList[]>(
     [],
   );
 
+  const [favoriteUserList, setFavoriteUserList] = useRecoilState(
+    favoriteUserListState,
+  );
+
+  const fetchFavoriteUserList = async () => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/favorites`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      console.log(res.data);
+      setFavoriteUserList(res.data);
+    } catch (error) {}
+  };
+
   const handleOverlayClick = (e: any) => {
     if (e.target === e.currentTarget) {
-      setSearchMemeberVisible(false);
+      setCreateMemeberVisible(false);
+      fetchFavoriteUserList();
     }
   };
 
@@ -50,6 +85,26 @@ const SearchMemberModal = () => {
       console.log(res.data);
       setSearchMemberList(res.data);
     } catch (error) {}
+  };
+
+  const toogleFavorite = async (userId: number) => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/favorites/toggle-user/${userId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      fetchUser();
+      console.log(res);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -71,7 +126,7 @@ const SearchMemberModal = () => {
             <div className="p-[2rem] flex flex-col gap-[1.5rem]">
               <div className="flex flex-col gap-[1rem]">
                 <div className="text-black font-bold leading-[1.6rem]">
-                  멤버 찾기
+                  자주 찾는 멤버 추가
                 </div>
                 <div>
                   <div
@@ -97,7 +152,10 @@ const SearchMemberModal = () => {
                   <div
                     key={member.userId}
                     className="flex justify-between items-center p-[0.75rem] hover:bg-gray-2
-                  cursor-pointer hover:rounded-[0.5rem]"
+                    cursor-pointer hover:rounded-[0.5rem]"
+                    onClick={() => {
+                      toogleFavorite(member.userId);
+                    }}
                   >
                     <div className="flex items-center gap-[0.75rem] text-black">
                       <div className="w-[1.5rem]">
@@ -121,20 +179,6 @@ const SearchMemberModal = () => {
                     )}
                   </div>
                 ))}
-                {/* <div
-                  className="flex justify-between items-center p-[0.75rem] hover:bg-gray-2
-                  cursor-pointer hover:rounded-[0.5rem]"
-                >
-                  <div className="flex items-center gap-[0.75rem] text-black">
-                    <div className="w-[1.5rem]">
-                      <Image src={defaultUser} alt="defaultUser" />
-                    </div>
-                    <div className="text-[0.875rem]">홍길동</div>
-                  </div>
-                  <div>
-                    <Image src={star} alt="즐겨찾기" />
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
@@ -144,4 +188,4 @@ const SearchMemberModal = () => {
   );
 };
 
-export default SearchMemberModal;
+export default CreateFavoriteMemberModal;

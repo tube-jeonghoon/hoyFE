@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { VscChevronDown } from 'react-icons/vsc';
 import dynamic from 'next/dynamic';
 import MyCalendar from '@/components/MyCalendar';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import selectedDateState from '@/store/atom/selectedDateState';
 import { isCalendarModalState } from '@/store/atom/modalStatus';
 import { currentHeaderNameState } from '@/store/atom/userStatusState';
@@ -10,6 +10,7 @@ import Image from 'next/image';
 import verticalSetting from '../../../public/img/verticalSetting.svg';
 import { useRouter } from 'next/router';
 import CustomViewOptionBtn from '../customViewOptionBtn';
+import { formattedCalendarDateSelector } from '@/store/selector/currentTime';
 const DynamicMyCalendar = dynamic(() => import('@/components/MyCalendar'), {
   ssr: false,
 });
@@ -26,6 +27,7 @@ const Header = () => {
     useState(false);
 
   const showVerticalSettingIcon = router.pathname === '/viewGroup';
+  const calendarDate = useRecoilValue(formattedCalendarDateSelector);
 
   const toggleCalendar = () => {
     setCalendarVisible(!calendarVisible);
@@ -55,7 +57,7 @@ const Header = () => {
           )}
         </div>
         <div className="flex items-center text-[1.625rem] font-bold relative">
-          <div>2023년 8월</div>
+          <div>{calendarDate}</div>
           <button className="ml-[0.3rem]" onClick={toggleCalendar}>
             <VscChevronDown />
           </button>

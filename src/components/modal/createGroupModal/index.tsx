@@ -8,8 +8,9 @@ import membercheckImg from '../../../../public/img/memberCheck.svg';
 import fillMemberCheckImg from '../../../../public/img/fillMemberCheck.svg';
 import userImg from '../../../../public/img/defaultUser.png';
 import axios from 'axios';
-import Cookie from 'js-cookie';
+import Cookies from 'js-cookie';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import groupListState from '@/store/atom/groupListState';
 
 interface Member {
   userId: number;
@@ -27,10 +28,11 @@ const CreateGroupModal = () => {
   const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
+  const [groupList, setGroupList] = useRecoilState(groupListState);
 
   const fetchUser = async () => {
     try {
-      const accessToken = Cookie.get('ACCESS_KEY');
+      const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/group/available-users`,
         {
@@ -48,8 +50,26 @@ const CreateGroupModal = () => {
     }
   };
 
+  const fetchGroupListData = async () => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/group`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      console.log('fetchGroupListData', res.data);
+      setGroupList(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const createGroup = async () => {
-    const accessToken = Cookie.get('ACCESS_KEY');
+    const accessToken = Cookies.get('ACCESS_KEY');
     const memberIds = selectedMembers.map(member => member.userId);
 
     const paylaod = {
@@ -71,8 +91,7 @@ const CreateGroupModal = () => {
 
       console.log(res.data);
       setCreateGroupVisible(false);
-      // 상태 추적을 sidebar에서 못해서 임시 방편으로 새로고침
-      window.location.href = '/home';
+      fetchGroupListData();
     } catch (error) {
       console.error('그룹 만들기가 실패하였습니다. ❌', error);
     }

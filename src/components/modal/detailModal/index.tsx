@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import detailImg from '../../../../public/img/detailImg.png';
 import { IoCheckbox, IoSquareOutline } from 'react-icons/io5';
@@ -8,22 +8,16 @@ import CommentCard from '@/components/commentCard';
 import sendMsg from '../../../../public/img/sendMsg.svg';
 import noneComment from '../../../../public/img/noneComment.svg';
 import axios from 'axios';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilState } from 'recoil';
 import { isDetailModalState } from '@/store/atom/modalStatus';
-import Cookie from 'js-cookie';
+import Cookies from 'js-cookie';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
-
-interface DetailProps {
-  taskId: number;
-}
-
-interface postUser {
-  nickname: string;
-  imgUrl: string;
-}
+import { DetailProps, postUser } from './types';
+import detailFillCheck from '../../../../public/img/detailFillCheck.svg';
 
 const DetailModal = (Props: DetailProps) => {
+  const queryClient = useQueryClient();
   const [commentStatus, setCommentStatus] = useState(false);
   const { taskId } = Props;
   const [title, setTitle] = useState<string>('');
@@ -31,25 +25,63 @@ const DetailModal = (Props: DetailProps) => {
     nickname: '',
     imgUrl: '',
   });
+  const [priority, setPriority] = useState<number>(0);
   const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
     currentWorkspaceState,
   );
   const [isDetailModalOpen, setIsDetailModalOpen] =
     useRecoilState(isDetailModalState);
 
-  const mutation = useMutation(taskId => {
-    // accessToken을 Cookie에서 가져옵니다.
-    const accessToken = Cookie.get('ACCESS_KEY');
+  const { data: taskDetailData, isSuccess: taskDetailSuccess } = useQuery(
+    ['taskDetail', taskId],
+    async () => {
+      const accessToken = Cookies.get('ACCESS_KEY');
 
-    return axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
-      },
-    );
+      );
+
+      return res.data;
+    },
+  );
+  console.log(taskDetailData);
+
+  const changePriority = async (taskId: number) => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.put(
+        // workspace/{:workspaceId}/tasks/{:taskId}/priority
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/priority`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      console.log(res.data);
+
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const priorityMutation = useMutation(changePriority, {
+    onSuccess: () => {
+      console.log('✨ ➤ onSuccess ➤ priority mutation');
+    },
   });
+
+  const togglePriorityHandler = () => {
+    // taskId와 같은 식별자를 넣어줍니다.
+    priorityMutation.mutate(taskId);
+  };
 
   const deleteTask = async (taskId: number) => {
     const userConfirmed = window.confirm('정말로 이 글을 삭제하시겠습니까?');
@@ -58,7 +90,7 @@ const DetailModal = (Props: DetailProps) => {
       return;
     }
     try {
-      const accessToken = Cookie.get('ACCESS_KEY');
+      const accessToken = Cookies.get('ACCESS_KEY');
       await axios.delete(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}`,
         {
@@ -69,7 +101,8 @@ const DetailModal = (Props: DetailProps) => {
       );
       setIsDetailModalOpen(false);
       console.log(`${taskId}번 글 삭제 완료`);
-      window.location.href = '/home';
+
+      queryClient.invalidateQueries('todos');
     } catch (error) {
       console.error(error);
     }
@@ -78,27 +111,31 @@ const DetailModal = (Props: DetailProps) => {
   const handleOverlayClick = (e: any) => {
     if (e.target === e.currentTarget) {
       setIsDetailModalOpen(false);
-      console.log(`들어옴`);
     }
   };
 
   useEffect(() => {
-    console.log(taskId);
-    mutation.mutate(taskId);
-  }, [taskId]);
+    // mutation의 onSuccess에서 데이터를 가져온 후 상태를 업데이트
+    if (priorityMutation.isSuccess) {
+      // 서버 응답을 이용해 상태 업데이트 로직을 작성할 수 있습니다.
+      setPriority(priorityMutation.data);
+      queryClient.invalidateQueries('taskDetail');
+      queryClient.invalidateQueries('todos');
+    }
+  }, [priorityMutation.status]);
 
   useEffect(() => {
-    if (mutation.status === 'success') {
-      console.log(mutation.data.data);
-      setTitle(mutation.data.data.task.title);
-      setPostUser(mutation.data.data.user);
-      console.log(postUser);
-      // console.log(postUser.imgUrl);
+    if (taskDetailSuccess) {
+      setTitle(taskDetailData.task.title);
+      setPostUser(taskDetailData.user);
+      setPriority(taskDetailData.task.priority);
     }
-    if (mutation.status === 'error') {
-      console.log(mutation.error);
-    }
-  }, [mutation.status]);
+  }, [taskDetailData, taskDetailSuccess]);
+
+  useEffect(() => {
+    console.log(taskId);
+    // mutation.mutate(taskId);
+  }, [taskId]);
 
   return (
     <div
@@ -116,9 +153,9 @@ const DetailModal = (Props: DetailProps) => {
           <div className="flex gap-[0.75rem]">
             <div>
               <Image
+                src={postUser.imgUrl}
                 width={24}
                 height={24}
-                src={postUser.imgUrl}
                 alt="디테일"
               />
             </div>
@@ -129,8 +166,12 @@ const DetailModal = (Props: DetailProps) => {
           </div>
           <div className="flex justify-between">
             <div className="flex gap-[0.62rem] items-center cursor-pointer">
-              <div className="text-gray-4">
-                <Image src={checkBoxIcon} alt="체크박스" />
+              <div className="text-gray-4" onClick={togglePriorityHandler}>
+                {priority === 0 ? (
+                  <Image src={checkBoxIcon} alt="체크박스" />
+                ) : (
+                  <Image src={detailFillCheck} alt="체크박스" />
+                )}
               </div>
               <div className="text-black text-[0.875rem] leading-[1.4rem]">
                 중요

@@ -197,7 +197,7 @@ const ViewGroup = () => {
                   <div key={todo.id} className="todo-list">
                     {todo.status ? (
                       <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-                        <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
+                        <div className="text-black mr-[0.62rem] w-[1.5rem]">
                           <Image src={fillCheckBox} alt="체크박스" />
                         </div>
                         {todo.priority == 1 && (
@@ -217,7 +217,7 @@ const ViewGroup = () => {
                       </div>
                     ) : (
                       <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-                        <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
+                        <div className="text-black mr-[0.62rem] w-[1.5rem]">
                           <Image src={checkBoxIcon} alt="체크박스" />
                         </div>
                         {todo.priority == 1 && (

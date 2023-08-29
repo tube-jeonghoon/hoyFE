@@ -78,6 +78,7 @@ const CreateWorkSpaceModal = () => {
       console.log('Workspace created', response.data);
       setCreateWorkspaceVisible(false);
       setSelectedFile(null);
+      window.location.reload();
       // Blob URL 해제
       if (filePreview) {
         URL.revokeObjectURL(filePreview);

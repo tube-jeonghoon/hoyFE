@@ -5,9 +5,11 @@ import Image from 'next/image';
 import { useRecoilState } from 'recoil';
 import {
   isCreateGroupModalState,
+  isCreateMemberModalState,
   isCreateWorkspaceModalState,
   isSearchMemberModalState,
   isSelectWorkspaceModalState,
+  isUpdateModalState,
 } from '@/store/atom/modalStatus';
 import WorkspaceSelectModal from '../modal/workspaceSelectModal';
 import CreateWorkSpaceModal from '../modal/createWorkSpaceModal';
@@ -23,6 +25,10 @@ import {
 } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
 import CreateGroupModal from '../modal/createGroupModal';
+import CreateFavoriteMemberModal from '../modal/createFavoriteMemberModal';
+import favoriteUserListState from '@/store/atom/favoriteUserListState';
+import groupListState from '@/store/atom/groupListState';
+import UpdateModal from '../updateModal';
 
 interface GroupList {
   id: number;
@@ -31,6 +37,12 @@ interface GroupList {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
+}
+
+interface FavoriteUserList {
+  userId: number;
+  nickname: string;
+  imgUrl: string;
 }
 
 const SideBar = () => {
@@ -53,6 +65,12 @@ const SideBar = () => {
   const [createGroupModalVisible, setCreateGroupModalVisible] = useRecoilState(
     isCreateGroupModalState,
   );
+  const [createFavoriteVisible, setCreateFavoriteVisible] = useRecoilState(
+    isCreateMemberModalState,
+  );
+  const [updateModalVisible, setUpdateModalVisible] =
+    useRecoilState(isUpdateModalState);
+
   const [workspaceList, setWorkspaceList] = useRecoilState(workspaceListState);
   const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
     currentWorkspaceState,
@@ -68,7 +86,11 @@ const SideBar = () => {
     '방민석',
   ]);
 
-  const [groupList, setGroupList] = useState([]);
+  const [favoriteUserList, setFavoriteUserList] = useRecoilState(
+    favoriteUserListState,
+  );
+
+  const [groupList, setGroupList] = useRecoilState(groupListState);
 
   const toggleWorkspaceSelect = () => {
     setWorkspaceSelectVisible(!workspaceSelectVisible);
@@ -78,8 +100,18 @@ const SideBar = () => {
     setSearchMemeberVisible(!searchMemeberVisible);
   };
 
+  const toggleCreateFavoriteMemeber = () => {
+    setCreateFavoriteVisible(!createFavoriteVisible);
+  };
+
   const toggleCreateGroupModal = () => {
     setCreateGroupModalVisible(!createGroupModalVisible);
+  };
+
+  const toggleUpdateModal = () => {
+    console.log(`클릭됌`);
+    console.log(updateModalVisible);
+    setUpdateModalVisible(!updateModalVisible);
   };
 
   const fetchWorkSpaceData = async () => {
@@ -98,6 +130,25 @@ const SideBar = () => {
       console.log('받아온 워크스페이스 리스트 ', res.data);
       setCurrentWorkSpace(res.data[0]);
       console.log('기본 선택된 워크스페이스', res.data[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchFavoriteUserList = async () => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/favorites`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      console.log(res.data);
+      setFavoriteUserList(res.data);
     } catch (error) {
       console.error(error);
     }
@@ -159,6 +210,7 @@ const SideBar = () => {
 
   useEffect(() => {
     fetchWorkSpaceData();
+    fetchFavoriteUserList();
     fetchUserData();
     fetchGroupListData();
   }, []);
@@ -206,7 +258,11 @@ const SideBar = () => {
             <div>(나)</div>
           </div>
         </div>
-        <div className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer">
+        <div
+          className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer
+              relative"
+          onClick={toggleUpdateModal}
+        >
           <div className="mr-[0.75rem]">
             <Image
               src="/img/notifications.png"
@@ -216,6 +272,7 @@ const SideBar = () => {
             />
           </div>
           <div>업데이트</div>
+          {updateModalVisible && <UpdateModal />}
         </div>
         <div
           className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer"
@@ -240,20 +297,21 @@ const SideBar = () => {
       <div className="favorite-person-Area">
         <div className="flex items-center justify-between h-[2.5rem] px-[0.75rem] ">
           <div className="font-bold text-black">자주 찾는 멤버</div>
-          <div className="cursor-pointer">
+          <div className="cursor-pointer" onClick={toggleCreateFavoriteMemeber}>
             <AiOutlinePlus />
           </div>
         </div>
+        {createFavoriteVisible && <CreateFavoriteMemberModal />}
         <div className="favorite-persion text-[0.875rem] max-h-[12rem] overflow-y-auto">
-          {userList.map((user, idx) => (
+          {favoriteUserList.map(user => (
             <div
-              key={idx}
+              key={user.userId}
               className="flex items-center p-[0.75rem] cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem]"
             >
               <div>
-                <Image src="/img/user.png" alt="img" width="24" height="24" />
+                <Image src={user.imgUrl} alt="img" width="24" height="24" />
               </div>
-              <div className="mx-[0.75rem]">{user}</div>
+              <div className="mx-[0.75rem]">{user.nickname}</div>
             </div>
           ))}
         </div>
