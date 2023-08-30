@@ -123,6 +123,7 @@ const ViewGroup = () => {
       const todos = await fetchCustomViewTodoApi({
         userId: user.userId,
         currentDate: user.selectedDate,
+        workspaceId: currentWorkspace.workspace_id,
       });
       // console.log('fhi', todos);
       // console.log('------');

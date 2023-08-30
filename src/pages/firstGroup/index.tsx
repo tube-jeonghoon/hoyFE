@@ -92,8 +92,8 @@ const FirstGroup = () => {
       // console.log('Workspace created', response.data);
       setCreateWorkspaceVisible(false);
       setSelectedFile(null);
+
       router.push('/home');
-      window.location.reload();
       // Blob URL 해제
       if (filePreview) {
         URL.revokeObjectURL(filePreview);

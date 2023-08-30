@@ -54,7 +54,7 @@ const WorkspaceSelectModal = () => {
     workspaceUrl: string,
   ) => {
     // console.log(`클릭됌`);
-    workspaceId;
+    // console.log(workspaceId);
     // console.log(workspaceName);
     // console.log(workspaceUrl);
     const newCurrentWorkspace = {

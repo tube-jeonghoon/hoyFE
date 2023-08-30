@@ -25,7 +25,7 @@ const currentWorkspaceState = atom<CurrentWorkspace>({
   default: {
     workspace_id: 0,
     workspace_name: '',
-    workspace_imgUrl: '',
+    workspace_imgUrl: '' || null,
   },
 });
 

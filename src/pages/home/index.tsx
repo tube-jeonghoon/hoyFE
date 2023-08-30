@@ -43,7 +43,6 @@ import {
 } from 'react-beautiful-dnd';
 
 const Home = () => {
-  console.log('Home 컴포넌트 렌더링');
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -109,9 +108,8 @@ const Home = () => {
 
   // 받아온 워크스페이스 리스트가 없으면 초기페이지로 이동
   useEffect(() => {
-    console.log(`실행되니?`);
     if (workspaceSuccess) {
-      console.log(workspaceData.length);
+      // console.log(workspaceData.length);
       if (workspaceData?.length === 0) {
         router.push('/firstGroup');
       }
