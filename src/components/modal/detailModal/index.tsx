@@ -248,7 +248,7 @@ const DetailModal = (Props: DetailProps) => {
         </div>
         <div>
           <div className="p-[2rem]">
-            {commentBody !== [] ? (
+            {commentBody.length > 0 ? (
               <div>
                 <div className="flex gap-[0.5rem] mb-[1.5rem]">
                   <div className="text-black font-bold leading-[1.6rem]">

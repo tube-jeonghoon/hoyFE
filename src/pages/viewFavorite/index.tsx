@@ -28,7 +28,6 @@ import detailState from '@/store/atom/detailState';
 import selectedDateState from '@/store/atom/selectedDateState';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
-import { Todo, NewTodoItem, NewTask, CurrentDate } from './type';
 import addTodoApi from '@/apis/utils/api/addTodoApi';
 import { addDays, parseISO, set, subDays } from 'date-fns';
 import arrowRight from '../../../public/img/arrow_right.svg';
@@ -41,6 +40,7 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import { Todo, NewTodoItem, NewTask, CurrentDate } from './types';
 
 const ViewFavorite = () => {
   const queryClient = useQueryClient();

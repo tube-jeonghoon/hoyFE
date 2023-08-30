@@ -1,24 +1,34 @@
-import { isCreateWorkspaceModalState } from '@/store/atom/modalStatus';
-import React, { useRef, useState } from 'react';
+import React, {
+  useRef,
+  useState,
+  ChangeEvent,
+  InputHTMLAttributes,
+} from 'react';
 import { useRecoilState } from 'recoil';
 import Image from 'next/image';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import pica from 'pica';
+import { isCreateWorkspaceModalState } from '@/store/atom/modalStatus';
+interface FileInputRef extends InputHTMLAttributes<HTMLInputElement> {
+  current: HTMLInputElement | null;
+}
+
 const CreateWorkSpaceModal = () => {
   const [createWorkspaceVisible, setCreateWorkspaceVisible] = useRecoilState(
     isCreateWorkspaceModalState,
   );
-  const fileInputRef = useRef(null);
-  const workspaceNameRef = useRef(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [filePreview, setFilePreview] = useState(null);
-  const [fileName, setFileName] = useState(null);
-  const [fileError, setFileError] = useState(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const workspaceNameRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
-  const handleImageUpload = async event => {
+  const handleImageUpload = async (event: any) => {
     const file = event.target.files[0];
     if (!file) return;
+
     // 파일 유형 확인
     if (!file.type.startsWith('image/')) {
       setFileError('이미지 파일만 업로드 가능합니다.');
@@ -26,29 +36,37 @@ const CreateWorkSpaceModal = () => {
     } else {
       setFileError(null);
     }
+
     const targetSize = 300;
     const reader = new FileReader();
 
-    reader.onload = async e => {
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.onload = async () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = targetSize;
-        canvas.height = targetSize;
-        // Pica 리사이징
-        await pica().resize(img, canvas);
-        // 상태에 파일 저장
-        canvas.toBlob(async resizedBlob => {
-          setSelectedFile(
-            new File([resizedBlob], file.name, { type: 'image/jpeg' }),
-          );
-          // 파일 미리보기 URL과 파일 이름 설정
-          const previewUrl = URL.createObjectURL(file);
-          setFilePreview(previewUrl);
-          setFileName(file.name);
-        });
-      };
+    reader.onload = async (e: ProgressEvent<FileReader>) => {
+      if (e.target?.result && typeof e.target.result === 'string') {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+
+        img.onload = async () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = targetSize;
+          canvas.height = targetSize;
+
+          // Pica 리사이징
+          await pica().resize(img, canvas);
+
+          canvas.toBlob(async resizedBlob => {
+            if (resizedBlob) {
+              setSelectedFile(
+                new File([resizedBlob], file.name, { type: 'image/jpeg' }),
+              );
+            }
+
+            // 파일 미리보기 URL과 파일 이름 설정
+            const previewUrl = URL.createObjectURL(file);
+            setFilePreview(previewUrl);
+            setFileName(file.name);
+          });
+        };
+      }
     };
     reader.readAsDataURL(file);
   };
