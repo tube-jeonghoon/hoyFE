@@ -15,7 +15,7 @@ interface NewTodoItem {
   date: string;
   dayOfWeek: string;
   day: string;
-  tasks: Todo[]; // 이미 이전에 Todo 타입을 정의해두었습니다.
+  tasks: Todo[];
 }
 
 interface NewTask {

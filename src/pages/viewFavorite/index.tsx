@@ -40,7 +40,12 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { Todo, NewTodoItem, NewTask, CurrentDate } from './types';
+import {
+  Todo,
+  NewTodoItem,
+  NewTask,
+  CurrentDate,
+} from '../../types/viewFavoriteTypes';
 
 const ViewFavorite = () => {
   const queryClient = useQueryClient();

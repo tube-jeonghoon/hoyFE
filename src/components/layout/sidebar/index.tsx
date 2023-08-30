@@ -29,7 +29,7 @@ import CreateFavoriteMemberModal from '../../modal/createFavoriteMemberModal';
 import favoriteUserListState from '@/store/atom/favoriteUserListState';
 import groupListState from '@/store/atom/groupListState';
 import UpdateModal from '../../updateModal';
-import { GroupList, FavoriteUserList } from './types';
+import { GroupList, FavoriteUserList } from '../../../types/sidebarTypes';
 import { useQuery } from 'react-query';
 import { fetchWorkspaceData } from '@/apis/utils/api/sidebar/fetchWorkSpace';
 import fetchUserDataApi from '@/apis/utils/api/sidebar/fetchUserDataApi';

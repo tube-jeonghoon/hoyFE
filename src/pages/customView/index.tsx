@@ -50,7 +50,7 @@ const CustomView = () => {
           },
         },
       );
-      const dataWithSelectedDate = res.data.map(user => ({
+      const dataWithSelectedDate = res.data.map((user: any) => ({
         ...user,
         selectedDate: format(selectedDay, 'yyyy-MM-dd'),
       }));
