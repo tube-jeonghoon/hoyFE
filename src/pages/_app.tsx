@@ -8,9 +8,6 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { useState } from 'react';
 import SideBar from '@/components/layout/sidebar';
 
-const clientId =
-  '207985048710-uut7o2bb4n3i63b0gtgsaubefimn2fsl.apps.googleusercontent.com';
-
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const [queryClient] = useState(() => new QueryClient());
@@ -25,7 +22,9 @@ export default function App({ Component, pageProps }: AppProps) {
     router.pathname === '/updateModal'
   ) {
     return (
-      <GoogleOAuthProvider clientId={clientId}>
+      <GoogleOAuthProvider
+        clientId={`${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}`}
+      >
         <QueryClientProvider client={queryClient}>
           <RecoilRoot>
             <div className="font-pretendard">
@@ -38,7 +37,9 @@ export default function App({ Component, pageProps }: AppProps) {
   }
 
   return (
-    <GoogleOAuthProvider clientId={clientId}>
+    <GoogleOAuthProvider
+      clientId={`${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}`}
+    >
       <QueryClientProvider client={queryClient}>
         <RecoilRoot>
           <div className="bg-gray-1">

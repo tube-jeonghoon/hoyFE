@@ -44,6 +44,7 @@ import {
 
 const Home = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [newTodoList, setNewTodoList] = useState<NewTodoItem[]>([]);
@@ -416,12 +417,12 @@ const Home = () => {
   /***************************** DND LINE ENDED  **********************************/
 
   // 액세스 토큰을 가지고 있지 않다면 /login 으로 리다이렉팅
-  // useEffect(() => {
-  //   setIsLogin(Cookies.get('ACCESS_KEY') ? true : false);
-  //   if (!Cookies.get('ACCESS_KEY')) {
-  //     router.push('/login');
-  //   }
-  // }, [isLogin])
+  useEffect(() => {
+    setIsLogin(Cookies.get('ACCESS_KEY') ? true : false);
+    if (!Cookies.get('ACCESS_KEY')) {
+      router.push('/login');
+    }
+  }, [isLogin]);
 
   return (
     <div className="px-[5rem] py-[3.75rem] overflow-y-auto h-[48rem]">
