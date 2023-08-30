@@ -43,6 +43,7 @@ import {
 } from 'react-beautiful-dnd';
 
 const Home = () => {
+  console.log('Home 컴포넌트 렌더링');
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -88,7 +89,7 @@ const Home = () => {
   //   ]);
   // };
 
-  const { data: workspaceData } = useQuery(
+  const { data: workspaceData, isSuccess: workspaceSuccess } = useQuery(
     'workspaceData',
     async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
@@ -100,11 +101,27 @@ const Home = () => {
           },
         },
       );
-      // console.log(res.data);
+      console.log(res.data);
       return res.data;
     },
-    { staleTime: 0 },
   );
+
+  // 받아온 워크스페이스 리스트가 없으면 초기페이지로 이동
+  useEffect(() => {
+    console.log(`실행되니?`);
+    if (workspaceSuccess) {
+      console.log(workspaceData.length);
+      if (workspaceData?.length === 0) {
+        router.push('/firstGroup');
+      }
+    }
+  }, [workspaceSuccess, workspaceData]);
+
+  useEffect(() => {
+    if (workspaceData) {
+      setCurrentWorkspace(workspaceData[0]);
+    }
+  }, [workspaceData]);
 
   const { data: todosData } = useQuery(
     ['todos', currentWorkspace?.workspace_id, currentDate.formatDate],
@@ -331,19 +348,6 @@ const Home = () => {
     setSelectedDate(parseISO(formattedNewDate));
     queryClient.invalidateQueries('todos');
   };
-
-  // 받아온 워크스페이스 리스트가 없으면 초기페이지로 이동
-  useEffect(() => {
-    if (workspaceData?.length === 0) {
-      router.push('/firstGroup');
-    }
-  }, []);
-
-  useEffect(() => {
-    if (workspaceData) {
-      setCurrentWorkspace(workspaceData[0]);
-    }
-  }, [workspaceData]);
 
   useEffect(() => {
     if (todosData) {

@@ -59,7 +59,7 @@ const ViewGroup = () => {
         selectedDate: format(selectedDay, 'yyyy-MM-dd'),
       }));
 
-      // console.log('fetchGroupMember', dataWithSelectedDate);
+      console.log('fetchGroupMember', dataWithSelectedDate);
       setViewGroupUserList(dataWithSelectedDate);
       // 반환된 멤버 리스트를 반환
       return dataWithSelectedDate;
