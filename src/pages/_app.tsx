@@ -46,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
             <div
               className={`flex font-pretendard max-w-[1440px] mx-auto bg-white`}
             >
-              <div className="sidebar desktop:w-[13rem] desktopL:w-[16rem] border-r-[0.1rem] border-r-gray-[#EAEEF3] h-screen">
+              <div className="sidebar desktop:w-[13rem] desktopL:w-[16rem] border-r-[1px] border-r-gray-[#EAEEF3] h-screen">
                 <SideBar />
               </div>
               <div className="nav-bar">

@@ -21,7 +21,7 @@ export const firstWorkspaceSelector = selector<CurrentWorkspace | null>({
           },
         },
       );
-      console.log(res.data);
+      // console.log(res.data);
       const workspaces = res.data;
       if (workspaces && workspaces.length > 0) {
         return workspaces[0];

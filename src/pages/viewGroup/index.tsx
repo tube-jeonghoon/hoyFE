@@ -59,7 +59,7 @@ const ViewGroup = () => {
         selectedDate: format(selectedDay, 'yyyy-MM-dd'),
       }));
 
-      console.log('fetchGroupMember', dataWithSelectedDate);
+      // console.log('fetchGroupMember', dataWithSelectedDate);
       setViewGroupUserList(dataWithSelectedDate);
       // 반환된 멤버 리스트를 반환
       return dataWithSelectedDate;
@@ -73,7 +73,7 @@ const ViewGroup = () => {
     direction: 'previous' | 'next',
   ) => {
     const currentDate = new Date(user.selectedDate); // 사용자의 현재 선택한 날짜
-    console.log('fhi: changeDateForUser', currentDate);
+    // console.log('fhi: changeDateForUser', currentDate);
 
     let newDate: Date;
     if (direction == 'previous') {
@@ -82,7 +82,7 @@ const ViewGroup = () => {
       newDate = addDays(currentDate, 1);
     }
     const newDateString = format(newDate, 'yyyy-MM-dd');
-    console.log('newDateString', newDateString);
+    // console.log('newDateString', newDateString);
 
     const updatedUsers = viewGroupUserList.map(u => {
       if (u.userId == user.userId) {
@@ -94,7 +94,7 @@ const ViewGroup = () => {
       return u;
     });
     setViewGroupUserList(updatedUsers);
-    console.log('viewGroupUserList', viewGroupUserList);
+    // console.log('viewGroupUserList', viewGroupUserList);
     // 날짜가 변경된 후 해당 날짜에 대한 todo 업데이트
     await updateTodosForUsers(updatedUsers);
   };
@@ -119,13 +119,13 @@ const ViewGroup = () => {
   // 변경된 날짜로 Todo 리스트 불러오기
   const fetchTodoForUser = async (user: ViewGroupUserList) => {
     try {
-      console.log('fhi', user.selectedDate);
+      // console.log('fhi', user.selectedDate);
       const todos = await fetchCustomViewTodoApi({
         userId: user.userId,
         currentDate: user.selectedDate,
       });
-      console.log('fhi', todos);
-      console.log('------');
+      // console.log('fhi', todos);
+      // console.log('------');
       return todos;
     } catch (error) {
       console.error('Error fetching todos for user:', user.userId, error);
@@ -139,8 +139,8 @@ const ViewGroup = () => {
       await updateTodosForUsers(members);
     };
     fetchAndUpdate();
-    console.log('viewOtherGroup', currentGroupId);
-    console.log('✨ ➤ useEffect ➤ viewGroupUserList:', viewGroupUserList);
+    // console.log('viewOtherGroup', currentGroupId);
+    // console.log('✨ ➤ useEffect ➤ viewGroupUserList:', viewGroupUserList);
   }, [currentGroupId]);
 
   return (

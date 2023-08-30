@@ -54,7 +54,7 @@ const CustomView = () => {
         ...user,
         selectedDate: format(selectedDay, 'yyyy-MM-dd'),
       }));
-      console.log('fetchGroupMember', dataWithSelectedDate);
+      // console.log('fetchGroupMember', dataWithSelectedDate);
       setViewGroupUserList(dataWithSelectedDate);
       // 반환된 멤버 리스트를 반환
       return dataWithSelectedDate;
@@ -69,16 +69,16 @@ const CustomView = () => {
   ) => {
     console.log('user.selectedDate', user.selectedDate);
     const currentDate = new Date(user.selectedDate); // 사용자의 현재 선택한 날짜
-    console.log('fhi: changeDateForUser', currentDate);
+    // console.log('fhi: changeDateForUser', currentDate);
     let newDate: Date;
     if (direction == 'previous') {
       newDate = subDays(currentDate, 1);
     } else {
       newDate = addDays(currentDate, 1);
     }
-    console.log('newDate', newDate);
+    // console.log('newDate', newDate);
     const newDateString = format(newDate, 'yyyy-MM-dd');
-    console.log('newDateString', newDateString);
+    // console.log('newDateString', newDateString);
 
     const updatedUsers = viewGroupUserList.map(u => {
       if (u.userId == user.userId) {
@@ -91,7 +91,7 @@ const CustomView = () => {
     });
 
     setViewGroupUserList(updatedUsers);
-    console.log('viewGroupUserList', viewGroupUserList);
+    // console.log('viewGroupUserList', viewGroupUserList);
     // 날짜가 변경된 후 해당 날짜에 대한 todo 업데이트
     await updateTodosForUsers(updatedUsers);
   };
@@ -112,12 +112,12 @@ const CustomView = () => {
   // 변경된 날짜로 Todo 리스트 불러오기
   const fetchTodoForUser = async (user: ViewUserGroupList) => {
     try {
-      console.log('fhi', user.selectedDate);
+      // console.log('fhi', user.selectedDate);
       const todos = await fetchCustomViewTodoApi({
         userId: user.userId,
         currentDate: user.selectedDate,
       });
-      console.log('fhi', todos);
+      // console.log('fhi', todos);
       return todos;
     } catch (error) {
       console.error('Error fetching todos for user:', user.userId, error);
@@ -131,12 +131,12 @@ const CustomView = () => {
       await updateTodosForUsers(members);
     };
     fetchAndUpdate();
-    console.log('viewGroup', currentGroupId);
-    console.log('✨ ➤ useEffect ➤ viewGroupUserList:', viewGroupUserList);
+    // console.log('viewGroup', currentGroupId);
+    // console.log('✨ ➤ useEffect ➤ viewGroupUserList:', viewGroupUserList);
   }, [currentGroupId]);
 
   useEffect(() => {
-    console.log('Updated viewGroupUserList', viewGroupUserList);
+    // console.log('Updated viewGroupUserList', viewGroupUserList);
   }, [viewGroupUserList]);
 
   return (
@@ -144,9 +144,9 @@ const CustomView = () => {
       <div className="cards grid grid-cols-3 gap-x-[3.12rem] gap-y-[3.75rem]">
         {/* <OtherTodo /> */}
         {viewGroupUserList?.map(user => {
-          console.log('fhihh11', user.selectedDate);
+          // console.log('fhihh11', user.selectedDate);
           const parsedDate = new Date(user.selectedDate);
-          console.log(parsedDate);
+          // console.log(parsedDate);
           const dayofWeek = format(parsedDate, 'EEE', { locale: ko });
           const day = format(parsedDate, 'M/d');
           // console.log('fhi', dayofWeek, day);

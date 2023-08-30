@@ -89,7 +89,7 @@ const FirstGroup = () => {
           },
         },
       );
-      console.log('Workspace created', response.data);
+      // console.log('Workspace created', response.data);
       setCreateWorkspaceVisible(false);
       setSelectedFile(null);
       router.push('/home');

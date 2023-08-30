@@ -90,8 +90,8 @@ const DetailModal = (Props: DetailProps) => {
         },
       );
 
-      console.log(res.data);
-      console.log(res.data.comments);
+      // console.log(res.data);
+      // console.log(res.data.comments);
       setCommentBody(res.data.comments);
       return res.data;
     },
@@ -112,7 +112,7 @@ const DetailModal = (Props: DetailProps) => {
           },
         },
       );
-      console.log(res.data);
+      // console.log(res.data);
 
       return res.data;
     } catch (error) {
@@ -122,7 +122,7 @@ const DetailModal = (Props: DetailProps) => {
 
   const priorityMutation = useMutation(changePriority, {
     onSuccess: () => {
-      console.log('✨ ➤ onSuccess ➤ priority mutation');
+      // console.log('✨ ➤ onSuccess ➤ priority mutation');
     },
   });
 
@@ -148,7 +148,7 @@ const DetailModal = (Props: DetailProps) => {
         },
       );
       setIsDetailModalOpen(false);
-      console.log(`${taskId}번 글 삭제 완료`);
+      // console.log(`${taskId}번 글 삭제 완료`);
 
       queryClient.invalidateQueries('todos');
     } catch (error) {
@@ -179,7 +179,7 @@ const DetailModal = (Props: DetailProps) => {
   }, [taskDetailData, taskDetailSuccess]);
 
   useEffect(() => {
-    console.log(taskId);
+    // console.log(taskId);
     // mutation.mutate(taskId);
   }, [taskId]);
 

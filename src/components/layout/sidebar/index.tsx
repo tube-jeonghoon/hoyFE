@@ -9,6 +9,7 @@ import {
   isCreateWorkspaceModalState,
   isSearchMemberModalState,
   isSelectWorkspaceModalState,
+  isSettingsModalState,
   isUpdateModalState,
 } from '@/store/atom/modalStatus';
 import WorkspaceSelectModal from '../../modal/workspaceSelectModal';
@@ -34,6 +35,7 @@ import { useQuery } from 'react-query';
 import { fetchWorkspaceData } from '@/apis/utils/api/sidebar/fetchWorkSpace';
 import fetchUserDataApi from '@/apis/utils/api/sidebar/fetchUserDataApi';
 import defaultWorkspace from '../../../../public/img/defaultWorkspace.svg';
+import SettingsModal from '@/components/modal/settingsModal';
 
 const SideBar = () => {
   const router = useRouter();
@@ -59,6 +61,9 @@ const SideBar = () => {
   );
   const [updateModalVisible, setUpdateModalVisible] =
     useRecoilState(isUpdateModalState);
+
+  const [updateSettingsVisible, setSettingsModalVisible] =
+    useRecoilState(isSettingsModalState);
 
   const [workspaceList, setWorkspaceList] = useRecoilState(workspaceListState);
   const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
@@ -93,6 +98,10 @@ const SideBar = () => {
     setUpdateModalVisible(!updateModalVisible);
   };
 
+  const toggleSettingsModal = () => {
+    setSettingsModalVisible(!updateSettingsVisible);
+  };
+
   const {
     data: workspaceSidbarData,
     isSuccess: workspaceSidbarSuccess,
@@ -109,7 +118,7 @@ const SideBar = () => {
       //   setIsWorkspaceSelected(true); // 워크스페이스 선택 상태 업데이트
       // }
 
-      console.log(workspaceSidbarData[0]);
+      // console.log(workspaceSidbarData[0]);
     }
     if (workspaceSidbarError) {
       console.error(workspaceSidbarError);
@@ -186,9 +195,9 @@ const SideBar = () => {
   });
 
   useEffect(() => {
-    console.log(fetchUserDataSuccess);
+    // console.log(fetchUserDataSuccess);
     if (fetchUserDataSuccess) {
-      console.log('fetchUserData 들어옴', fetchUserData);
+      // console.log('fetchUserData 들어옴', fetchUserData);
       setCurrentUserData(fetchUserData);
       setCurrentHeaderName(fetchUserData.nickname);
     }
@@ -301,7 +310,10 @@ const SideBar = () => {
           <div>멤버 찾기</div>
         </div>
         {searchMemeberVisible && <SearchMemberModal />}
-        <div className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer">
+        <div
+          className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer"
+          onClick={toggleSettingsModal}
+        >
           <div className="mr-[0.75rem]">
             <Image src="/img/settings.png" alt="img" width="24" height="24" />
           </div>
@@ -358,6 +370,7 @@ const SideBar = () => {
         </div>
       </div>
       {createWorkspaceVisible && <CreateWorkSpaceModal />}
+      {updateSettingsVisible && <SettingsModal />}
     </div>
   );
 };

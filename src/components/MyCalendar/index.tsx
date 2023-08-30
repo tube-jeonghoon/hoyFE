@@ -16,8 +16,8 @@ const MyCalendar = () => {
   const handleSelectedDate = (value: any) => {
     setSelectedDate(value);
     setCalendarVisible(!calendarVisible);
-    console.log(`선택된 날짜 : ${value}`);
-    console.log(`선택된 날짜 : ${selectedDate}`);
+    // console.log(`선택된 날짜 : ${value}`);
+    // console.log(`선택된 날짜 : ${selectedDate}`);
   };
   return (
     <div className="w-full">

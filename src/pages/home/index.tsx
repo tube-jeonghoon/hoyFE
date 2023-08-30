@@ -100,7 +100,7 @@ const Home = () => {
           },
         },
       );
-      console.log(res.data);
+      // console.log(res.data);
       return res.data;
     },
     { staleTime: 0 },
@@ -167,7 +167,7 @@ const Home = () => {
         });
       });
 
-      console.log(sortedData);
+      // console.log(sortedData);
       return sortedData;
     },
   );
@@ -176,7 +176,7 @@ const Home = () => {
     (taskItem: NewTask) => addTodoApi(taskItem, currentWorkspace),
     {
       onError: error => {
-        console.log(error);
+        console.error(error);
       },
       onSuccess: (data, variables) => {
         if (!data) return;
@@ -240,7 +240,7 @@ const Home = () => {
             return item;
           });
 
-          console.log('✨ ➤ Home ➤ sortedList:', sortedList);
+          // console.log('✨ ➤ Home ➤ sortedList:', sortedList);
           return sortedList;
         });
 
@@ -249,7 +249,7 @@ const Home = () => {
           ...prevTitles,
           [variables.date as keyof typeof prevTitles]: '',
         }));
-        console.log(`useMutation 진입`, data);
+        // console.log(`useMutation 진입`, data);
         // Task 추가 하자마자 데이터를 다시 fetch
         queryClient.invalidateQueries('todos');
       },
@@ -292,7 +292,7 @@ const Home = () => {
 
       return res;
     } catch (error) {
-      console.log(taskId);
+      // console.log(taskId);
       console.error('완료 표시에서 에러 발생', error);
     }
   };
@@ -406,7 +406,7 @@ const Home = () => {
     const targetObj = copyTodoList.find(obj => obj.date === sourceDate);
     const tasksRemoved = targetObj?.tasks.splice(source.index, 1);
     const targetTask = tasksRemoved && tasksRemoved[0];
-    console.log('onDragEnd: targetTask: ', targetTask);
+    // console.log('onDragEnd: targetTask: ', targetTask);
 
     // destination 영역에 todo 추가 -> 만약 해당 영역에 tasks가 빈 배열이라면?
     const destObj = copyTodoList.find(todo => todo.date === destinationDate);
@@ -510,7 +510,7 @@ const Home = () => {
                             title: inputTitles,
                             date: todo.date,
                           };
-                          console.log(newTask);
+                          // console.log(newTask);
                           addMutation.mutate(newTask);
                         }
                       }}

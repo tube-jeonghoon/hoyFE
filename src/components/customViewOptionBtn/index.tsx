@@ -22,7 +22,7 @@ const CustomViewOptionBtn = () => {
       const res = await axios.delete(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${selectedWorkspace.workspace_id}/group/${currentGroupId}`,
       );
-      console.log(res);
+      // console.log(res);
     } catch (error) {
       console.error(error);
     }

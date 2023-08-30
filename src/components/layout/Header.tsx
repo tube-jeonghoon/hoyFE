@@ -34,7 +34,7 @@ const Header = () => {
   };
 
   const toggleCustomViewOptionBtn = () => {
-    console.log('toggleCustomViewOptionBtn');
+    // console.log('toggleCustomViewOptionBtn');
     setIsCustomViewOptionBtnVisible(!isCustomViewOptionBtnVisible);
   };
 

@@ -19,7 +19,7 @@ const Login = () => {
     const uniqueToken = urlParams.get('uniqueToken');
     if (uniqueToken != null) {
       localStorage.setItem('uniqueToken', uniqueToken);
-      console.log(uniqueToken);
+      // console.log(uniqueToken);
     }
   };
 
@@ -27,8 +27,8 @@ const Login = () => {
     const uniqueToken = localStorage.getItem('uniqueToken');
     const email = router.query.email;
     const accessToken = Cookies.get('ACCESS_KEY');
-    console.log('✨ ➤ sendInvitationAcceptance ➤ uniqueToken:', uniqueToken);
-    console.log('✨ ➤ sendInvitationAcceptance ➤ email:', email);
+    // console.log('✨ ➤ sendInvitationAcceptance ➤ uniqueToken:', uniqueToken);
+    // console.log('✨ ➤ sendInvitationAcceptance ➤ email:', email);
     try {
       if (uniqueToken && email) {
         await axios.post(
@@ -64,7 +64,7 @@ const Login = () => {
 
   useEffect(() => {
     const uniqueToken = router.query.uniqueToken;
-    console.log(uniqueToken);
+    // console.log(uniqueToken);
   }, []);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const Login = () => {
     const accessToken = router.query.access_token;
 
     if (typeof accessToken === 'string') {
-      console.log('Access Token:', accessToken);
+      // console.log('Access Token:', accessToken);
       Cookies.set('ACCESS_KEY', accessToken);
 
       sendInvitationAcceptance();
@@ -84,7 +84,7 @@ const Login = () => {
   const loginCheck = () => {
     const accessToken = Cookies.get('ACCESS_KEY');
 
-    console.log(accessToken);
+    // console.log(accessToken);
     if (accessToken) {
       router.push('/home');
     }
@@ -114,7 +114,7 @@ const Login = () => {
                 console.log('Login Success');
               }}
               onError={() => {
-                console.log('Login Failed');
+                console.error('Login Failed');
               }}
               ux_mode="redirect"
               login_uri={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google/callback`}

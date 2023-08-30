@@ -58,7 +58,7 @@ const CreateFavoriteMemberModal = () => {
         },
       );
 
-      console.log(res.data);
+      // console.log(res.data);
       setFavoriteUserList(res.data);
     } catch (error) {}
   };
@@ -82,7 +82,7 @@ const CreateFavoriteMemberModal = () => {
         },
       );
 
-      console.log(res.data);
+      // console.log(res.data);
       setSearchMemberList(res.data);
     } catch (error) {}
   };
@@ -101,7 +101,7 @@ const CreateFavoriteMemberModal = () => {
       );
 
       fetchUser();
-      console.log(res);
+      // console.log(res);
     } catch (error) {
       console.error(error);
     }

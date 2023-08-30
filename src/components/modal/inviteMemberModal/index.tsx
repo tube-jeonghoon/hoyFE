@@ -1,18 +1,124 @@
-import React from 'react';
+import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import axios from 'axios';
+import React, { useState } from 'react';
+import { useRecoilState } from 'recoil';
+import Cookies from 'js-cookie';
+import Image from 'next/image';
+import cancel from '../../../../public/img/cancel.svg';
 
 const InviteMemberModal = () => {
+  const [email, setEmail] = useState<string>('');
+  const [inviteList, setInviteList] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
+    currentWorkspaceState,
+  );
+
+  const workspaceId = 1; // 추후에 동적으로 설정할 수 있습니다.
+
+  const handleInputChange = (e: any) => {
+    setEmail(e.target.value);
+  };
+  const handleEnterPress = async (e: any) => {
+    if (e.key === 'Enter') {
+      // 이미 inviteList에 존재하는 이메일인지 확인
+      if (inviteList.includes(email)) {
+        setErrorMessage('이미 추가된 이메일 주소입니다.');
+        return;
+      }
+
+      try {
+        const accessToken = Cookies.get('ACCESS_KEY');
+        const response = await axios.get(
+          `http://localhost:8000/api/workspace/${workspaceId}/invitations/availability?email=${email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
+        if (response.data.answer) {
+          setInviteList([...inviteList, email]);
+          setEmail('');
+          setErrorMessage('');
+          // console.log(inviteList);
+        }
+      } catch (error: any) {
+        if (error.response && error.response.data) {
+          console.error(error);
+          setErrorMessage(error.response.data.message);
+        }
+      }
+    }
+  };
+
+  const handleSendInvites = async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8000/api/workspace/${workspaceId}/invitations`,
+        {
+          emails: inviteList,
+        },
+      );
+      console.log('Invitations sent:', response.data);
+      setInviteList([]);
+      setEmail('');
+    } catch (error) {
+      console.error('Error sending invites:', error);
+    }
+  };
+
+  const handleRemoveEmail = (emailToRemove: string) => {
+    setInviteList(inviteList.filter(email => email !== emailToRemove));
+  };
+
   return (
-    <div className="w-[390px] h-[136px] px-9 py-6 bg-white rounded-lg shadow border border-zinc-200 flex-col justify-start items-end gap-3 inline-flex">
-      <div className="flex-col justify-start items-start gap-3 flex">
-        <div className="w-[318px] h-11 p-3 rounded-lg border border-zinc-200 justify-start items-center gap-2.5 inline-flex">
-          <div className="grow shrink basis-0 text-gray-400 text-sm font-medium leading-snug">
-            e-mail을 입력해 멤버를 추가해주세요.
+    <div className="absolute top-[1.5rem] right-0">
+      <div
+        className="w-[24.375rem] bg-white border-[1px] rounded-[0.75rem] p-[1.5rem] flex flex-col gap-[0.75rem]
+        text-black"
+      >
+        <div className="border-[1px] p-[0.75rem] rounded-[0.75rem]">
+          <input
+            value={email}
+            onChange={handleInputChange}
+            onKeyPress={handleEnterPress}
+            className="w-full text-[0.875rem] focus:outline-none"
+            type="text"
+            placeholder="e-mail을 입력해 멤버를 추가해주세요."
+          />
+        </div>
+        <div>
+          <div className="flex gap-[0.62rem] flex-wrap overflow-y-auto max-h-[18.5rem]">
+            {inviteList.map((invitedEmail, index) => (
+              <div
+                key={index}
+                className="border-[1px] border-gray-[#DFE0E8] bg-gray-1 px-[1rem] py-[0.5rem]
+                  flex items-center gap-[0.12rem] rounded-[6.25rem]"
+              >
+                <div>{invitedEmail}</div>
+                <div
+                  className="cursor-pointer"
+                  onClick={() => handleRemoveEmail(invitedEmail)}
+                >
+                  <Image src={cancel} alt="취소" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-      <div className="h-8 px-3 py-1 bg-zinc-200 rounded-lg border border-zinc-200 justify-center items-center gap-2.5 inline-flex">
-        <div className="text-white text-sm font-semibold leading-snug">
-          전송
+        <div className="flex items-center justify-between text-[0.875rem]">
+          <div className="leading-[1.4rem] text-gray-4">
+            {errorMessage || ''}
+          </div>
+          <div
+            onClick={handleSendInvites}
+            className="h-[2rem] bg-gray-3 text-white flex items-center rounded-[0.5rem]
+          gap-[0.2rem] px-[0.75rem] py-[0.25rem] cursor-pointer font-semibold hover:bg-primary-blue"
+          >
+            <div>전송</div>
+            <div>({inviteList.length})</div>
+          </div>
         </div>
       </div>
     </div>

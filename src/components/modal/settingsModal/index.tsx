@@ -1,12 +1,12 @@
 import WorkspaceSettings from '@/components/workspaceSettings';
 import React from 'react';
 import Image from 'next/image';
-import workSpace from '../../../public/img/workSpace.svg';
+import workSpace from '../../../../public/img/workSpace.svg';
 import { isSettingsModalState } from '@/store/atom/modalStatus';
 import { useRecoilState } from 'recoil';
 import AccountSettings from '@/components/accountSettings';
 
-const Settings = () => {
+const SettingsModal = () => {
   const [settingsVisible, SetSettingsVisible] =
     useRecoilState(isSettingsModalState);
 
@@ -21,6 +21,7 @@ const Settings = () => {
       <div
         className="absolute z-[101] top-0 left-0 w-[100vw] h-[100vh]
         bg-black bg-opacity-10"
+        onClick={handleOverlayClick}
       >
         <div
           className="bg-white top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2
@@ -45,8 +46,8 @@ const Settings = () => {
               {/* <div>문의하기</div> */}
             </div>
             <div className="py-[2rem] px-[1.5rem]">
-              <AccountSettings />
-              {/* <WorkspaceSettings /> */}
+              {/* <AccountSettings /> */}
+              <WorkspaceSettings />
             </div>
           </div>
         </div>
@@ -55,4 +56,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default SettingsModal;

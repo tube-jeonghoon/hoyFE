@@ -93,7 +93,7 @@ const CreateWorkSpaceModal = () => {
           },
         },
       );
-      console.log('Workspace created', response.data);
+      // console.log('Workspace created', response.data);
       setCreateWorkspaceVisible(false);
       setSelectedFile(null);
       window.location.reload();

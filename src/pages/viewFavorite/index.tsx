@@ -178,7 +178,7 @@ const ViewFavorite = () => {
     (taskItem: NewTask) => addTodoApi(taskItem, currentWorkSpace),
     {
       onError: error => {
-        console.log(error);
+        console.error(error);
       },
       onSuccess: (data, variables) => {
         if (!data) return;
@@ -242,7 +242,7 @@ const ViewFavorite = () => {
             return item;
           });
 
-          console.log('✨ ➤ Home ➤ sortedList:', sortedList);
+          // console.log('✨ ➤ Home ➤ sortedList:', sortedList);
           return sortedList;
         });
 
@@ -251,7 +251,7 @@ const ViewFavorite = () => {
           ...prevTitles,
           [variables.date as keyof typeof prevTitles]: '',
         }));
-        console.log(`useMutation 진입`, data);
+        // console.log(`useMutation 진입`, data);
         // Task 추가 하자마자 데이터를 다시 fetch
         queryClient.invalidateQueries('todos');
       },
@@ -294,7 +294,7 @@ const ViewFavorite = () => {
 
       return res;
     } catch (error) {
-      console.log(taskId);
+      // console.log(taskId);
       console.error('완료 표시에서 에러 발생', error);
     }
   };
@@ -401,7 +401,7 @@ const ViewFavorite = () => {
     const targetObj = copyTodoList.find(obj => obj.date === sourceDate);
     const tasksRemoved = targetObj?.tasks.splice(source.index, 1);
     const targetTask = tasksRemoved && tasksRemoved[0];
-    console.log('onDragEnd: targetTask: ', targetTask);
+    // console.log('onDragEnd: targetTask: ', targetTask);
 
     // destination 영역에 todo 추가 -> 만약 해당 영역에 tasks가 빈 배열이라면?
     const destObj = copyTodoList.find(todo => todo.date === destinationDate);
@@ -505,7 +505,7 @@ const ViewFavorite = () => {
                             title: inputTitles,
                             date: todo.date,
                           };
-                          console.log(newTask);
+                          // console.log(newTask);
                           addMutation.mutate(newTask);
                         }
                       }}

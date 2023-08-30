@@ -99,7 +99,7 @@ const CreateGroupModal = () => {
       name: groupTitle,
       memberIds,
     };
-    console.log(paylaod);
+    // console.log(paylaod);
 
     try {
       const res = await axios.post(
@@ -112,7 +112,7 @@ const CreateGroupModal = () => {
         },
       );
 
-      console.log(res.data);
+      // console.log(res.data);
       setCreateGroupVisible(false);
       // fetchGroupListData();
       queryClinet.invalidateQueries('groupListData');

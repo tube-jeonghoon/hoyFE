@@ -11,6 +11,6 @@ export const fetchWorkspaceData = async () => {
       },
     },
   );
-  console.log(res.data);
+  // console.log(res.data);
   return res.data;
 };

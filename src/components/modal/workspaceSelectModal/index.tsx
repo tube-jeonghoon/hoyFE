@@ -34,7 +34,7 @@ const WorkspaceSelectModal = () => {
 
   const closeModal = () => {
     setWorkspaceSelectVisible(false);
-    console.log(`들어옴`);
+    // console.log(`들어옴`);
   };
 
   const handleClickOutside = (e: any) => {
@@ -53,10 +53,10 @@ const WorkspaceSelectModal = () => {
     workspaceName: string,
     workspaceUrl: string,
   ) => {
-    console.log(`클릭됌`);
-    console.log(workspaceId);
-    console.log(workspaceName);
-    console.log(workspaceUrl);
+    // console.log(`클릭됌`);
+    workspaceId;
+    // console.log(workspaceName);
+    // console.log(workspaceUrl);
     const newCurrentWorkspace = {
       workspace_id: workspaceId,
       workspace_name: workspaceName,

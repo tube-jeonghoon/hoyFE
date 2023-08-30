@@ -21,7 +21,7 @@ const AccountSettings = () => {
                 </div>
                 <div className="w-[237px] h-8 px-3 py-1 rounded-lg border border-zinc-200 justify-start items-center gap-2.5 inline-flex">
                   <div className="grow shrink basis-0 text-neutral-600 text-sm font-medium">
-                    {name}
+                    {/* {name} */}
                   </div>
                   <div className="w-5 h-5 relative" />
                 </div>
