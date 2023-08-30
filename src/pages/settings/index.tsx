@@ -4,6 +4,7 @@ import Image from 'next/image';
 import workSpace from '../../../public/img/workSpace.svg';
 import { isSettingsModalState } from '@/store/atom/modalStatus';
 import { useRecoilState } from 'recoil';
+import AccountSettings from '@/components/accountSettings';
 
 const Settings = () => {
   const [settingsVisible, SetSettingsVisible] =
@@ -44,7 +45,8 @@ const Settings = () => {
               {/* <div>문의하기</div> */}
             </div>
             <div className="py-[2rem] px-[1.5rem]">
-              <WorkspaceSettings />
+              <AccountSettings />
+              {/* <WorkspaceSettings /> */}
             </div>
           </div>
         </div>

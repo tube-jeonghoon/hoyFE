@@ -7,11 +7,20 @@ import owner from '../../../public/img/owner.svg';
 import verticalSetting from '../../../public/img/verticalSetting.svg';
 import { useRecoilState } from 'recoil';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import { isInviteMemberModalState } from '@/store/atom/modalStatus';
 
 const WorkspaceSettings = () => {
   const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
+
+  const [inViteMemberVisible, setInViteMemberVisible] = useRecoilState(
+    isInviteMemberModalState,
+  );
+
+  const toggleInviteMemberModal = () => {
+    setInViteMemberVisible(!inViteMemberVisible);
+  };
 
   return (
     <div className="text-black">
@@ -39,7 +48,7 @@ const WorkspaceSettings = () => {
             </div>
             <div className="flex justify-end">
               <div className="text-[0.75rem] text-gray-5 cursor-pointer">
-                이 워크 스페이스를 삭제하기
+                이 워크스페이스를 삭제하기
               </div>
             </div>
           </div>
