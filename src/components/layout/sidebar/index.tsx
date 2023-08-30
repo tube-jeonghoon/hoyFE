@@ -33,6 +33,7 @@ import { GroupList, FavoriteUserList } from '../../../types/sidebarTypes';
 import { useQuery } from 'react-query';
 import { fetchWorkspaceData } from '@/apis/utils/api/sidebar/fetchWorkSpace';
 import fetchUserDataApi from '@/apis/utils/api/sidebar/fetchUserDataApi';
+import defaultWorkspace from '../../../../public/img/defaultWorkspace.svg';
 
 const SideBar = () => {
   const router = useRouter();
@@ -123,10 +124,10 @@ const SideBar = () => {
   ]);
 
   const { data: favoriteUserListData, isSuccess: favoriteUserListSucess } =
-    useQuery(['favoriteUserList', currentWorkSpace.workspace_id], async () => {
+    useQuery(['favoriteUserList', currentWorkSpace?.workspace_id], async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/favorites`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace?.workspace_id}/favorites`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -143,7 +144,7 @@ const SideBar = () => {
   }, [favoriteUserListData]);
 
   const { data: groupListData, isSuccess: groupListDataSuccess } = useQuery(
-    ['groupListData', currentWorkSpace.workspace_id],
+    ['groupListData', currentWorkSpace?.workspace_id],
     async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
@@ -170,7 +171,7 @@ const SideBar = () => {
     isSuccess: fetchUserDataSuccess,
     isLoading: fetchUserDataLoading,
     isError: fetchUserDataError,
-  } = useQuery(['fetchUserData', currentWorkSpace.workspace_id], async () => {
+  } = useQuery(['fetchUserData', currentWorkSpace?.workspace_id], async () => {
     const accessToken = Cookies.get('ACCESS_KEY');
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/current-user`,
@@ -239,11 +240,11 @@ const SideBar = () => {
         onClick={toggleWorkspaceSelect}
       >
         <div className="flex items-center gap-[0.62rem]">
-          <div className="desktop:w-[1.5rem] desktopL:w-[2.5rem]">
-            <Image src="/img/teamImage.png" alt="img" width="40" height="40" />
+          <div className="desktop:w-[1.5rem] desktopL:w-[2.5rem] min-w-[2.5rem]">
+            <Image src={defaultWorkspace} alt="img" width="40" height="40" />
           </div>
           <div className="text-black mx-[0.62rem] desktop:text-[0.8rem] desktopL:text-[1rem] font-bold">
-            {currentWorkSpace.workspace_name}
+            {currentWorkSpace?.workspace_name}
           </div>
         </div>
         <div

@@ -50,7 +50,7 @@ const Home = () => {
   const [newTodoList, setNewTodoList] = useState<NewTodoItem[]>([]);
   const [isLogin, setIsLogin] = useRecoilState(loginState);
   const [addNewTask, setaddNewTask] = useState<NewTask>();
-  const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
+  const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
   const [selectedDate, setSelectedDate] = useRecoilState(currentDateState);
@@ -100,17 +100,18 @@ const Home = () => {
           },
         },
       );
-      return res.data[0];
+      console.log(res.data);
+      return res.data;
     },
     { staleTime: 0 },
   );
 
   const { data: todosData } = useQuery(
-    ['todos', currentWorkSpace.workspace_id, currentDate.formatDate],
+    ['todos', currentWorkspace?.workspace_id, currentDate.formatDate],
     async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks?date=${currentDate.formatDate}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/tasks?date=${currentDate.formatDate}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -172,7 +173,7 @@ const Home = () => {
   );
 
   const addMutation = useMutation(
-    (taskItem: NewTask) => addTodoApi(taskItem, currentWorkSpace),
+    (taskItem: NewTask) => addTodoApi(taskItem, currentWorkspace),
     {
       onError: error => {
         console.log(error);
@@ -260,7 +261,7 @@ const Home = () => {
       // 본문을 담지 않는 PUT 요청
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/status`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/tasks/${taskId}/status`,
         {},
         {
           headers: {
@@ -331,9 +332,16 @@ const Home = () => {
     queryClient.invalidateQueries('todos');
   };
 
+  // 받아온 워크스페이스 리스트가 없으면 초기페이지로 이동
+  useEffect(() => {
+    if (workspaceData?.length === 0) {
+      router.push('/firstGroup');
+    }
+  }, []);
+
   useEffect(() => {
     if (workspaceData) {
-      setCurrentWorkSpace(workspaceData);
+      setCurrentWorkspace(workspaceData[0]);
     }
   }, [workspaceData]);
 
@@ -372,7 +380,7 @@ const Home = () => {
 
     try {
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/drag`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/tasks/${taskId}/drag`,
         { date: newDate },
         {
           headers: {

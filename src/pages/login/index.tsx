@@ -5,6 +5,9 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { useQuery } from 'react-query';
+import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import { useRecoilState } from 'recoil';
 
 const Login = () => {
   const router = useRouter();
@@ -45,25 +48,12 @@ const Login = () => {
     } catch (error) {
       console.error('Error sending invitation acceptance:', error);
     }
-    // if (uniqueToken && email) {
-    //   try {
-    //     await fetch('https://api.hoy.im/workspace/accept-invitation', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({ uniqueToken, email }),
-    //     });
-    //     localStorage.removeItem('uniqueToken');
-    //   } catch (error) {
-    //     console.error('Error sending invitation acceptance:', error);
-    //   }
   };
 
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
     if (Cookies.get('ACCESS_KEY')) {
-      // router.push('/home');
+      router.push('/home');
     }
   }, []);
 

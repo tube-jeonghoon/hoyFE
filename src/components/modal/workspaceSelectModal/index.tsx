@@ -10,6 +10,7 @@ import CreateWorkSpaceModal from '../createWorkSpaceModal';
 import workspaceListState from '@/store/atom/workspaceListState';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import { useQueryClient } from 'react-query';
+import defaultWorkspace from '../../../../public/img/defaultWorkspace.svg';
 
 interface WorkspaceList {
   workspace_id: number;
@@ -96,7 +97,7 @@ const WorkspaceSelectModal = () => {
             <div className="justify-start items-center gap-2.5 flex hover:bg-gray-2">
               {workspace.workspace_imgUrl === null ? (
                 <Image
-                  src="/img/teamImage.png"
+                  src={defaultWorkspace}
                   alt="img"
                   width="40"
                   height="40"
