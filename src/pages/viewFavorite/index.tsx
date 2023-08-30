@@ -42,7 +42,7 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 
-const Home = () => {
+const ViewFavorite = () => {
   const queryClient = useQueryClient();
 
   const [todoList, setTodoList] = useState<Todo[]>([]);
@@ -165,7 +165,6 @@ const Home = () => {
         });
       });
 
-      console.log(sortedData);
       return sortedData;
     },
   );
@@ -585,11 +584,12 @@ const Home = () => {
                               </div>
                               <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
                                 {task.title}
-                                {task.commentCount !== 0 && (
-                                  <div className="ml-[0.62rem] text-gray-4">
-                                    [{task.commentCount}]
-                                  </div>
-                                )}
+                                {task.commentCount !== 0 ||
+                                  (undefined && (
+                                    <div className="ml-[0.62rem] text-gray-4">
+                                      [{task.commentCount}]
+                                    </div>
+                                  ))}
                               </div>
                               <div
                                 className="cursor-pointer"
@@ -618,4 +618,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default ViewFavorite;

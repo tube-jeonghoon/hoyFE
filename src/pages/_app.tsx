@@ -1,12 +1,12 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
-import SideBar from '@/components/layout/SideBar';
 import Header from '@/components/layout/Header';
 import { RecoilRoot } from 'recoil';
 import { useRouter } from 'next/router';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { useState } from 'react';
+import SideBar from '@/components/layout/sidebar';
 
 const clientId =
   '207985048710-uut7o2bb4n3i63b0gtgsaubefimn2fsl.apps.googleusercontent.com';

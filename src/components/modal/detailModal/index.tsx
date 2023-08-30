@@ -15,10 +15,14 @@ import Cookies from 'js-cookie';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import { DetailProps, postUser } from './types';
 import detailFillCheck from '../../../../public/img/detailFillCheck.svg';
+import { IoEllipsisVertical } from 'react-icons/io5';
+import userProfile from '../../../../public/img/userProfile.png';
+import { CommentBody } from './types';
 
 const DetailModal = (Props: DetailProps) => {
   const queryClient = useQueryClient();
-  const [commentStatus, setCommentStatus] = useState(false);
+  const [commentStatus, setCommentStatus] = useState(true);
+  const [commentBody, setCommentBody] = useState<CommentBody[]>([]);
   const { taskId } = Props;
   const [title, setTitle] = useState<string>('');
   const [postUser, setPostUser] = useState<postUser>({
@@ -32,6 +36,46 @@ const DetailModal = (Props: DetailProps) => {
   const [isDetailModalOpen, setIsDetailModalOpen] =
     useRecoilState(isDetailModalState);
 
+  const [isEditing, setIsEditing] = useState(false); // 제목 편집 여부를 저장
+  const [newTitle, setNewTitle] = useState(''); // 새로운 제목을 저장
+
+  // 제목 수정
+  const updateTitleMutation = useMutation(async (newTitle: string) => {
+    const accessToken = Cookies.get('ACCESS_KEY');
+    await axios.put(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/detail`,
+      { title: newTitle },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    queryClient.invalidateQueries('todos');
+  });
+
+  const handleTitleClick = () => {
+    setNewTitle(title);
+    setIsEditing(true);
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewTitle(e.target.value);
+  };
+
+  const handleTitleUpdate = async () => {
+    await updateTitleMutation.mutateAsync(newTitle);
+    setTitle(newTitle);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleTitleUpdate();
+    }
+  };
+
+  // 디테일 페이지 조회
   const { data: taskDetailData, isSuccess: taskDetailSuccess } = useQuery(
     ['taskDetail', taskId],
     async () => {
@@ -46,11 +90,15 @@ const DetailModal = (Props: DetailProps) => {
         },
       );
 
+      console.log(res.data);
+      console.log(res.data.comments);
+      setCommentBody(res.data.comments);
       return res.data;
     },
   );
-  console.log(taskDetailData);
+  // console.log(taskDetailData);
 
+  // 중요도 표시 토글
   const changePriority = async (taskId: number) => {
     try {
       const accessToken = Cookies.get('ACCESS_KEY');
@@ -79,10 +127,10 @@ const DetailModal = (Props: DetailProps) => {
   });
 
   const togglePriorityHandler = () => {
-    // taskId와 같은 식별자를 넣어줍니다.
     priorityMutation.mutate(taskId);
   };
 
+  // 글 삭제
   const deleteTask = async (taskId: number) => {
     const userConfirmed = window.confirm('정말로 이 글을 삭제하시겠습니까?');
 
@@ -115,9 +163,7 @@ const DetailModal = (Props: DetailProps) => {
   };
 
   useEffect(() => {
-    // mutation의 onSuccess에서 데이터를 가져온 후 상태를 업데이트
     if (priorityMutation.isSuccess) {
-      // 서버 응답을 이용해 상태 업데이트 로직을 작성할 수 있습니다.
       setPriority(priorityMutation.data);
       queryClient.invalidateQueries('taskDetail');
       queryClient.invalidateQueries('todos');
@@ -161,8 +207,18 @@ const DetailModal = (Props: DetailProps) => {
             </div>
             <div>{postUser.nickname}</div>
           </div>
-          <div className="text-black text-[1.25rem] font-bold leading-[2rem]">
-            {title}
+          <div className="text-black text-[1.25rem] font-bold leading-[2rem] cursor-pointer">
+            {isEditing ? (
+              <input
+                type="text"
+                value={newTitle}
+                onChange={handleTitleChange}
+                onKeyDown={handleKeyDown}
+                onBlur={handleTitleUpdate}
+              />
+            ) : (
+              <span onClick={handleTitleClick}>{title}</span>
+            )}
           </div>
           <div className="flex justify-between">
             <div className="flex gap-[0.62rem] items-center cursor-pointer">
@@ -192,7 +248,7 @@ const DetailModal = (Props: DetailProps) => {
         </div>
         <div>
           <div className="p-[2rem]">
-            {commentStatus ? (
+            {commentBody !== [] ? (
               <div>
                 <div className="flex gap-[0.5rem] mb-[1.5rem]">
                   <div className="text-black font-bold leading-[1.6rem]">
@@ -203,10 +259,30 @@ const DetailModal = (Props: DetailProps) => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-[1.25rem]">
-                  <CommentCard />
-                  <CommentCard />
-                  <CommentCard />
-                  <CommentCard />
+                  <div className="flex gap-[0.62rem] w-full justify-between items-center mb-[0.62rem]">
+                    <div className="flex gap-[0.62rem] items-center">
+                      <div className="rounded-[0.5rem]">
+                        <Image src={userProfile} alt="유저프로필" />
+                      </div>
+                      <div className="text-black text-[0.875rem]">
+                        전정훈 (나)
+                      </div>
+                      <div className="text-gray-4 text-[0.75rem]">
+                        1분 미만 전
+                      </div>
+                    </div>
+                    <div className="text-gray-4 cursor-pointer">
+                      <IoEllipsisVertical />
+                    </div>
+                  </div>
+                  <div className="pb-[1.25rem]">
+                    <div className="text-black text-[0.875rem] leading-[1.4rem]">
+                      업무에 수고가 많으십니다! 항상 고생이 많으시네요!
+                      대단하십니다.
+                    </div>
+                  </div>
+                  <div className="border-b-[1px] text-gray-2">{''}</div>
+                  {/* <CommentCard /> */}
                 </div>
               </div>
             ) : (

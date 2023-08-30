@@ -55,9 +55,21 @@ const formattedCalendarDateSelector = selector({
   },
 });
 
+// 시간 이동에 쓸 날짜
+const formattedSelectedDateSelector = selector({
+  key: 'formattedSelectedDateSelector',
+  get: ({ get }) => {
+    const currentDate = get(currentDateState);
+    const formatDate = format(currentDate, 'yyyy-MM-dd');
+
+    return formatDate;
+  },
+});
+
 export {
   formattedCurrentDateSelector,
   formattedBeforeDateSelector,
   formattedAfterDateSelector,
   formattedCalendarDateSelector,
+  formattedSelectedDateSelector,
 };

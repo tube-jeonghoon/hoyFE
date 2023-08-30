@@ -100,16 +100,20 @@ const ViewGroup = () => {
   };
 
   const updateTodosForUsers = async (usersList: ViewGroupUserList[]) => {
-    const updatedUsers = await Promise.all(
-      usersList.map(async user => {
-        const userTodos = await fetchTodoForUser(user);
-        return {
-          ...user,
-          todos: userTodos,
-        };
-      }),
-    );
-    setViewGroupUserList(updatedUsers);
+    try {
+      const updatedUsers = await Promise.all(
+        usersList.map(async user => {
+          const userTodos = await fetchTodoForUser(user);
+          return {
+            ...user,
+            todos: userTodos,
+          };
+        }),
+      );
+      setViewGroupUserList(updatedUsers);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   // 변경된 날짜로 Todo 리스트 불러오기

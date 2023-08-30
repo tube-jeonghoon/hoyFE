@@ -47,7 +47,7 @@ const Header = () => {
             <div>
               <div
                 className="w-[1.25rem] h-[1.25rem] cursor-pointer focus:bg-gray-2 hover:bg-gray-2
-            p-[0.12rem] rounded-[0.5rem]"
+                  p-[0.12rem] rounded-[0.5rem]"
                 onClick={toggleCustomViewOptionBtn}
               >
                 <Image src={verticalSetting} alt="세로선" />

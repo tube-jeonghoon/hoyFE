@@ -11,6 +11,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import groupListState from '@/store/atom/groupListState';
+import { useQuery, useQueryClient } from 'react-query';
 
 interface Member {
   userId: number;
@@ -19,6 +20,7 @@ interface Member {
 }
 
 const CreateGroupModal = () => {
+  const queryClinet = useQueryClient();
   const [createGroupVisible, setCreateGroupVisible] = useRecoilState(
     isCreateGroupModalState,
   );
@@ -30,11 +32,11 @@ const CreateGroupModal = () => {
   );
   const [groupList, setGroupList] = useRecoilState(groupListState);
 
-  const fetchUser = async () => {
-    try {
+  const { data: groupFetchUserData, isSuccess: groupFetchUserSuccess } =
+    useQuery('groupFetchUserData', async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/group/available-users`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/group/available-users`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -42,31 +44,52 @@ const CreateGroupModal = () => {
         },
       );
 
-      console.log(res.data.workspaceMembers);
-      setWorkspaceMembers(res.data.workspaceMembers);
-      return res;
-    } catch (error) {
-      console.error(error);
-    }
-  };
+      return res.data.workspaceMembers;
+    });
 
-  const fetchGroupListData = async () => {
-    try {
-      const accessToken = Cookies.get('ACCESS_KEY');
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/group`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-      console.log('fetchGroupListData', res.data);
-      setGroupList(res.data);
-    } catch (error) {
-      console.error(error);
+  useEffect(() => {
+    if (groupFetchUserSuccess) {
+      setWorkspaceMembers(groupFetchUserData);
     }
-  };
+  }, [groupFetchUserSuccess, groupFetchUserData]);
+
+  // const fetchUser = async () => {
+  //   try {
+  //     const accessToken = Cookies.get('ACCESS_KEY');
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/group/available-users`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //         },
+  //       },
+  //     );
+
+  //     console.log(res.data.workspaceMembers);
+  //     setWorkspaceMembers(res.data.workspaceMembers);
+  //     return res;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  // const fetchGroupListData = async () => {
+  //   try {
+  //     const accessToken = Cookies.get('ACCESS_KEY');
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/group`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //         },
+  //       },
+  //     );
+  //     console.log('fetchGroupListData', res.data);
+  //     setGroupList(res.data);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const createGroup = async () => {
     const accessToken = Cookies.get('ACCESS_KEY');
@@ -91,7 +114,8 @@ const CreateGroupModal = () => {
 
       console.log(res.data);
       setCreateGroupVisible(false);
-      fetchGroupListData();
+      // fetchGroupListData();
+      queryClinet.invalidateQueries('groupListData');
     } catch (error) {
       console.error('그룹 만들기가 실패하였습니다. ❌', error);
     }
@@ -112,10 +136,6 @@ const CreateGroupModal = () => {
       setSelectedMembers(prevMembers => [...prevMembers, member]);
     }
   };
-
-  useEffect(() => {
-    fetchUser();
-  }, [createGroupVisible]);
 
   return (
     <div

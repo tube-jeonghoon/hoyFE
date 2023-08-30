@@ -11,9 +11,9 @@ import {
   isSelectWorkspaceModalState,
   isUpdateModalState,
 } from '@/store/atom/modalStatus';
-import WorkspaceSelectModal from '../modal/workspaceSelectModal';
-import CreateWorkSpaceModal from '../modal/createWorkSpaceModal';
-import SearchMemberModal from '../searchMemberModal';
+import WorkspaceSelectModal from '../../modal/workspaceSelectModal';
+import CreateWorkSpaceModal from '../../modal/createWorkSpaceModal';
+import SearchMemberModal from '../../searchMemberModal';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import workspaceListState from '@/store/atom/workspaceListState';
@@ -24,30 +24,18 @@ import {
   currentWorkspaceState,
 } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
-import CreateGroupModal from '../modal/createGroupModal';
-import CreateFavoriteMemberModal from '../modal/createFavoriteMemberModal';
+import CreateGroupModal from '../../modal/createGroupModal';
+import CreateFavoriteMemberModal from '../../modal/createFavoriteMemberModal';
 import favoriteUserListState from '@/store/atom/favoriteUserListState';
 import groupListState from '@/store/atom/groupListState';
-import UpdateModal from '../updateModal';
-
-interface GroupList {
-  id: number;
-  name: string;
-  memberCount: number;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string | null;
-}
-
-interface FavoriteUserList {
-  userId: number;
-  nickname: string;
-  imgUrl: string;
-}
+import UpdateModal from '../../updateModal';
+import { GroupList, FavoriteUserList } from './types';
+import { useQuery } from 'react-query';
+import { fetchWorkspaceData } from '@/apis/utils/api/sidebar/fetchWorkSpace';
+import fetchUserDataApi from '@/apis/utils/api/sidebar/fetchUserDataApi';
 
 const SideBar = () => {
   const router = useRouter();
-  const userName = '전정훈';
   const [currentUserData, setCurrentUserData] =
     useRecoilState(currentUserDataState);
   const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
@@ -77,20 +65,12 @@ const SideBar = () => {
   );
   const [currentGroup, setCurrentGroup] = useRecoilState(currentGroupState);
 
-  const [userList, setUserList] = useState([
-    '전정훈',
-    '정혜승',
-    '권용재',
-    '방민석',
-    '하정민',
-    '방민석',
-  ]);
-
   const [favoriteUserList, setFavoriteUserList] = useRecoilState(
     favoriteUserListState,
   );
 
   const [groupList, setGroupList] = useRecoilState(groupListState);
+  const [isWorkspaceSelected, setIsWorkspaceSelected] = useState(false);
 
   const toggleWorkspaceSelect = () => {
     setWorkspaceSelectVisible(!workspaceSelectVisible);
@@ -109,34 +89,41 @@ const SideBar = () => {
   };
 
   const toggleUpdateModal = () => {
-    console.log(`클릭됌`);
-    console.log(updateModalVisible);
     setUpdateModalVisible(!updateModalVisible);
   };
 
-  const fetchWorkSpaceData = async () => {
-    try {
-      const accessToken = Cookies.get('ACCESS_KEY');
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            // Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
-          },
-        },
-      );
-      setWorkspaceList(res.data);
-      console.log('받아온 워크스페이스 리스트 ', res.data);
-      setCurrentWorkSpace(res.data[0]);
-      console.log('기본 선택된 워크스페이스', res.data[0]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const {
+    data: workspaceSidbarData,
+    isSuccess: workspaceSidbarSuccess,
+    isError: workspaceSidbarError,
+  } = useQuery('workspaceSidbarData', fetchWorkspaceData);
 
-  const fetchFavoriteUserList = async () => {
-    try {
+  useEffect(() => {
+    if (workspaceSidbarSuccess) {
+      setWorkspaceList(workspaceSidbarData);
+
+      // 워크스페이스가 아직 선택되지 않았다면 첫 번째 워크스페이스를 선택
+      // if (!isWorkspaceSelected) {
+      //   setCurrentWorkSpace(workspaceSidbarData[0]);
+      //   setIsWorkspaceSelected(true); // 워크스페이스 선택 상태 업데이트
+      // }
+
+      console.log(workspaceSidbarData[0]);
+    }
+    if (workspaceSidbarError) {
+      console.error(workspaceSidbarError);
+    }
+  }, [
+    workspaceSidbarSuccess,
+    workspaceSidbarError,
+    workspaceSidbarData,
+    setWorkspaceList,
+    setCurrentWorkSpace,
+    isWorkspaceSelected, // 의존성 배열에 추가
+  ]);
+
+  const { data: favoriteUserListData, isSuccess: favoriteUserListSucess } =
+    useQuery(['favoriteUserList', currentWorkSpace.workspace_id], async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/favorites`,
@@ -146,56 +133,92 @@ const SideBar = () => {
           },
         },
       );
+      return res.data;
+    });
 
-      console.log(res.data);
-      setFavoriteUserList(res.data);
-    } catch (error) {
-      console.error(error);
+  useEffect(() => {
+    if (favoriteUserListSucess) {
+      setFavoriteUserList(favoriteUserListData);
     }
-  };
+  }, [favoriteUserListData]);
 
-  const fetchGroupListData = async () => {
-    try {
+  const { data: groupListData, isSuccess: groupListDataSuccess } = useQuery(
+    ['groupListData', currentWorkSpace.workspace_id],
+    async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/1/group`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/group`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         },
       );
-      console.log('fetchGroupListData', res.data);
-      setGroupList(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
-  const fetchUserData = async () => {
-    try {
-      const accessToken = Cookies.get('ACCESS_KEY');
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/current-user`,
-        {
-          headers: {
-            // Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
-            Authorization: `Bearer ${accessToken}`,
-          },
+      return res.data;
+    },
+  );
+
+  useEffect(() => {
+    if (groupListDataSuccess) {
+      setGroupList(groupListData);
+    }
+  }, [groupListData]);
+
+  const {
+    data: fetchUserData,
+    isSuccess: fetchUserDataSuccess,
+    isLoading: fetchUserDataLoading,
+    isError: fetchUserDataError,
+  } = useQuery(['fetchUserData', currentWorkSpace.workspace_id], async () => {
+    const accessToken = Cookies.get('ACCESS_KEY');
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/current-user`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      );
+      },
+    );
 
-      console.log(res.data);
-      setCurrentUserData(res.data);
-      setCurrentHeaderName(res.data.nickname);
-    } catch (error) {
-      console.error(error);
+    return res.data;
+  });
+
+  useEffect(() => {
+    console.log(fetchUserDataSuccess);
+    if (fetchUserDataSuccess) {
+      console.log('fetchUserData 들어옴', fetchUserData);
+      setCurrentUserData(fetchUserData);
+      setCurrentHeaderName(fetchUserData.nickname);
     }
-  };
+  }, [fetchUserData]);
+
+  // const fetchUserData = async () => {
+  //   try {
+  //     const accessToken = Cookies.get('ACCESS_KEY');
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/current-user`,
+  //       {
+  //         headers: {
+  //           // Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
+  //           Authorization: `Bearer ${accessToken}`,
+  //         },
+  //       },
+  //     );
+
+  //     console.log(res.data);
+  //     setCurrentUserData(res.data);
+  //     setCurrentHeaderName(res.data.nickname);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const userDataHandler = () => {
-    fetchUserData();
-    router.push('/home');
+    // router.push는 쿼리의 상태에 따라 변경될 수 있습니다.
+    if (!fetchUserDataLoading && !fetchUserDataError) {
+      router.push('/home');
+    }
   };
 
   const fetchGroupState = (id: number, name: string): void => {
@@ -204,16 +227,9 @@ const SideBar = () => {
     router.push('/viewGroup');
   };
 
-  useEffect(() => {
-    // console.log(currentGroup);
-  }, [currentGroup]);
-
-  useEffect(() => {
-    fetchWorkSpaceData();
-    fetchFavoriteUserList();
-    fetchUserData();
-    fetchGroupListData();
-  }, []);
+  // useEffect(() => {
+  //   fetchUserData();
+  // }, []);
 
   return (
     <div className="my-[2.5rem] mx-[1.5rem] flex flex-col gap-[2rem]">

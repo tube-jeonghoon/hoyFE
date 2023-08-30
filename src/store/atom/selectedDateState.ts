@@ -2,7 +2,7 @@ import { atom } from 'recoil';
 
 const selectedDateState = atom({
   key: 'selectedDateState',
-  default: '',
+  default: new Date(),
 });
 
 export default selectedDateState;
