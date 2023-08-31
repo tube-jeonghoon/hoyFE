@@ -27,12 +27,12 @@ const Login = () => {
     const uniqueToken = localStorage.getItem('uniqueToken');
     const email = router.query.email;
     const accessToken = Cookies.get('ACCESS_KEY');
-    // console.log('✨ ➤ sendInvitationAcceptance ➤ uniqueToken:', uniqueToken);
-    // console.log('✨ ➤ sendInvitationAcceptance ➤ email:', email);
+
     try {
       if (uniqueToken && email) {
         await axios.post(
-          'https://api.hoy.im/api/workspace/accept-invitation',
+          // 'https://api.hoy.im/api/workspace/accept-invitation',
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/accept-invitation`,
           {
             uniqueToken,
             email,
@@ -43,6 +43,13 @@ const Login = () => {
             },
           },
         );
+        console.log(
+          '✨ ➤ sendInvitationAcceptance ➤ uniqueToken:',
+          uniqueToken,
+        );
+        console.log('✨ ➤ sendInvitationAcceptance ➤ email:', email);
+        console.log('✨ ➤ sendInvitationAcceptance ➤ email:', uniqueToken);
+        console.log(`sendInvitationAcceptance 로직 들어옴 `);
         localStorage.removeItem('uniqueToken');
       }
     } catch (error) {
@@ -53,7 +60,7 @@ const Login = () => {
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
     if (Cookies.get('ACCESS_KEY')) {
-      router.push('/home');
+      // router.push('/home');
     }
   }, []);
 
@@ -77,7 +84,7 @@ const Login = () => {
 
       sendInvitationAcceptance();
 
-      window.location.href = '/home';
+      // window.location.href = '/home';
     }
   }, [router.query.access_token]);
 
@@ -86,7 +93,7 @@ const Login = () => {
 
     // console.log(accessToken);
     if (accessToken) {
-      router.push('/home');
+      // router.push('/home');
     }
   };
 

@@ -2,7 +2,10 @@ import WorkspaceSettings from '@/components/workspaceSettings';
 import React from 'react';
 import Image from 'next/image';
 import workSpace from '../../../../public/img/workSpace.svg';
-import { isSettingsModalState } from '@/store/atom/modalStatus';
+import {
+  isInviteMemberModalState,
+  isSettingsModalState,
+} from '@/store/atom/modalStatus';
 import { useRecoilState } from 'recoil';
 import AccountSettings from '@/components/accountSettings';
 
@@ -10,9 +13,14 @@ const SettingsModal = () => {
   const [settingsVisible, SetSettingsVisible] =
     useRecoilState(isSettingsModalState);
 
+  const [inviteVisible, setInviteVisible] = useRecoilState(
+    isInviteMemberModalState,
+  );
+
   const handleOverlayClick = (e: any) => {
     if (e.target === e.currentTarget) {
       SetSettingsVisible(false);
+      setInviteVisible(false);
     }
   };
 
