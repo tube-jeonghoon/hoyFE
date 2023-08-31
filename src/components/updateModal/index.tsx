@@ -158,12 +158,12 @@ const UpdateModal = () => {
 
   return (
     <div
-      className="absolute top-0 left-[13rem] z-[90] flex items-center justify-center bg-white min-w-[24rem]"
+      className="absolute top-0 left-[13rem] flex items-center justify-center bg-white min-w-[24rem]"
       onClick={handleOutsideClick}
     >
       <div
-        className="px-[2.25rem] py-[1.5rem] border border-gray-[#DFE0E8]
-        rounded-[0.5rem] flex flex-col gap-[0.75rem]"
+        className="px-[2.25rem] py-[1.5rem] border border-gray-[#DFE0E8] min-w-[24rem]
+        rounded-[0.5rem] flex flex-col gap-[0.75rem] z-[90] relative"
         onClick={handleModalContentClick}
       >
         <div className="flex items-center justify-end">

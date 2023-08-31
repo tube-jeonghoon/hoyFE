@@ -66,6 +66,7 @@ const WorkspaceSelectModal = () => {
     };
 
     setCurrentWorkSpace(newCurrentWorkspace);
+    // setCurrentWorkSpace({ ...newCurrentWorkspace });
     queryClinet.invalidateQueries('taskList');
     queryClinet.invalidateQueries('workspaceData');
     queryClinet.invalidateQueries('todos');
@@ -73,6 +74,7 @@ const WorkspaceSelectModal = () => {
     queryClinet.invalidateQueries('groupListData');
     queryClinet.invalidateQueries('fetchUserData');
     queryClinet.invalidateQueries('fetchGroupMember');
+    queryClinet.invalidateQueries('workspaceSidbarData');
 
     router.push('/home');
   };

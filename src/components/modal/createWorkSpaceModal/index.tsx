@@ -120,6 +120,16 @@ const CreateWorkSpaceModal = () => {
     }
   };
 
+  // 사진 삭제
+  const handleRemoveImage = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // 입력 상태 초기화
+    }
+    setSelectedFile(null);
+    setFilePreview(null);
+    setFileName(null);
+  };
+
   return (
     <div
       className={`modalContainer fixed inset-0 flex items-center justify-center z-[101] ${
@@ -189,6 +199,7 @@ const CreateWorkSpaceModal = () => {
                       <div
                         className="border-[1px] px-[0.75rem] py-[0.25rem] rounded-[0.5rem]
                       text-[0.875rem] font-bold leading-[1.4rem] cursor-pointer"
+                        onClick={handleRemoveImage}
                       >
                         사진 삭제
                       </div>

@@ -23,7 +23,7 @@ const CustomViewTasks = (props: CutomViewTasksProps) => {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}workspace/${currentWorkspace.workspace_id}/tasks/member/${userId}?date=${selectedDay}}`,
       );
 
-      console.log(res.data);
+      // console.log(res.data);
     } catch (error) {
       console.error(error);
     }

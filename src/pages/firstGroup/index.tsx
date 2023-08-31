@@ -89,17 +89,18 @@ const FirstGroup = () => {
           },
         },
       );
-      // console.log('Workspace created', response.data);
+      // ('Workspace created', response.data);
       setCreateWorkspaceVisible(false);
       setSelectedFile(null);
 
-      router.push('/home');
       // Blob URL 해제
       if (filePreview) {
         URL.revokeObjectURL(filePreview);
         setFilePreview(null); // 미리보기 및 파일이름 상태 초기화
         setFileName(null);
       }
+
+      router.push('/home');
     } catch (error) {
       console.error('Error creating workspace:', error);
     }
@@ -111,9 +112,19 @@ const FirstGroup = () => {
     }
   };
 
+  // 사진 삭제
+  const handleRemoveImage = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // 입력 상태 초기화
+    }
+    setSelectedFile(null);
+    setFilePreview(null);
+    setFileName(null);
+  };
+
   return (
     <div className="w-screen h-screen">
-      <div className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2">
+      <div className="w-[408px] absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2">
         <div className="flex flex-col gap-[6.25rem] p-[1.5rem]">
           <div className="mx-auto">
             <div className="text-[1.5rem] font-bold leading-[2.4rem]">
@@ -171,6 +182,7 @@ const FirstGroup = () => {
                       <div
                         className="border-[1px] px-[0.75rem] py-[0.25rem] rounded-[0.5rem]
                       text-[0.875rem] font-bold leading-[1.4rem] cursor-pointer"
+                        onClick={handleRemoveImage}
                       >
                         사진 삭제
                       </div>

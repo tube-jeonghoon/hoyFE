@@ -10,7 +10,10 @@ import noneComment from '../../../../public/img/noneComment.svg';
 import axios from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilState } from 'recoil';
-import { isDetailModalState } from '@/store/atom/modalStatus';
+import {
+  isDetailModalState,
+  iscommentEditModalState,
+} from '@/store/atom/modalStatus';
 import Cookies from 'js-cookie';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import { DetailProps, postUser } from './types';
@@ -19,6 +22,7 @@ import { IoEllipsisVertical } from 'react-icons/io5';
 import userProfile from '../../../../public/img/userProfile.png';
 import { CommentBody } from './types';
 import defaultUser from '../../../../public/img/defaultUser.png';
+import CommentEditModal from '../commentEditModal';
 
 const DetailModal = (Props: DetailProps) => {
   const queryClient = useQueryClient();
@@ -37,10 +41,24 @@ const DetailModal = (Props: DetailProps) => {
   const [isDetailModalOpen, setIsDetailModalOpen] =
     useRecoilState(isDetailModalState);
 
+  // const [iscommentEditModalVisible, setIscommentEditModalVisible] =
+  //   useRecoilState(iscommentEditModalState);
+  const [iscommentEditModalVisible, setIscommentEditModalVisible] = useState<{
+    [key: number]: boolean;
+  }>({});
+
   const [isEditing, setIsEditing] = useState(false); // 제목 편집 여부를 저장
   const [newTitle, setNewTitle] = useState(''); // 새로운 제목을 저장
 
   const [commentText, setCommentText] = useState(''); // 작성할 댓글의 내용
+
+  // 특정 댓글 ID를 받아 상태를 업데이트하는 함수
+  const toggleCommentEditModal = (commentId: number) => {
+    setIscommentEditModalVisible(prevState => ({
+      ...prevState,
+      [commentId]: !prevState[commentId],
+    }));
+  };
 
   // 댓글 작성 API 호출 함수
   const postComment = async (commentText: string) => {
@@ -324,8 +342,20 @@ const DetailModal = (Props: DetailProps) => {
                             1분 미만 전
                           </div>
                         </div>
-                        <div className="text-gray-4 cursor-pointer">
+                        <div
+                          className="text-gray-4 cursor-pointer hover:bg-gray-2 rounded-[0.5rem]
+                            p-[0.25rem] relative"
+                          onClick={() =>
+                            toggleCommentEditModal(comment.comment_id)
+                          }
+                        >
                           <IoEllipsisVertical />
+                          {iscommentEditModalVisible[comment.comment_id] && (
+                            <CommentEditModal
+                              taskId={taskId}
+                              commentId={comment.comment_id}
+                            />
+                          )}
                         </div>
                       </div>
                       <div className="pb-[1.25rem]">

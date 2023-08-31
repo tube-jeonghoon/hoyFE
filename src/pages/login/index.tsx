@@ -43,13 +43,13 @@ const Login = () => {
             },
           },
         );
-        console.log(
-          '✨ ➤ sendInvitationAcceptance ➤ uniqueToken:',
-          uniqueToken,
-        );
-        console.log('✨ ➤ sendInvitationAcceptance ➤ email:', email);
-        console.log('✨ ➤ sendInvitationAcceptance ➤ email:', uniqueToken);
-        console.log(`sendInvitationAcceptance 로직 들어옴 `);
+        // console.log(
+        //   '✨ ➤ sendInvitationAcceptance ➤ uniqueToken:',
+        //   uniqueToken,
+        // );
+        // console.log('✨ ➤ sendInvitationAcceptance ➤ email:', email);
+        // console.log('✨ ➤ sendInvitationAcceptance ➤ email:', uniqueToken);
+        // console.log(`sendInvitationAcceptance 로직 들어옴 `);
         localStorage.removeItem('uniqueToken');
       }
     } catch (error) {

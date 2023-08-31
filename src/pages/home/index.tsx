@@ -26,7 +26,10 @@ import {
 } from 'react-query';
 import detailState from '@/store/atom/detailState';
 import selectedDateState from '@/store/atom/selectedDateState';
-import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import {
+  currentFavoriteUserIdState,
+  currentWorkspaceState,
+} from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
 import { Todo, NewTodoItem, NewTask, CurrentDate } from '../../types/homeType';
 import addTodoApi from '@/apis/utils/api/addTodoApi';
@@ -55,8 +58,7 @@ const Home = () => {
   );
   const [selectedDate, setSelectedDate] = useRecoilState(currentDateState);
 
-  const [isDetailModal, setIstDetailModal] =
-    useRecoilState<number>(detailState);
+  const [isDetailModal, setIsDetailModal] = useRecoilState<number>(detailState);
   const [inputTitles, setInputTitles] = useState<Record<string, string>>({});
   const [isDetailModalOpen, setIsDetailModalOpen] =
     useRecoilState(isDetailModalState);
@@ -101,7 +103,7 @@ const Home = () => {
           },
         },
       );
-      console.log(res.data);
+      // console.log(res.data);
       return res.data;
     },
   );
@@ -116,9 +118,12 @@ const Home = () => {
     }
   }, [workspaceSuccess, workspaceData]);
 
+  // 워크스페이스의 시작값이 0일때 첫번째 워크스페이스를 선택
   useEffect(() => {
-    if (workspaceData) {
-      setCurrentWorkspace(workspaceData[0]);
+    if (currentWorkspace.workspace_id === 0) {
+      if (workspaceData) {
+        setCurrentWorkspace(workspaceData[0]);
+      }
     }
   }, [workspaceData]);
 
@@ -315,7 +320,7 @@ const Home = () => {
 
   const detailModal = (taskId: number) => {
     setIsDetailModalOpen(true);
-    setIstDetailModal(taskId);
+    setIsDetailModal(taskId);
   };
 
   const handleKeyDown = (

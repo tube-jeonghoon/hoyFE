@@ -20,6 +20,10 @@ import CustomViewTasks from '@/components/customViewTasks';
 import { parseISO, addDays, format, subDays } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { fetchCustomViewTodoApi } from '@/apis/utils/api/fetchTodoApi';
+import { isDetailModalState } from '@/store/atom/modalStatus';
+import detailState from '@/store/atom/detailState';
+import { useQuery } from 'react-query';
+import DetailModal from '@/components/modal/detailModal';
 
 interface ViewGroupUserList {
   userId: number;
@@ -41,6 +45,35 @@ const ViewGroup = () => {
   const [viewGroupUserList, setViewGroupUserList] = useState<
     ViewGroupUserList[]
   >([]);
+  const [isDetailModalOpen, setIsDetailModalOpen] =
+    useRecoilState(isDetailModalState);
+  const [isDetailModal, setIsDetailModal] = useRecoilState<number>(detailState);
+
+  // 워크스페이스의 시작값이 0일때 첫번째 워크스페이스를 선택
+  const { data: workspaceData, isSuccess: workspaceSuccess } = useQuery(
+    'workspaceData',
+    async () => {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      // console.log(res.data);
+      return res.data;
+    },
+  );
+
+  useEffect(() => {
+    if (currentWorkspace.workspace_id === 0) {
+      if (workspaceData) {
+        setCurrentWorkspace(workspaceData[0]);
+      }
+    }
+  }, [workspaceData]);
 
   const fetchGroupMember = async () => {
     try {
@@ -59,7 +92,7 @@ const ViewGroup = () => {
         selectedDate: format(selectedDay, 'yyyy-MM-dd'),
       }));
 
-      console.log('fetchGroupMember', dataWithSelectedDate);
+      // console.log('fetchGroupMember', dataWithSelectedDate);
       setViewGroupUserList(dataWithSelectedDate);
       // 반환된 멤버 리스트를 반환
       return dataWithSelectedDate;
@@ -144,6 +177,11 @@ const ViewGroup = () => {
     // console.log('✨ ➤ useEffect ➤ viewGroupUserList:', viewGroupUserList);
   }, [currentGroupId]);
 
+  const detailModal = (taskId: number) => {
+    setIsDetailModalOpen(true);
+    setIsDetailModal(taskId);
+  };
+
   return (
     <div className="px-[5rem] py-[3.75rem] overflow-y-auto h-[48rem]">
       <div className="cards grid grid-cols-3 gap-x-[3.12rem] gap-y-[3.75rem]">
@@ -216,9 +254,15 @@ const ViewGroup = () => {
                             [{todo.commentCount}]
                           </div>
                         </div>
-                        <div className="cursor-pointer">
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => detailModal(todo.id)}
+                        >
                           <IoEllipsisVertical />
                         </div>
+                        {isDetailModalOpen && isDetailModal === todo.id && (
+                          <DetailModal taskId={todo.id} />
+                        )}
                       </div>
                     ) : (
                       <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
@@ -236,9 +280,15 @@ const ViewGroup = () => {
                             [{todo.commentCount}]
                           </div>
                         </div>
-                        <div className="cursor-pointer">
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => detailModal(todo.id)}
+                        >
                           <IoEllipsisVertical />
                         </div>
+                        {isDetailModalOpen && isDetailModal === todo.id && (
+                          <DetailModal taskId={todo.id} />
+                        )}
                       </div>
                     )}
                   </div>

@@ -50,6 +50,11 @@ const isInviteMemberModalState = atom({
   default: false,
 });
 
+const iscommentEditModalState = atom({
+  key: 'iscommentEditModalState',
+  default: false,
+});
+
 export {
   isCalendarModalState,
   isSelectWorkspaceModalState,
@@ -61,4 +66,5 @@ export {
   isUpdateModalState,
   isSettingsModalState,
   isInviteMemberModalState,
+  iscommentEditModalState,
 };

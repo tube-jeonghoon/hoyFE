@@ -32,7 +32,7 @@ import favoriteUserListState from '@/store/atom/favoriteUserListState';
 import groupListState from '@/store/atom/groupListState';
 import UpdateModal from '../../updateModal';
 import { GroupList, FavoriteUserList } from '../../../types/sidebarTypes';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { fetchWorkspaceData } from '@/apis/utils/api/sidebar/fetchWorkSpace';
 import fetchUserDataApi from '@/apis/utils/api/sidebar/fetchUserDataApi';
 import defaultWorkspace from '../../../../public/img/defaultWorkspace.svg';
@@ -40,6 +40,7 @@ import SettingsModal from '@/components/modal/settingsModal';
 
 const SideBar = () => {
   const router = useRouter();
+  const queryClinet = useQueryClient();
   const [currentUserData, setCurrentUserData] =
     useRecoilState(currentUserDataState);
   const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
@@ -235,9 +236,16 @@ const SideBar = () => {
   // };
 
   const userDataHandler = () => {
+    queryClinet.invalidateQueries('taskList');
+    queryClinet.invalidateQueries('workspaceData');
+    queryClinet.invalidateQueries('todos');
+    queryClinet.invalidateQueries('favoriteUserList');
+    queryClinet.invalidateQueries('groupListData');
+    queryClinet.invalidateQueries('fetchUserData');
+    queryClinet.invalidateQueries('fetchGroupMember');
+    queryClinet.invalidateQueries('workspaceSidbarData');
     // router.push는 쿼리의 상태에 따라 변경될 수 있습니다.
     if (!fetchUserDataLoading && !fetchUserDataError) {
-      console.log(`너니?`);
       router.push('/home');
     }
   };
@@ -261,7 +269,16 @@ const SideBar = () => {
       >
         <div className="flex items-center gap-[0.62rem]">
           <div className="desktop:w-[1.5rem] desktopL:w-[2.5rem] min-w-[2.5rem]">
-            <Image src={defaultWorkspace} alt="img" width="40" height="40" />
+            {currentWorkSpace.workspace_imgUrl === null ? (
+              <Image src={defaultWorkspace} alt="img" width="40" height="40" />
+            ) : (
+              <Image
+                src={currentWorkSpace.workspace_imgUrl || defaultWorkspace}
+                alt="img"
+                width="40"
+                height="40"
+              />
+            )}
           </div>
           <div className="text-black mx-[0.62rem] desktop:text-[0.8rem] desktopL:text-[1rem] font-bold">
             {currentWorkSpace?.workspace_name}

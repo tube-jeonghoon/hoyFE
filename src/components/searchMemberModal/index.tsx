@@ -47,7 +47,7 @@ const SearchMemberModal = () => {
         },
       );
 
-      console.log(res.data);
+      // console.log(res.data);
       setSearchMemberList(res.data);
     } catch (error) {}
   };

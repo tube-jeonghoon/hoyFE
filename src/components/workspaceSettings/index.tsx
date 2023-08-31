@@ -9,9 +9,10 @@ import { useRecoilState } from 'recoil';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import { isInviteMemberModalState } from '@/store/atom/modalStatus';
 import InviteMemberModal from '../modal/inviteMemberModal';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/router';
 
 interface WorkspaceUserList {
   userId: number;
@@ -21,6 +22,8 @@ interface WorkspaceUserList {
 }
 
 const WorkspaceSettings = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const [workspaceUserList, setWorkspaceUserList] = useState<
     WorkspaceUserList[]
   >([]);
@@ -78,7 +81,7 @@ const WorkspaceSettings = () => {
           },
         },
       );
-      // console.log(res.data);
+      // console.log('받아온 유저 목록', res.data);
       return res.data;
     },
   );
@@ -90,12 +93,47 @@ const WorkspaceSettings = () => {
     }
   }, [currentUserData, currentUserSuccess]);
 
+  const deleteWorkspaceMutation = useMutation(
+    async (workspaceId: number) => {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${workspaceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      return res.data;
+    },
+    {
+      // 성공 시 호출될 콜백
+      onSuccess: () => {
+        // 쿼리 데이터를 무효화하여 리프레시
+        queryClient.invalidateQueries('currentUser');
+        // 이곳에 추가적인 로직을 넣을 수 있습니다.
+        router.push('/home');
+      },
+    },
+  );
+  const deleteWorkspaceHandler = () => {
+    // 현재 워크스페이스 ID를 사용하여 워크스페이스를 삭제
+    if (currentWorkspace && currentWorkspace.workspace_id) {
+      deleteWorkspaceMutation.mutate(currentWorkspace.workspace_id);
+    }
+  };
+
   return (
     <div className="text-black">
       <div className="mb-[0.75rem] font-semibold leading-[1.6rem]">설정</div>
       <div className="flex gap-[1.25rem] mb-[1.5rem]">
         <div className="min-w-[3.75rem] min-h-[3.75rem]">
-          <Image src={defaultUser} alt="기본유저" />
+          <Image
+            src={currentWorkspace.workspace_imgUrl || defaultUser}
+            width={60}
+            height={60}
+            alt="기본유저"
+          />
         </div>
         <div>
           <div className="flex flex-col gap-[0.62rem]">
@@ -118,7 +156,10 @@ const WorkspaceSettings = () => {
               </div>
             </div>
             <div className="flex justify-end">
-              <div className="text-[0.75rem] text-gray-5 cursor-pointer">
+              <div
+                className="text-[0.75rem] text-gray-5 cursor-pointer"
+                onClick={deleteWorkspaceHandler}
+              >
                 이 워크스페이스를 삭제하기
               </div>
             </div>
@@ -144,7 +185,7 @@ const WorkspaceSettings = () => {
               <div className="h-[1.5rem] w-[1.5rem]">
                 <Image src={defaultUser} alt="기본유저" />
               </div>
-              <div>전정훈</div>
+              <div>관리자 이름예정</div>
             </div>
             <div className="cursor-pointer">
               <Image src={ownerIcon} alt="주인" />

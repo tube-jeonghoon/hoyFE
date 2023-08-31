@@ -118,6 +118,7 @@ const ViewFavorite = () => {
       'favoriteUserTodos',
       currentWorkSpace.workspace_id,
       currentDate.formatDate,
+      currentFavoriteUserId,
     ],
     async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
@@ -179,6 +180,7 @@ const ViewFavorite = () => {
         });
       });
 
+      // console.log(sortedData);
       return sortedData;
     },
   );
@@ -206,7 +208,7 @@ const ViewFavorite = () => {
 
   useEffect(() => {
     if (workspaceData) {
-      setCurrentWorkSpace(workspaceData);
+      // setCurrentWorkSpace(workspaceData);
     }
   }, [workspaceData]);
 
@@ -302,26 +304,6 @@ const ViewFavorite = () => {
               </div>
             </div>
 
-            <div
-              className="flex items-center mb-[1.12rem] h-[3rem] p-[0.62rem]
-                          border-b-[0.1rem]"
-            >
-              <div
-                className="mr-[0.6rem] text-gray-3 cursor-pointer"
-                onClick={() => {
-                  const title = inputTitles[todo.date];
-                  if (title) {
-                    const newTask = {
-                      title: inputTitles,
-                      date: todo.date,
-                    };
-                    console.log(newTask);
-                  }
-                }}
-              >
-                <AiOutlinePlus />
-              </div>
-            </div>
             {todo.tasks.map(task => (
               <div key={task.id} className="todo-list">
                 {task.status ? (
