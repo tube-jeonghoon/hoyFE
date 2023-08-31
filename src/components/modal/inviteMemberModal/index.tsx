@@ -14,8 +14,6 @@ const InviteMemberModal = () => {
     currentWorkspaceState,
   );
 
-  const workspaceId = 1; // 추후에 동적으로 설정할 수 있습니다.
-
   const handleInputChange = (e: any) => {
     setEmail(e.target.value);
   };
@@ -29,15 +27,15 @@ const InviteMemberModal = () => {
 
       try {
         const accessToken = Cookies.get('ACCESS_KEY');
-        const response = await axios.get(
-          `http://localhost:8000/api/workspace/${workspaceId}/invitations/availability?email=${email}`,
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/invitations/availability?email=${email}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
           },
         );
-        if (response.data.answer) {
+        if (res.data.answer) {
           setInviteList([...inviteList, email]);
           setEmail('');
           setErrorMessage('');
@@ -54,13 +52,13 @@ const InviteMemberModal = () => {
 
   const handleSendInvites = async () => {
     try {
-      const response = await axios.post(
-        `http://localhost:8000/api/workspace/${workspaceId}/invitations`,
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/invitations`,
         {
           emails: inviteList,
         },
       );
-      console.log('Invitations sent:', response.data);
+      console.log('Invitations sent:', res.data);
       setInviteList([]);
       setEmail('');
     } catch (error) {
