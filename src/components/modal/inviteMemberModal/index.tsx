@@ -52,10 +52,16 @@ const InviteMemberModal = () => {
 
   const handleSendInvites = async () => {
     try {
+      const accessKey = Cookies.get('ACCESS_KEY');
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/invitations`,
         {
           emails: inviteList,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessKey}`,
+          },
         },
       );
       console.log('Invitations sent:', res.data);
