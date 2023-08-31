@@ -8,12 +8,21 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import axios, { AxiosResponse } from 'axios';
 import { useRecoilState } from 'recoil';
 
+type Alarm = {
+  alarm_id: number;
+  alarm_status: string;
+  nickname: string;
+  status: string;
+  task_title: string;
+  imgUrl: string;
+};
+
 const UpdateModal = () => {
   const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
     currentWorkspaceState,
   );
   const [isModalOpen, setModalOpen] = useState(true);
-  const [alarmList, setAlarmList] = useState([]); // 서버 res.data
+  const [alarmList, setAlarmList] = useState<Alarm[]>([]); // 서버 res.data
 
   const fetchAlarms = async () => {
     const accessToken = Cookies.get('ACCESS_KEY');
@@ -37,7 +46,7 @@ const UpdateModal = () => {
     isLoading,
     isError,
     refetch,
-  } = useQuery('alarms', fetchAlarms, {
+  } = useQuery<Alarm[]>('alarms', fetchAlarms, {
     refetchInterval: 5000,
   });
 
@@ -57,14 +66,13 @@ const UpdateModal = () => {
   const markAsReadMutation = useMutation(alarmId => fetchUpdate(alarmId), {
     onMutate: (alarmId: number) => {
       // 이전 알림 데이터를 저장해둠
-      const previousAlarms =
-        queryClient.getQueryData<{ alarm_id: number }[]>('alarms') || [];
+      const previousAlarms = queryClient.getQueryData<Alarm[]>('alarms') || [];
       // UI 업데이트 (alarmId에 해당하는 알림을 READ로 처리)
       const updatedAlarms = previousAlarms.map(alarm =>
         alarm.alarm_id === alarmId ? { ...alarm, status: 'READ' } : alarm,
       );
       // 'UNREAD' 상태의 알람을 배열 앞쪽으로 정렬하되, 방금 'READ' 처리된 알람은 'READ' 알람 중 맨 앞에 위치
-      updatedAlarms.sort((a, b) => {
+      updatedAlarms.sort((a, b): any => {
         if (a.status === 'UNREAD' && b.status === 'READ') return -1;
         if (a.status === 'READ' && b.status === 'UNREAD') return 1;
         if (
@@ -85,9 +93,9 @@ const UpdateModal = () => {
       // Return a snapshot so we can rollback in case of failure
       return { previousAlarms };
     },
-    onError: (error, alarmId, { previousAlarms }) => {
+    onError: (error, alarmId, context) => {
       // 요청 실패시 이전 데이터로 롤백
-      queryClient.setQueryData('alarms', previousAlarms);
+      queryClient.setQueryData('alarms', context?.previousAlarms);
     },
     onSuccess: () => {
       // 성공시 캐시된 데이터를 무효화하여 새로운 요청 트리거
@@ -120,9 +128,9 @@ const UpdateModal = () => {
       // 이전 알림 데이터를 반환하여, onError에서 롤백 가능하게 함
       return { previousAlarms };
     },
-    onError: (error, alarmId, { previousAlarms }) => {
+    onError: (error, alarmId, context) => {
       // 요청 실패시 이전 데이터로 롤백
-      queryClient.setQueryData('alarms', previousAlarms);
+      queryClient.setQueryData('alarms', context?.previousAlarms);
     },
     onSuccess: () => {
       // 성공시 캐시된 데이터를 무효화하여 새로운 요청 트리거
@@ -134,14 +142,14 @@ const UpdateModal = () => {
 
   // if (isError) return <div>Error occurred</div>;
 
-  const handleOutsideClick = e => {
+  const handleOutsideClick = (e: any) => {
     // 클릭한 대상이 바깥 영역이면 모달 닫기
     if (e.target === e.currentTarget) {
       setModalOpen(false);
     }
   };
 
-  const handleModalContentClick = e => {
+  const handleModalContentClick = (e: any) => {
     // 모달 내부 클릭 시
     e.stopPropagation();
   };
