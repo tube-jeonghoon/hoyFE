@@ -237,6 +237,7 @@ const SideBar = () => {
   const userDataHandler = () => {
     // router.push는 쿼리의 상태에 따라 변경될 수 있습니다.
     if (!fetchUserDataLoading && !fetchUserDataError) {
+      console.log(`너니?`);
       router.push('/home');
     }
   };
