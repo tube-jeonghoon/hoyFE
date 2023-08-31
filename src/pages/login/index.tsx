@@ -60,7 +60,7 @@ const Login = () => {
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
     if (Cookies.get('ACCESS_KEY')) {
-      // router.push('/home');
+      router.push('/home');
     }
   }, []);
 
@@ -82,9 +82,9 @@ const Login = () => {
       // console.log('Access Token:', accessToken);
       Cookies.set('ACCESS_KEY', accessToken);
 
-      sendInvitationAcceptance();
-
-      // window.location.href = '/home';
+      sendInvitationAcceptance().then(() => {
+        window.location.href = '/home';
+      });
     }
   }, [router.query.access_token]);
 
@@ -93,7 +93,7 @@ const Login = () => {
 
     // console.log(accessToken);
     if (accessToken) {
-      // router.push('/home');
+      router.push('/home');
     }
   };
 

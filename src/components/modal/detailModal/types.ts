@@ -14,5 +14,5 @@ export interface CommentBody {
   isOwner: boolean;
   user_id: number;
   user_imgUrl: string;
-  workspaceMember_nickName: string;
+  workspaceMember_nickname: string;
 }

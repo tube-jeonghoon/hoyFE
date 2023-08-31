@@ -18,6 +18,7 @@ import detailFillCheck from '../../../../public/img/detailFillCheck.svg';
 import { IoEllipsisVertical } from 'react-icons/io5';
 import userProfile from '../../../../public/img/userProfile.png';
 import { CommentBody } from './types';
+import defaultUser from '../../../../public/img/defaultUser.png';
 
 const DetailModal = (Props: DetailProps) => {
   const queryClient = useQueryClient();
@@ -38,6 +39,42 @@ const DetailModal = (Props: DetailProps) => {
 
   const [isEditing, setIsEditing] = useState(false); // 제목 편집 여부를 저장
   const [newTitle, setNewTitle] = useState(''); // 새로운 제목을 저장
+
+  const [commentText, setCommentText] = useState(''); // 작성할 댓글의 내용
+
+  // 댓글 작성 API 호출 함수
+  const postComment = async (commentText: string) => {
+    const accessToken = Cookies.get('ACCESS_KEY');
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/comment`,
+      { text: commentText },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+  };
+
+  // 댓글 작성 useMutation
+  const postCommentMutation = useMutation(postComment, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['taskDetail', taskId]); // 댓글 작성 후 쿼리 데이터를 갱신
+      queryClient.invalidateQueries('todos');
+    },
+  });
+
+  const handleCommentSubmit = () => {
+    postCommentMutation.mutate(commentText); // 댓글 작성 API 호출
+    setCommentText(''); // 입력 필드 초기화
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // 기본 Enter 키 이벤트를 막음
+      handleCommentSubmit();
+    }
+  };
 
   // 제목 수정
   const updateTitleMutation = useMutation(async (newTitle: string) => {
@@ -258,37 +295,49 @@ const DetailModal = (Props: DetailProps) => {
                     [{commentBody.length}]
                   </div>
                 </div>
-                {commentBody.map(comment => (
-                  <div
-                    key={comment.comment_id}
-                    className="flex flex-col gap-[1.25rem]"
-                  >
-                    <div className="flex gap-[0.62rem] w-full justify-between items-center mb-[0.62rem]">
-                      <div className="flex gap-[0.62rem] items-center">
-                        <div className="rounded-[0.5rem]">
-                          <Image src={userProfile} alt="유저프로필" />
+                <div className="flex flex-col gap-[1.25rem]">
+                  {commentBody.map(comment => (
+                    <div key={comment.comment_id} className="flex flex-col">
+                      <div className="flex gap-[0.62rem] w-full justify-between items-center mb-[0.62rem]">
+                        <div className="flex gap-[0.62rem] items-center">
+                          <div className="rounded-[0.5rem]">
+                            <Image
+                              src={comment.user_imgUrl}
+                              width={24}
+                              height={24}
+                              alt="유저프로필"
+                            />
+                          </div>
+                          <div className="flex gap-[2px] items-center">
+                            <div className="text-black text-[0.875rem]">
+                              {comment.workspaceMember_nickname}
+                            </div>
+                            {comment.isOwner ? (
+                              <div className="text-black text-[0.875rem]">
+                                (나)
+                              </div>
+                            ) : (
+                              ''
+                            )}
+                          </div>
+                          <div className="text-gray-4 text-[0.75rem]">
+                            1분 미만 전
+                          </div>
                         </div>
-                        <div className="text-black text-[0.875rem]">
-                          전정훈 (나)
-                        </div>
-                        <div className="text-gray-4 text-[0.75rem]">
-                          1분 미만 전
+                        <div className="text-gray-4 cursor-pointer">
+                          <IoEllipsisVertical />
                         </div>
                       </div>
-                      <div className="text-gray-4 cursor-pointer">
-                        <IoEllipsisVertical />
+                      <div className="pb-[1.25rem]">
+                        <div className="text-black text-[0.875rem] leading-[1.4rem]">
+                          {comment.comment_text}
+                        </div>
                       </div>
+                      <div className="border-b-[1px] text-gray-2">{''}</div>
+                      {/* <CommentCard /> */}
                     </div>
-                    <div className="pb-[1.25rem]">
-                      <div className="text-black text-[0.875rem] leading-[1.4rem]">
-                        업무에 수고가 많으십니다! 항상 고생이 많으시네요!
-                        대단하십니다.
-                      </div>
-                    </div>
-                    <div className="border-b-[1px] text-gray-2">{''}</div>
-                    {/* <CommentCard /> */}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             ) : (
               // <div>
@@ -346,18 +395,22 @@ const DetailModal = (Props: DetailProps) => {
             )}
             <div
               className="h-[3rem] flex items-center justify-between rounded-[0.5rem]
-            border-[1px] absolute w-[18.5rem] bottom-[1.5rem] p-[0.75rem]"
+              border-[1px] absolute w-[18.5rem] bottom-[1.5rem] p-[0.75rem]"
             >
               <div className="text-[0.75rem] leading-[1.4rem] w-full text-gray-4">
                 <input
                   className="w-full focus:outline-none focus:text-black bg-transparent"
                   type="textarea"
                   placeholder="코멘트 내용을 작성해 주세요."
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  onKeyPress={handleKeyPress}
                 />
               </div>
               <div
                 className="bg-gray-2 rounded-[6.25rem] w-[2rem] h-[2rem]
-              flex justify-center items-center p-[0.5rem] cursor-pointer"
+              flex justify-center items-center p-[0.5rem] cursor-pointer hover:bg-primary-blue"
+                onClick={handleCommentSubmit}
               >
                 <Image src={sendMsg} alt="전송" />
               </div>

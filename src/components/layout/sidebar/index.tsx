@@ -23,6 +23,7 @@ import {
   currentUserDataState,
   currentHeaderNameState,
   currentWorkspaceState,
+  currentFavoriteUserIdState,
 } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
 import CreateGroupModal from '../../modal/createGroupModal';
@@ -65,6 +66,9 @@ const SideBar = () => {
   const [updateSettingsVisible, setSettingsModalVisible] =
     useRecoilState(isSettingsModalState);
 
+  const [currentFavoriteUserId, setCurrentFavoriteUserId] = useRecoilState(
+    currentFavoriteUserIdState,
+  );
   const [workspaceList, setWorkspaceList] = useRecoilState(workspaceListState);
   const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
     currentWorkspaceState,
@@ -145,6 +149,12 @@ const SideBar = () => {
       );
       return res.data;
     });
+
+  // 즐겨찾기 멤버를 누르면 발생되는 이벤트
+  const viewFavoriteHandler = (userId: number) => {
+    setCurrentFavoriteUserId(userId);
+    router.push('/viewFavorite');
+  };
 
   useEffect(() => {
     if (favoriteUserListSucess) {
@@ -286,7 +296,7 @@ const SideBar = () => {
         </div>
         <div
           className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer
-              relative"
+              relative z-[100]"
           onClick={toggleUpdateModal}
         >
           <div className="mr-[0.75rem]">
@@ -336,6 +346,7 @@ const SideBar = () => {
             <div
               key={user.userId}
               className="flex items-center p-[0.75rem] cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem]"
+              onClick={() => viewFavoriteHandler(user.userId)}
             >
               <div>
                 <Image src={user.imgUrl} alt="img" width="24" height="24" />

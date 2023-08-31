@@ -34,9 +34,15 @@ const currentGroupState = atom<number>({
   default: 0,
 });
 
+const currentFavoriteUserIdState = atom<number>({
+  key: 'currentFavoriteUserIdState',
+  default: 0,
+});
+
 export {
   currentUserDataState,
   currentHeaderNameState,
   currentWorkspaceState,
   currentGroupState,
+  currentFavoriteUserIdState,
 };

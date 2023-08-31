@@ -5,7 +5,7 @@ import { useRecoilState } from 'recoil';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
 import cancel from '../../../../public/img/cancel.svg';
-
+import { useMutation } from 'react-query';
 const InviteMemberModal = () => {
   const [email, setEmail] = useState<string>('');
   const [inviteList, setInviteList] = useState<string[]>([]);
@@ -13,7 +13,6 @@ const InviteMemberModal = () => {
   const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
-
   const handleInputChange = (e: any) => {
     setEmail(e.target.value);
   };
@@ -24,11 +23,13 @@ const InviteMemberModal = () => {
         setErrorMessage('이미 추가된 이메일 주소입니다.');
         return;
       }
-
       try {
         const accessToken = Cookies.get('ACCESS_KEY');
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/invitations/availability?email=${email}`,
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/invitations/availability`,
+          {
+            email: email,
+          },
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -44,14 +45,14 @@ const InviteMemberModal = () => {
       } catch (error: any) {
         if (error.response && error.response.data) {
           console.error(error);
+          console.error(error.response.data.message);
           setErrorMessage(error.response.data.message);
         }
       }
     }
   };
-
-  const handleSendInvites = async () => {
-    try {
+  const InviteMutation = useMutation(
+    async () => {
       const accessKey = Cookies.get('ACCESS_KEY');
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/invitations`,
@@ -64,18 +65,22 @@ const InviteMemberModal = () => {
           },
         },
       );
-      console.log('Invitations sent:', res.data);
-      setInviteList([]);
-      setEmail('');
-    } catch (error) {
-      console.error('Error sending invites:', error);
-    }
-  };
-
+      return res.data;
+    },
+    {
+      onSuccess: data => {
+        console.log('Invitations sent:', data);
+        setInviteList([]);
+        setEmail('');
+      },
+      onError: error => {
+        console.error('Error sending invites:', error);
+      },
+    },
+  );
   const handleRemoveEmail = (emailToRemove: string) => {
     setInviteList(inviteList.filter(email => email !== emailToRemove));
   };
-
   return (
     <div className="absolute top-[1.5rem] right-0">
       <div
@@ -116,11 +121,11 @@ const InviteMemberModal = () => {
             {errorMessage || ''}
           </div>
           <div
-            onClick={handleSendInvites}
+            onClick={() => !InviteMutation.isLoading && InviteMutation.mutate()}
             className="h-[2rem] bg-gray-3 text-white flex items-center rounded-[0.5rem]
           gap-[0.2rem] px-[0.75rem] py-[0.25rem] cursor-pointer font-semibold hover:bg-primary-blue"
           >
-            <div>전송</div>
+            <div>{InviteMutation.isLoading ? '로딩중...' : '전송'}</div>
             <div>({inviteList.length})</div>
           </div>
         </div>
@@ -128,5 +133,4 @@ const InviteMemberModal = () => {
     </div>
   );
 };
-
 export default InviteMemberModal;

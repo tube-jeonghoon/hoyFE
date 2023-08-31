@@ -26,7 +26,10 @@ import {
 } from 'react-query';
 import detailState from '@/store/atom/detailState';
 import selectedDateState from '@/store/atom/selectedDateState';
-import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import {
+  currentFavoriteUserIdState,
+  currentWorkspaceState,
+} from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
 import addTodoApi from '@/apis/utils/api/addTodoApi';
 import { addDays, parseISO, set, subDays } from 'date-fns';
@@ -47,8 +50,14 @@ import {
   CurrentDate,
 } from '../../types/viewFavoriteTypes';
 
-const ViewFavorite = () => {
+interface ViewFavoriteProps {
+  userId: number;
+}
+
+const ViewFavorite = (Props: ViewFavoriteProps) => {
   const queryClient = useQueryClient();
+
+  const { userId } = Props;
 
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [newTodoList, setNewTodoList] = useState<NewTodoItem[]>([]);
@@ -58,6 +67,9 @@ const ViewFavorite = () => {
     currentWorkspaceState,
   );
   const [selectedDate, setSelectedDate] = useRecoilState(currentDateState);
+  const [currentFavoriteUserId, setCurrentFavoriteUserId] = useRecoilState(
+    currentFavoriteUserIdState,
+  );
 
   const [isDetailModal, setIstDetailModal] =
     useRecoilState<number>(detailState);
@@ -109,12 +121,17 @@ const ViewFavorite = () => {
     { staleTime: 0 },
   );
 
-  const { data: todosData } = useQuery(
-    ['todos', currentWorkSpace.workspace_id, currentDate.formatDate],
+  const { data: favoriteUserTodoData } = useQuery(
+    [
+      'favoriteUserTodos',
+      currentWorkSpace.workspace_id,
+      currentDate.formatDate,
+    ],
     async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks?date=${currentDate.formatDate}`,
+        //workspace/{:workspaceId}/tasks/member/{:userId}/three-days?date={date?}
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/member/${currentFavoriteUserId}/three-days?date=${currentDate.formatDate}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -163,7 +180,7 @@ const ViewFavorite = () => {
           return {
             ...todo,
             tasks:
-              todosData?.filter(
+              favoriteUserTodoData?.filter(
                 (task: Todo) => task.scheduleDate === todo.date,
               ) || [],
           };
@@ -341,10 +358,10 @@ const ViewFavorite = () => {
   }, [workspaceData]);
 
   useEffect(() => {
-    if (todosData) {
-      setTodoList(todosData);
+    if (favoriteUserTodoData) {
+      setTodoList(favoriteUserTodoData);
     }
-  }, [todosData]);
+  }, [favoriteUserTodoData]);
 
   // useEffect(() => {
   //   fetchDate();

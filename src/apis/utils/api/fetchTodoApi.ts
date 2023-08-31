@@ -12,6 +12,7 @@ export const fetchCustomViewTodoApi = async ({
   currentDate,
   workspaceId,
 }: FetchCustomViewTodoApi) => {
+  console.log(userId, currentDate, workspaceId);
   const accessToken = Cookies.get('ACCESS_KEY');
   try {
     const response = await axios.get(
@@ -22,6 +23,8 @@ export const fetchCustomViewTodoApi = async ({
         },
       },
     );
+
+    console.log(response.data);
 
     return response.data;
   } catch (error) {

@@ -11,6 +11,7 @@ import workspaceListState from '@/store/atom/workspaceListState';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import { useQueryClient } from 'react-query';
 import defaultWorkspace from '../../../../public/img/defaultWorkspace.svg';
+import { useRouter } from 'next/router';
 
 interface WorkspaceList {
   workspace_id: number;
@@ -19,6 +20,7 @@ interface WorkspaceList {
 }
 
 const WorkspaceSelectModal = () => {
+  const router = useRouter();
   const queryClinet = useQueryClient();
   const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
     currentWorkspaceState,
@@ -70,6 +72,9 @@ const WorkspaceSelectModal = () => {
     queryClinet.invalidateQueries('favoriteUserList');
     queryClinet.invalidateQueries('groupListData');
     queryClinet.invalidateQueries('fetchUserData');
+    queryClinet.invalidateQueries('fetchGroupMember');
+
+    router.push('/home');
   };
 
   return (
