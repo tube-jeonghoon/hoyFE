@@ -38,12 +38,6 @@ import arrowLeft from '../../../public/img/arrow_left.svg';
 import format from 'date-fns/format';
 import currentDateState from '@/store/atom/currentDateState';
 import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
-import {
   Todo,
   NewTodoItem,
   NewTask,
@@ -252,52 +246,81 @@ const ViewFavorite = () => {
       <div className="todos grid grid-cols-3 ">
         {newTodoList.map((todo, idx) => (
           <div
-            className="todo mr-[3.12rem] desktop:w-[11.5rem] desktopL:w-[19rem]"
             key={idx}
+            className="todo mr-[3.12rem] desktop:w-[11.5rem] desktopL:w-[19rem]"
           >
-            <div className="todo-date flex items-center justify-center mb-[1.125rem] py-[1.125rem]">
-              <div
-                className={`mr-[0.5rem] text-[1.125rem] font-bold ${
-                  idx === Math.floor(newTodoList.length / 2)
-                    ? 'text-primary-blue'
-                    : ''
-                }`}
-              >
-                {todo.dayOfWeek}
+            <div
+              className={`todo-date flex items-center mb-[1.125rem] py-[1.125rem] ${
+                idx === 0
+                  ? 'justify-start'
+                  : idx === 1
+                  ? 'justify-center'
+                  : idx === 2
+                  ? 'justify-end'
+                  : ''
+              }`}
+            >
+              <div className="flex gap-[5rem] h-[2.5rem]">
+                {idx === 0 && (
+                  <div
+                    onClick={moveDateBackward}
+                    className="p-[0.8rem] bg-gray-1 rounded-[0.5rem] w-[2.5rem] h-[2.5rem] cursor-pointer"
+                  >
+                    <Image
+                      src={arrowLeft}
+                      width={24}
+                      height={24}
+                      alt="화살표"
+                    />
+                  </div>
+                )}
+                <div className="flex items-center">
+                  <div
+                    className={`mr-[0.5rem] text-[1.125rem] font-bold ${
+                      idx === Math.floor(newTodoList.length / 2)
+                        ? 'text-primary-blue'
+                        : ''
+                    }`}
+                  >
+                    {todo.dayOfWeek}
+                  </div>
+                  <div className="text-gray-5">{todo.day}</div>
+                </div>
+                {idx === newTodoList.length - 1 && (
+                  <div
+                    onClick={moveDateForward}
+                    className="p-[0.8rem] bg-gray-1 rounded-[0.5rem] w-[2.5rem] h-[2.5rem] cursor-pointer"
+                  >
+                    <Image
+                      src={arrowRight}
+                      width={24}
+                      height={24}
+                      alt="화살표"
+                    />
+                  </div>
+                )}
               </div>
-              <div className="text-gray-5">{todo.day}</div>
             </div>
+
             <div
               className="flex items-center mb-[1.12rem] h-[3rem] p-[0.62rem]
-            border-b-[0.1rem]"
+                          border-b-[0.1rem]"
             >
               <div
                 className="mr-[0.6rem] text-gray-3 cursor-pointer"
                 onClick={() => {
                   const title = inputTitles[todo.date];
-                  console.log(title);
-                  console.log(todo.date);
                   if (title) {
-                    const newTask = { title: inputTitles, date: todo.date };
+                    const newTask = {
+                      title: inputTitles,
+                      date: todo.date,
+                    };
                     console.log(newTask);
                   }
                 }}
               >
                 <AiOutlinePlus />
               </div>
-              <input
-                type="text"
-                className="outline-none text-[0.875rem] text-gray-4 border-gray-4
-              focus:text-black w-full"
-                placeholder="리스트를 작성해 주세요."
-                onChange={e => {
-                  setInputTitles({
-                    ...inputTitles,
-                    [todo.date]: e.target.value,
-                  });
-                }}
-                value={inputTitles[todo.date] || ''}
-              />
             </div>
             {todo.tasks.map(task => (
               <div key={task.id} className="todo-list">
@@ -321,7 +344,6 @@ const ViewFavorite = () => {
                         )}
                       </div>
                     </div>
-
                     <div
                       className="cursor-pointer"
                       onClick={() => detailModal(task.id)}
@@ -334,10 +356,7 @@ const ViewFavorite = () => {
                   </div>
                 ) : (
                   <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-                    <div
-                      className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]"
-                      onClick={() => toggleTaskCompletion(task.id)}
-                    >
+                    <div className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]">
                       <Image src={checkBoxIcon} alt="체크박스" />
                     </div>
                     <div className="flex items-center mr-[0.62rem]">
@@ -347,12 +366,11 @@ const ViewFavorite = () => {
                     </div>
                     <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
                       {task.title}
-                      {task.commentCount !== 0 ||
-                        (undefined && (
-                          <div className="ml-[0.62rem] text-gray-4">
-                            [{task.commentCount}]
-                          </div>
-                        ))}
+                      {task.commentCount !== 0 && (
+                        <div className="ml-[0.62rem] text-gray-4">
+                          [{task.commentCount}]
+                        </div>
+                      )}
                     </div>
                     <div
                       className="cursor-pointer"
@@ -369,8 +387,6 @@ const ViewFavorite = () => {
             ))}
           </div>
         ))}
-        <div className="current-date"></div>
-        <div className="after-date"></div>
       </div>
     </div>
   );
