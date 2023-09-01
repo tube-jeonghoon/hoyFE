@@ -59,6 +59,7 @@ const Login = () => {
 
   // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
   useEffect(() => {
+    if (localStorage.getItem('uniqueToken')) return;
     if (Cookies.get('ACCESS_KEY')) {
       router.push('/home');
     }
@@ -97,9 +98,9 @@ const Login = () => {
     }
   };
 
-  useEffect(() => {
-    loginCheck();
-  }, []);
+  // useEffect(() => {
+  //   loginCheck();
+  // }, []);
 
   return (
     <div className="w-screen h-screen">
