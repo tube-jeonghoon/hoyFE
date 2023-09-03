@@ -6,13 +6,17 @@ import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useQuery } from 'react-query';
-import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import {
+  currentWorkspaceState,
+  workspaceIdState,
+} from '@/store/atom/userStatusState';
 import { useRecoilState } from 'recoil';
 
 const Login = () => {
   const router = useRouter();
   const [userInfo, setUserInfo] = useState({ givenName: '', imageUrl: '' });
   const [loginResponse, setLoginResponse] = useState(null);
+  const [workspaceId, setWorkspaceId] = useRecoilState(workspaceIdState);
 
   const fetchUniqueToken = () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -43,13 +47,7 @@ const Login = () => {
             },
           },
         );
-        // console.log(
-        //   '✨ ➤ sendInvitationAcceptance ➤ uniqueToken:',
-        //   uniqueToken,
-        // );
-        // console.log('✨ ➤ sendInvitationAcceptance ➤ email:', email);
-        // console.log('✨ ➤ sendInvitationAcceptance ➤ email:', uniqueToken);
-        // console.log(`sendInvitationAcceptance 로직 들어옴 `);
+
         localStorage.removeItem('uniqueToken');
       }
     } catch (error) {
@@ -57,11 +55,11 @@ const Login = () => {
     }
   };
 
-  // 이미 액세스 토큰을 가지고 있으면 /home으로 리다이렉팅
+  // 이미 액세스 토큰을 가지고 있으면 /workspace으로 리다이렉팅
   useEffect(() => {
     if (localStorage.getItem('uniqueToken')) return;
     if (Cookies.get('ACCESS_KEY')) {
-      router.push('/home');
+      router.push('/workspace');
     }
   }, []);
 
@@ -84,23 +82,10 @@ const Login = () => {
       Cookies.set('ACCESS_KEY', accessToken);
 
       sendInvitationAcceptance().then(() => {
-        window.location.href = '/home';
+        window.location.href = '/workspace';
       });
     }
   }, [router.query.access_token]);
-
-  const loginCheck = () => {
-    const accessToken = Cookies.get('ACCESS_KEY');
-
-    // console.log(accessToken);
-    if (accessToken) {
-      router.push('/home');
-    }
-  };
-
-  // useEffect(() => {
-  //   loginCheck();
-  // }, []);
 
   return (
     <div className="w-screen h-screen">

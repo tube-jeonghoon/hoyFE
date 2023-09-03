@@ -8,6 +8,8 @@ import {
 } from '@/store/atom/modalStatus';
 import { useRecoilState } from 'recoil';
 import AccountSettings from '@/components/accountSettings';
+import { selectedSettingMenuState } from '@/store/atom/selectedMenuState';
+import settingUser from '../../../../public/img/settingUser.svg';
 
 const SettingsModal = () => {
   const [settingsVisible, SetSettingsVisible] =
@@ -17,11 +19,23 @@ const SettingsModal = () => {
     isInviteMemberModalState,
   );
 
+  const [selectedSettingMenu, setSelectedSettingMenu] = useRecoilState<string>(
+    selectedSettingMenuState,
+  );
+
   const handleOverlayClick = (e: any) => {
     if (e.target === e.currentTarget) {
       SetSettingsVisible(false);
       setInviteVisible(false);
     }
+  };
+
+  const userSettingsHandler = () => {
+    setSelectedSettingMenu('userSettings');
+  };
+
+  const workspaceSettingsHandler = () => {
+    setSelectedSettingMenu('workspaceSettings');
   };
 
   return (
@@ -37,11 +51,27 @@ const SettingsModal = () => {
         >
           <div className="flex text-black">
             <div className="py-[2rem] px-[1.5rem] border-r-[1px]">
-              {/* <div>계정</div> */}
-              <div>
+              <div className="flex flex-col gap-[0.25rem]">
                 <div
-                  className="flex w-[10rem] items-center gap-[0.62rem] p-[0.75rem] hover:bg-gray-2
-                  cursor-pointer rounded-[0.5rem]"
+                  className={`flex w-[10rem] items-center gap-[0.62rem] p-[0.75rem] hover:bg-gray-2
+                  cursor-pointer rounded-[0.5rem] ${
+                    selectedSettingMenu === 'userSettings' && 'bg-gray-2'
+                  }`}
+                  onClick={userSettingsHandler}
+                >
+                  <div>
+                    <Image src={settingUser} alt="계정" />
+                  </div>
+                  <div className="text-[0.875rem] leading-[1.4rem] font-semibold">
+                    계정
+                  </div>
+                </div>
+                <div
+                  className={`flex w-[10rem] items-center gap-[0.62rem] p-[0.75rem] hover:bg-gray-2
+                  cursor-pointer rounded-[0.5rem] ${
+                    selectedSettingMenu === 'workspaceSettings' && 'bg-gray-2'
+                  }`}
+                  onClick={workspaceSettingsHandler}
                 >
                   <div>
                     <Image src={workSpace} alt="워크스페이스" />
@@ -53,9 +83,11 @@ const SettingsModal = () => {
               </div>
               {/* <div>문의하기</div> */}
             </div>
-            <div className="py-[2rem] px-[1.5rem]">
-              {/* <AccountSettings /> */}
-              <WorkspaceSettings />
+            <div className="py-[2rem] px-[1.5rem] w-[22.875rem]">
+              {selectedSettingMenu === 'userSettings' && <AccountSettings />}
+              {selectedSettingMenu === 'workspaceSettings' && (
+                <WorkspaceSettings />
+              )}
             </div>
           </div>
         </div>

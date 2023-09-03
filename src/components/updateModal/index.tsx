@@ -34,7 +34,7 @@ const UpdateModal = () => {
         },
       },
     );
-    console.log(res.data);
+    // console.log(res.data);
     setAlarmList(res.data);
     return res.data;
   };

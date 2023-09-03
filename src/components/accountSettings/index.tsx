@@ -1,36 +1,55 @@
 import React from 'react';
+import Image from 'next/image';
+import defaultUser from '../../../public/img/defaultUser.png';
+import cancel from '../../../public/img/cancel.svg';
+import { useRecoilState } from 'recoil';
+import { currentUserDataState } from '@/store/atom/userStatusState';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/router';
 
 const AccountSettings = () => {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserDataState);
+
+  const logoutHandler = () => {
+    const confirm = window.confirm('로그아웃 하시겠습니까?');
+    if (!confirm) return;
+
+    // 로그아웃 로직
+    Cookies.remove('ACCESS_KEY');
+    Cookies.remove('REFRESH_KEY');
+    router.push('/login');
+  };
+
   return (
-    <div>
-      <div className="flex">
-        <div className="my-[2rem] mx-[1.5rem]">
-          <div className="w-[59px] h-10 justify-start items-center gap-2.5 inline-flex">
-            <div className="justify-start items-center gap-2.5 flex">
-              <div className="text-neutral-600 text-base font-semibold leading-relaxed">
-                내 프로필
-              </div>
-            </div>
+    <div className="text-black flex flex-col gap-[1.5rem]">
+      <div className="leading-[1.6rem]">내 프로필</div>
+      <div className="flex justify-between">
+        <div className="border-[#DFE0E8] rounded-[1.25rem] w-[3.75rem] h-[3.75rem]">
+          <Image src={defaultUser} alt="defaultUser" />
+        </div>
+        <div className="flex flex-col gap-[0.62rem]">
+          <div>나의 이름</div>
+          <div
+            className="w-[14.8rem] py-[0.25rem] px-[0.75rem] flex gap-[0.62rem]
+            border-[1px] border-[#DFE0E8] rounded-[0.5rem] justify-between items-center"
+          >
+            <input
+              className="text-[0.875rem] text-gray-3 focus:outline-none focus:text-black w-full"
+              type="text"
+              placeholder={currentUser.nickname}
+            />
+            <Image src={cancel} alt="cancel" />
           </div>
-          <div className="w-[318px] h-[84px] flex-col justify-center items-end gap-2.5 inline-flex">
-            <div className="w-[318px] justify-between items-start gap-5 inline-flex">
-              <div className="w-[60px] h-[60px] bg-black bg-opacity-60 rounded-[20px] border border-zinc-200" />
-              <div className="flex-col justify-start items-start gap-2.5 inline-flex">
-                <div className="text-neutral-600 text-sm font-semibold">
-                  나의 이름
-                </div>
-                <div className="w-[237px] h-8 px-3 py-1 rounded-lg border border-zinc-200 justify-start items-center gap-2.5 inline-flex">
-                  <div className="grow shrink basis-0 text-neutral-600 text-sm font-medium">
-                    {/* {name} */}
-                  </div>
-                  <div className="w-5 h-5 relative" />
-                </div>
-              </div>
-            </div>
-            <div className="text-zinc-400 text-xs font-medium">로그아웃</div>
+          <div
+            className="flex justify-end cursor-pointer"
+            onClick={logoutHandler}
+          >
+            <div className="text-[0.75rem] text-[#9092A0]">로그아웃</div>
           </div>
         </div>
       </div>
+      <div></div>
     </div>
   );
 };

@@ -24,6 +24,7 @@ import {
   currentHeaderNameState,
   currentWorkspaceState,
   currentFavoriteUserIdState,
+  workspaceIdState,
 } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
 import CreateGroupModal from '../../modal/createGroupModal';
@@ -37,10 +38,14 @@ import { fetchWorkspaceData } from '@/apis/utils/api/sidebar/fetchWorkSpace';
 import fetchUserDataApi from '@/apis/utils/api/sidebar/fetchUserDataApi';
 import defaultWorkspace from '../../../../public/img/defaultWorkspace.svg';
 import SettingsModal from '@/components/modal/settingsModal';
+import { selectedMenuState } from '@/store/atom/selectedMenuState';
 
 const SideBar = () => {
   const router = useRouter();
   const queryClinet = useQueryClient();
+
+  const [workspaceId, setWorkspaceId] = useRecoilState(workspaceIdState);
+
   const [currentUserData, setCurrentUserData] =
     useRecoilState(currentUserDataState);
   const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
@@ -83,6 +88,8 @@ const SideBar = () => {
   const [groupList, setGroupList] = useRecoilState(groupListState);
   const [isWorkspaceSelected, setIsWorkspaceSelected] = useState(false);
 
+  const [selectedMenu, setSelectedMenu] = useRecoilState(selectedMenuState);
+
   const toggleWorkspaceSelect = () => {
     setWorkspaceSelectVisible(!workspaceSelectVisible);
   };
@@ -107,6 +114,12 @@ const SideBar = () => {
     setSettingsModalVisible(!updateSettingsVisible);
   };
 
+  useEffect(() => {
+    if (workspaceId) {
+    }
+  }, [workspaceId]);
+
+  // 현재 보유하고 있는 워크스페이스를 가져오는 함수
   const {
     data: workspaceSidbarData,
     isSuccess: workspaceSidbarSuccess,
@@ -137,6 +150,7 @@ const SideBar = () => {
     isWorkspaceSelected, // 의존성 배열에 추가
   ]);
 
+  // 즐겨찾기 유저를 가져오는 함수
   const { data: favoriteUserListData, isSuccess: favoriteUserListSucess } =
     useQuery(['favoriteUserList', currentWorkSpace?.workspace_id], async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
@@ -152,8 +166,10 @@ const SideBar = () => {
     });
 
   // 즐겨찾기 멤버를 누르면 발생되는 이벤트
-  const viewFavoriteHandler = (userId: number) => {
+  const viewFavoriteHandler = (userId: number, userName: string) => {
+    setSelectedMenu('favoriteTasks');
     setCurrentFavoriteUserId(userId);
+    setCurrentHeaderName(userName);
     router.push('/viewFavorite');
   };
 
@@ -163,6 +179,7 @@ const SideBar = () => {
     }
   }, [favoriteUserListData]);
 
+  // 그룹의 리스트를 가져오는 함수
   const { data: groupListData, isSuccess: groupListDataSuccess } = useQuery(
     ['groupListData', currentWorkSpace?.workspace_id],
     async () => {
@@ -186,6 +203,7 @@ const SideBar = () => {
     }
   }, [groupListData]);
 
+  // 현재의 유저정보를 반환하는 함수
   const {
     data: fetchUserData,
     isSuccess: fetchUserDataSuccess,
@@ -235,6 +253,7 @@ const SideBar = () => {
   //   }
   // };
 
+  // 유저 이름을 눌렀을 때 동작되는 함수
   const userDataHandler = () => {
     queryClinet.invalidateQueries('taskList');
     queryClinet.invalidateQueries('workspaceData');
@@ -244,13 +263,17 @@ const SideBar = () => {
     queryClinet.invalidateQueries('fetchUserData');
     queryClinet.invalidateQueries('fetchGroupMember');
     queryClinet.invalidateQueries('workspaceSidbarData');
+
+    setSelectedMenu('userTask');
     // router.push는 쿼리의 상태에 따라 변경될 수 있습니다.
     if (!fetchUserDataLoading && !fetchUserDataError) {
-      router.push('/home');
+      router.push(`/workspace/${workspaceId}`);
     }
   };
 
-  const fetchGroupState = (id: number, name: string): void => {
+  // 그룹 이름을 눌렀을 때 동작되는 함수
+  const fetchGroupBtn = (id: number, name: string): void => {
+    setSelectedMenu('groupTask');
     setCurrentGroup(id);
     setCurrentHeaderName(name);
     router.push('/viewGroup');
@@ -269,16 +292,12 @@ const SideBar = () => {
       >
         <div className="flex items-center gap-[0.62rem]">
           <div className="desktop:w-[1.5rem] desktopL:w-[2.5rem] min-w-[2.5rem]">
-            {currentWorkSpace.workspace_imgUrl === null ? (
-              <Image src={defaultWorkspace} alt="img" width="40" height="40" />
-            ) : (
-              <Image
-                src={currentWorkSpace.workspace_imgUrl || defaultWorkspace}
-                alt="img"
-                width="40"
-                height="40"
-              />
-            )}
+            <Image
+              src={currentWorkSpace?.workspace_imgUrl || defaultWorkspace}
+              width={40}
+              height={40}
+              alt="워크스페이스"
+            />
           </div>
           <div className="text-black mx-[0.62rem] desktop:text-[0.8rem] desktopL:text-[1rem] font-bold">
             {currentWorkSpace?.workspace_name}
@@ -294,7 +313,10 @@ const SideBar = () => {
       </div>
       <div className="sidebar-menu text-[0.875rem] text-black">
         <div
-          className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer"
+          className={`flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer ${
+            selectedMenu === 'userTask' &&
+            'bg-gray-1 rounded-[0.5rem] font-bold'
+          }`}
           onClick={userDataHandler}
         >
           <div className="mr-[0.75rem]">
@@ -363,8 +385,11 @@ const SideBar = () => {
           {favoriteUserList.map(user => (
             <div
               key={user.userId}
-              className="flex items-center p-[0.75rem] cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem]"
-              onClick={() => viewFavoriteHandler(user.userId)}
+              className={`flex items-center p-[0.75rem] cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem] ${
+                selectedMenu === 'favoriteTasks' &&
+                'bg-gray-1 rounded-[0.5rem] font-bold'
+              }`}
+              onClick={() => viewFavoriteHandler(user.userId, user.nickname)}
             >
               <div>
                 <Image src={user.imgUrl} alt="img" width="24" height="24" />
@@ -387,8 +412,11 @@ const SideBar = () => {
           {groupList?.map((group: GroupList) => (
             <div
               key={group.id}
-              className="cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem] text-black"
-              onClick={() => fetchGroupState(group.id, group.name)}
+              className={`cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem] text-black ${
+                selectedMenu === 'groupTask' &&
+                'bg-gray-1 rounded-[0.5rem] font-bold'
+              }`}
+              onClick={() => fetchGroupBtn(group.id, group.name)}
             >
               <div className="p-[0.75rem] leading-[1.4rem] text-[0.875rem] flex items-center gap-[0.1rem] ">
                 <div>{group.name}</div>

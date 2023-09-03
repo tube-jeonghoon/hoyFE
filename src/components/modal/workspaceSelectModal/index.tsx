@@ -8,7 +8,10 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { useRecoilState } from 'recoil';
 import CreateWorkSpaceModal from '../createWorkSpaceModal';
 import workspaceListState from '@/store/atom/workspaceListState';
-import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import {
+  currentWorkspaceState,
+  workspaceIdState,
+} from '@/store/atom/userStatusState';
 import { useQueryClient } from 'react-query';
 import defaultWorkspace from '../../../../public/img/defaultWorkspace.svg';
 import { useRouter } from 'next/router';
@@ -22,6 +25,7 @@ interface WorkspaceList {
 const WorkspaceSelectModal = () => {
   const router = useRouter();
   const queryClinet = useQueryClient();
+  const [workspaceId, setWorkspaceId] = useRecoilState(workspaceIdState);
   const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
     currentWorkspaceState,
   );
@@ -50,6 +54,7 @@ const WorkspaceSelectModal = () => {
     setCreateWorkspaceVisible(true);
   };
 
+  // 워크스페이스를 클릭했을 때 일어나는 함수
   const changeCurrentWorkspaceHandler = (
     workspaceId: number,
     workspaceName: string,
@@ -65,8 +70,13 @@ const WorkspaceSelectModal = () => {
       workspace_url: workspaceUrl,
     };
 
+    console.log(workspaceId);
+    console.log(workspaceName);
+    console.log(workspaceUrl);
+
     setCurrentWorkSpace(newCurrentWorkspace);
-    // setCurrentWorkSpace({ ...newCurrentWorkspace });
+    console.log(newCurrentWorkspace);
+
     queryClinet.invalidateQueries('taskList');
     queryClinet.invalidateQueries('workspaceData');
     queryClinet.invalidateQueries('todos');
@@ -76,7 +86,7 @@ const WorkspaceSelectModal = () => {
     queryClinet.invalidateQueries('fetchGroupMember');
     queryClinet.invalidateQueries('workspaceSidbarData');
 
-    router.push('/home');
+    router.push(`/workspace/${workspaceId}`);
   };
 
   return (
@@ -102,22 +112,12 @@ const WorkspaceSelectModal = () => {
             }
           >
             <div className="justify-start items-center gap-2.5 flex hover:bg-gray-2">
-              {workspace.workspace_imgUrl === null ? (
-                <Image
-                  src={defaultWorkspace}
-                  alt="img"
-                  width="40"
-                  height="40"
-                />
-              ) : (
-                <Image
-                  src={workspace.workspace_imgUrl}
-                  alt="img"
-                  width="40"
-                  height="40"
-                />
-              )}
-
+              <Image
+                src={workspace.workspace_imgUrl || defaultWorkspace}
+                alt="img"
+                width="40"
+                height="40"
+              />
               <div className="text-neutral-600 text-base leading-relaxed">
                 {workspace.workspace_name}
               </div>

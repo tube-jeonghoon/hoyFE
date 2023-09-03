@@ -29,6 +29,11 @@ const currentWorkspaceState = atom<CurrentWorkspace>({
   },
 });
 
+const workspaceIdState = atom<string>({
+  key: 'workspaceIdState',
+  default: '',
+});
+
 const currentGroupState = atom<number>({
   key: 'currentGroupState',
   default: 0,
@@ -45,4 +50,5 @@ export {
   currentWorkspaceState,
   currentGroupState,
   currentFavoriteUserIdState,
+  workspaceIdState,
 };

@@ -100,7 +100,7 @@ const FirstGroup = () => {
         setFileName(null);
       }
 
-      router.push('/home');
+      router.push('/workspace');
     } catch (error) {
       console.error('Error creating workspace:', error);
     }

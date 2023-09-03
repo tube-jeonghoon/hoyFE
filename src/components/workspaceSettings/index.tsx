@@ -111,8 +111,8 @@ const WorkspaceSettings = () => {
       onSuccess: () => {
         // 쿼리 데이터를 무효화하여 리프레시
         queryClient.invalidateQueries('currentUser');
-        // 이곳에 추가적인 로직을 넣을 수 있습니다.
-        router.push('/home');
+
+        router.push('/workspace');
       },
     },
   );

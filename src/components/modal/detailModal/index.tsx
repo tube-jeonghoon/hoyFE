@@ -145,8 +145,8 @@ const DetailModal = (Props: DetailProps) => {
         },
       );
 
-      console.log(res.data);
-      console.log('✨ ➤ res.data:', res.data.comments);
+      // console.log(res.data);
+      // console.log('✨ ➤ res.data:', res.data.comments);
       setCommentBody(res.data.comments);
       return res.data;
     },
@@ -262,18 +262,28 @@ const DetailModal = (Props: DetailProps) => {
             </div>
             <div>{postUser.nickname}</div>
           </div>
-          <div className="text-black text-[1.25rem] font-bold leading-[2rem] cursor-pointer">
-            {isEditing ? (
-              <input
-                type="text"
-                value={newTitle}
-                onChange={handleTitleChange}
-                onKeyDown={handleKeyDown}
-                onBlur={handleTitleUpdate}
-              />
-            ) : (
-              <span onClick={handleTitleClick}>{title}</span>
-            )}
+          <div className="text-black text-[1.25rem] font-bold leading-[2rem] cursor-pointer ">
+            <div className="flex gap-[0.62rem] items-center">
+              {priority === 0 ? (
+                <div className="w-[0.375rem] h-[0.375rem]"></div>
+              ) : (
+                <div
+                  className="w-[0.375rem] h-[0.375rem] bg-primary-red
+                  border-none rounded-[5rem]"
+                ></div>
+              )}
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={newTitle}
+                  onChange={handleTitleChange}
+                  onKeyDown={handleKeyDown}
+                  onBlur={handleTitleUpdate}
+                />
+              ) : (
+                <div onClick={handleTitleClick}>{title}</div>
+              )}
+            </div>
           </div>
           <div className="flex justify-between">
             <div className="flex gap-[0.62rem] items-center cursor-pointer">
