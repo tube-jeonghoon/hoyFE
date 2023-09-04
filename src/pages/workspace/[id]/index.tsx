@@ -576,7 +576,7 @@ const Workspace = () => {
                               </div>
                               <div className="flex items-center mr-[0.62rem]">
                                 {task.priority === 1 && (
-                                  <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
+                                  <div className="w-[0.375rem] h-[0.375rem] border-none rounded-[5rem] bg-primary-red"></div>
                                 )}
                               </div>
                               <div className="w-full text-[0.875rem] text-gray-4 mr-[0.62rem] flex">

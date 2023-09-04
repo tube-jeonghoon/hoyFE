@@ -183,6 +183,13 @@ const ViewGroup = () => {
     setIsDetailModal(taskId);
   };
 
+  // accessToken이 없으면 로그인 페이지로 이동
+  useEffect(() => {
+    if (!Cookies.get('ACCESS_KEY')) {
+      window.location.href = '/login';
+    }
+  }, []);
+
   return (
     <div className="px-[5rem] py-[3.75rem] overflow-y-auto h-[48rem]">
       <div className="cards grid grid-cols-3 gap-x-[3.12rem] gap-y-[3.75rem]">

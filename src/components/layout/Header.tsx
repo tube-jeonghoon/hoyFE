@@ -58,6 +58,7 @@ const Header = () => {
         </div>
         <div className="flex items-center text-[1.625rem] font-bold relative">
           <div>{calendarDate}</div>
+          {}
           <button className="ml-[0.3rem]" onClick={toggleCalendar}>
             <VscChevronDown />
           </button>

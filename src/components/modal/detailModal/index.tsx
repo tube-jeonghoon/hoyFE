@@ -23,6 +23,7 @@ import userProfile from '../../../../public/img/userProfile.png';
 import { CommentBody } from './types';
 import defaultUser from '../../../../public/img/defaultUser.png';
 import CommentEditModal from '../commentEditModal';
+import { DateTime } from 'luxon';
 
 const DetailModal = (Props: DetailProps) => {
   const queryClient = useQueryClient();
@@ -146,7 +147,7 @@ const DetailModal = (Props: DetailProps) => {
       );
 
       // console.log(res.data);
-      // console.log('✨ ➤ res.data:', res.data.comments);
+      console.log('✨ ➤ res.data:', res.data.comments);
       setCommentBody(res.data.comments);
       return res.data;
     },
@@ -327,7 +328,7 @@ const DetailModal = (Props: DetailProps) => {
                   {commentBody.map(comment => (
                     <div key={comment.comment_id} className="flex flex-col">
                       <div className="flex gap-[0.62rem] w-full justify-between items-center mb-[0.62rem]">
-                        <div className="flex gap-[0.62rem] items-center">
+                        <div className="flex gap-[0.62rem] items-center w-full">
                           <div className="rounded-[0.5rem]">
                             <Image
                               src={comment.user_imgUrl}
@@ -337,7 +338,7 @@ const DetailModal = (Props: DetailProps) => {
                             />
                           </div>
                           <div className="flex gap-[2px] items-center">
-                            <div className="text-black text-[0.875rem]">
+                            <div className="text-black text-[0.875rem] w-[2.5rem]">
                               {comment.workspaceMember_nickname}
                             </div>
                             {comment.isOwner ? (
@@ -348,25 +349,49 @@ const DetailModal = (Props: DetailProps) => {
                               ''
                             )}
                           </div>
-                          <div className="text-gray-4 text-[0.75rem]">
-                            1분 미만 전
+                          <div className="flex items-center justify-between w-full">
+                            <div className="text-gray-4 text-[0.75rem]">
+                              {(function (differenceInMs: number) {
+                                let seconds = Math.floor(differenceInMs / 1000),
+                                  minutes = Math.floor(seconds / 60),
+                                  hours = Math.floor(minutes / 60),
+                                  days = Math.floor(hours / 24);
+
+                                if (days > 0) return days + '일 전';
+                                else if (hours > 0) return hours + '시간 전';
+                                else if (minutes > 0) return minutes + '분 전';
+                                else return seconds + '초 전';
+                              })(
+                                DateTime.local().valueOf() -
+                                  DateTime.fromISO(comment.comment_updatedAt, {
+                                    zone: 'Asia/Seoul',
+                                  }).valueOf(),
+                              )}
+                            </div>
+                            <div className="text-gray-4 text-[0.75rem]">
+                              {DateTime.fromISO(comment.comment_updatedAt, {
+                                zone: 'Asia/Seoul',
+                              }).toFormat('yyyy.MM.dd')}
+                            </div>
                           </div>
                         </div>
-                        <div
-                          className="text-gray-4 cursor-pointer hover:bg-gray-2 rounded-[0.5rem]
-                            p-[0.25rem] relative"
-                          onClick={() =>
-                            toggleCommentEditModal(comment.comment_id)
-                          }
-                        >
-                          <IoEllipsisVertical />
-                          {iscommentEditModalVisible[comment.comment_id] && (
-                            <CommentEditModal
-                              taskId={taskId}
-                              commentId={comment.comment_id}
-                            />
-                          )}
-                        </div>
+                        {comment.isOwner && (
+                          <div
+                            className="text-gray-4 cursor-pointer hover:bg-gray-2 rounded-[0.5rem]
+                              p-[0.25rem] relative"
+                            onClick={() =>
+                              toggleCommentEditModal(comment.comment_id)
+                            }
+                          >
+                            <IoEllipsisVertical />
+                            {iscommentEditModalVisible[comment.comment_id] && (
+                              <CommentEditModal
+                                taskId={taskId}
+                                commentId={comment.comment_id}
+                              />
+                            )}
+                          </div>
+                        )}
                       </div>
                       <div className="pb-[1.25rem]">
                         <div className="text-black text-[0.875rem] leading-[1.4rem]">
@@ -380,42 +405,6 @@ const DetailModal = (Props: DetailProps) => {
                 </div>
               </div>
             ) : (
-              // <div>
-              // <div className="flex gap-[0.5rem] mb-[1.5rem]">
-              //   <div className="text-black font-bold leading-[1.6rem]">
-              //     코멘트
-              //   </div>
-              //   <div className="text-gray-4 font-bold leading-[1.6rem]">
-              //     [{commentBody.length}]
-              //   </div>
-              // </div>
-              // <div className="flex flex-col gap-[1.25rem]">
-              //   <div className="flex gap-[0.62rem] w-full justify-between items-center mb-[0.62rem]">
-              //     <div className="flex gap-[0.62rem] items-center">
-              //       <div className="rounded-[0.5rem]">
-              //         <Image src={userProfile} alt="유저프로필" />
-              //       </div>
-              //       <div className="text-black text-[0.875rem]">
-              //         전정훈 (나)
-              //       </div>
-              //       <div className="text-gray-4 text-[0.75rem]">
-              //         1분 미만 전
-              //       </div>
-              //     </div>
-              //     <div className="text-gray-4 cursor-pointer">
-              //       <IoEllipsisVertical />
-              //     </div>
-              //   </div>
-              //   <div className="pb-[1.25rem]">
-              //     <div className="text-black text-[0.875rem] leading-[1.4rem]">
-              //       업무에 수고가 많으십니다! 항상 고생이 많으시네요!
-              //       대단하십니다.
-              //     </div>
-              //   </div>
-              //   <div className="border-b-[1px] text-gray-2">{''}</div>
-              //   {/* <CommentCard /> */}
-              // </div>
-              // </div>
               <div>
                 <div className="flex gap-[0.5rem] mb-[1.5rem]">
                   <div className="text-black font-bold leading-[1.6rem]">

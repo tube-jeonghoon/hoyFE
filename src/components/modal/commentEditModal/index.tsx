@@ -37,6 +37,7 @@ const CommentEditModal = (Props: CommentEditModalProps) => {
   const deleteCommentMutation = useMutation(deleteComment, {
     // 성공/실패 콜백 등 필요한 옵션을 여기에 추가할 수 있습니다.
     onSuccess: () => {
+      queryClient.invalidateQueries('todos');
       queryClient.invalidateQueries('commentList');
       queryClient.invalidateQueries('taskDetail');
     },

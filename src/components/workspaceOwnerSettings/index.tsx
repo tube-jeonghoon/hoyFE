@@ -120,6 +120,10 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
   );
 
   const deleteWorkspaceHandler = () => {
+    const confirm = window.confirm(
+      '정말로 이 워크스페이스를 삭제하시겠습니까?',
+    );
+    if (!confirm) return;
     // 현재 워크스페이스 ID를 사용하여 워크스페이스를 삭제
     if (currentWorkspace && currentWorkspace.workspace_id) {
       deleteWorkspaceMutation.mutate(currentWorkspace.workspace_id);
@@ -242,6 +246,8 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
   );
 
   const leaveWorkspaceHandler = () => {
+    const confirm = window.confirm('정말로 이 워크스페이스를 떠나시겠습니까?');
+    if (!confirm) return;
     leaveWorkspaceMutation.mutate();
   };
 

@@ -33,7 +33,7 @@ const Workspace = () => {
     if (workspaceData == undefined || workspaceData.length == 0) {
       queryClient.invalidateQueries('workspaceData');
       console.log(workspaceData);
-      // router.push('/firstGroup');
+      router.push('/firstGroup');
       return;
     }
 

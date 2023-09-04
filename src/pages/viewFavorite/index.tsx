@@ -235,13 +235,12 @@ const ViewFavorite = () => {
     setNewTodoList(updatedTodoList);
   }, [todoList]);
 
-  // 액세스 토큰을 가지고 있지 않다면 /login 으로 리다이렉팅
-  // useEffect(() => {
-  //   setIsLogin(Cookies.get('ACCESS_KEY') ? true : false);
-  //   if (!Cookies.get('ACCESS_KEY')) {
-  //     router.push('/login');
-  //   }
-  // }, [isLogin])
+  // accessToken이 없으면 로그인 페이지로 이동
+  useEffect(() => {
+    if (!Cookies.get('ACCESS_KEY')) {
+      window.location.href = '/login';
+    }
+  }, []);
 
   return (
     <div className="px-[5rem] py-[3.75rem] overflow-y-auto h-[48rem]">

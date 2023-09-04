@@ -174,7 +174,7 @@ const SideBar = () => {
 
   // 즐겨찾기 멤버를 누르면 발생되는 이벤트
   const viewFavoriteHandler = (userId: number, userName: string) => {
-    setSelectedMenu('favoriteTasks');
+    setSelectedMenu(userName);
     setCurrentFavoriteUserId(userId);
     setCurrentHeaderName(userName);
     router.push('/viewFavorite');
@@ -239,27 +239,6 @@ const SideBar = () => {
     }
   }, [fetchUserData]);
 
-  // const fetchUserData = async () => {
-  //   try {
-  //     const accessToken = Cookies.get('ACCESS_KEY');
-  //     const res = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/current-user`,
-  //       {
-  //         headers: {
-  //           // Authorization: `${process.env.NEXT_PUBLIC_TEMP_ACCESS_TOKEN}`,
-  //           Authorization: `Bearer ${accessToken}`,
-  //         },
-  //       },
-  //     );
-
-  //     console.log(res.data);
-  //     setCurrentUserData(res.data);
-  //     setCurrentHeaderName(res.data.nickname);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   // 유저 이름을 눌렀을 때 동작되는 함수
   const userDataHandler = () => {
     queryClient.invalidateQueries('taskList');
@@ -279,16 +258,12 @@ const SideBar = () => {
   };
 
   // 그룹 이름을 눌렀을 때 동작되는 함수
-  const fetchGroupBtn = (id: number, name: string): void => {
-    setSelectedMenu('groupTask');
+  const fetchGroupBtn = (id: number, groupName: string): void => {
+    setSelectedMenu(groupName);
     setCurrentGroup(id);
-    setCurrentHeaderName(name);
+    setCurrentHeaderName(groupName);
     router.push('/viewGroup');
   };
-
-  // useEffect(() => {
-  //   fetchUserData();
-  // }, []);
 
   return (
     <div className="my-[2.5rem] mx-[1.5rem] flex flex-col gap-[2rem]">
@@ -393,7 +368,7 @@ const SideBar = () => {
             <div
               key={user.userId}
               className={`flex items-center p-[0.75rem] cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem] ${
-                selectedMenu === 'favoriteTasks' &&
+                selectedMenu === user.nickname &&
                 'bg-gray-1 rounded-[0.5rem] font-bold'
               }`}
               onClick={() => viewFavoriteHandler(user.userId, user.nickname)}
@@ -420,7 +395,7 @@ const SideBar = () => {
             <div
               key={group.id}
               className={`cursor-pointer hover:bg-gray-1 hover:rounded-[0.5rem] text-black ${
-                selectedMenu === 'groupTask' &&
+                selectedMenu === group.name &&
                 'bg-gray-1 rounded-[0.5rem] font-bold'
               }`}
               onClick={() => fetchGroupBtn(group.id, group.name)}
