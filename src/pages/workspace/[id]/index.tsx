@@ -135,7 +135,7 @@ const Workspace = () => {
 
   // 워크스페이스의 시작값이 0일때 첫번째 워크스페이스를 선택
   useEffect(() => {
-    if (currentWorkspace.workspace_id === 0) {
+    if (currentWorkspace?.workspace_id === 0) {
       if (workspaceData) {
         setCurrentWorkspace(workspaceData[0]);
       }

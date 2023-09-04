@@ -30,26 +30,22 @@ const Workspace = () => {
 
   // 로그인 후 워크스페이스 액션
   useEffect(() => {
-    if (workspaceData == undefined || workspaceData.length == 0) {
-      queryClient.invalidateQueries('workspaceData');
-      console.log(workspaceData);
+    queryClient.invalidateQueries('workspaceData');
+    if (workspaceData && workspaceData.length === 0) {
       router.push('/firstGroup');
       return;
     }
 
-    if (workspaceSuccess) {
+    if (workspaceSuccess && workspaceData) {
       const newWorkspaceData = workspaceData[0];
 
-      // workspaceData[0]의 유효성 검사
       if (newWorkspaceData && 'workspace_id' in newWorkspaceData) {
         const newWorkspaceId = newWorkspaceData.workspace_id;
 
         if (newWorkspaceId !== workspaceId) {
-          // workspaceId 갱신
           setWorkspaceId(newWorkspaceId);
         }
 
-        // 라우팅
         if (newWorkspaceId) {
           router.push(`/workspace/${newWorkspaceId}`);
         }

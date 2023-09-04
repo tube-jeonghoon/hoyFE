@@ -67,6 +67,7 @@ const FirstGroup = () => {
     reader.readAsDataURL(file);
   };
 
+  // 생성하기 버튼 누를 시
   const handleCreateWorkspace = async () => {
     const formData = new FormData();
     if (selectedFile) {
