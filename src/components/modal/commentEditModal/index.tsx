@@ -57,12 +57,14 @@ const CommentEditModal = (Props: CommentEditModalProps) => {
         className="border-[1px] bg-white border-[#EAEEF3] p-[0.75rem] rounded-[0.75rem]
         w-[144px]"
       >
-        <div className="flex gap-[0.75rem] items-center p-[0.75rem] hover:bg-gray-2 rounded-[0.5rem]">
+        {/* <div className="flex gap-[0.75rem] items-center p-[0.75rem] hover:bg-gray-2 rounded-[0.5rem]">
           <div>
             <Image src={editIcon} alt="수정" />
           </div>
-          <div>수정</div>
-        </div>
+          <div onClick={() => alert(`현재 댓글 수정은 업데이트중입니다.`)}>
+            수정
+          </div>
+        </div> */}
         <div
           className="flex gap-[0.75rem] items-center p-[0.75rem] hover:bg-gray-2 rounded-[0.5rem]"
           onClick={handleCommentDelete}

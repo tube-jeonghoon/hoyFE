@@ -335,8 +335,11 @@ const DetailModal = (Props: DetailProps) => {
             </div>
           </div>
           <div className="flex justify-between">
-            <div className="flex gap-[0.62rem] items-center cursor-pointer">
-              <div className="text-gray-4" onClick={togglePriorityHandler}>
+            <div
+              className="flex gap-[0.62rem] items-center cursor-pointer"
+              onClick={togglePriorityHandler}
+            >
+              <div className="text-gray-4">
                 {priority === 0 ? (
                   <Image src={checkBoxIcon} alt="체크박스" />
                 ) : (

@@ -42,7 +42,14 @@ const Header = () => {
     <div className="w-[74rem] fixed z-[90] top-0 bg-white">
       <div className="p-[3.75rem] pb-[2.5rem] w-full">
         <div className="flex gap-[0.38rem] items-center">
-          <div className="text-gray-5">{currentHeaderName} 님의 투두리스트</div>
+          {router.pathname === '/viewGroup' ? (
+            <div className="text-gray-5">{currentHeaderName} 의 투두리스트</div>
+          ) : (
+            <div className="text-gray-5">
+              {currentHeaderName} 님의 투두리스트
+            </div>
+          )}
+
           {showVerticalSettingIcon && (
             <div>
               <div
