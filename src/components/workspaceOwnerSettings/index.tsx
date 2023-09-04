@@ -21,7 +21,6 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
 import pica from 'pica';
 import UserSettingsModal from '../modal/userSettingsModal';
-
 interface WorkspaceUserList {
   userId: number;
   nickname: string;
@@ -29,7 +28,6 @@ interface WorkspaceUserList {
   flag?: boolean;
   admin: boolean;
 }
-
 const WorkspaceOwnerSettings = forwardRef((props, ref) => {
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -41,11 +39,9 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
   const [workspaceUserList, setWorkspaceUserList] = useState<
     WorkspaceUserList[]
   >([]);
-
   const [isUserSettingsModalVisible, setIsUserSettingsModalVisible] = useState<{
     [key: number]: boolean;
   }>({});
-
   // 특정 댓글 ID를 받아 상태를 업데이트하는 함수
   const toggleUserSettingsModal = (commentId: number) => {
     setIsUserSettingsModalVisible(prevState => ({
@@ -53,22 +49,17 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
       [commentId]: !prevState[commentId],
     }));
   };
-
   const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
-
   const [inViteMemberVisible, setInViteMemberVisible] = useRecoilState(
     isInviteMemberModalState,
   );
-
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
-
   const toggleInviteMemberModal = () => {
     setInViteMemberVisible(!inViteMemberVisible);
   };
-
   // 현재 내 워크스페이스 있는 사람 목록
   const { data: currentUserData, isSuccess: currentUserSuccess } = useQuery(
     'currentUser',
@@ -87,14 +78,12 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
       return res.data;
     },
   );
-
   useEffect(() => {
     if (currentUserSuccess) {
       // console.log(currentUserData);
       setWorkspaceUserList(currentUserData);
     }
   }, [currentUserData, currentUserSuccess]);
-
   const deleteWorkspaceMutation = useMutation(
     async (workspaceId: number) => {
       const accessToken = Cookies.get('ACCESS_KEY');
@@ -113,35 +102,26 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
       onSuccess: () => {
         // 쿼리 데이터를 무효화하여 리프레시
         queryClient.invalidateQueries('currentUser');
-
         router.push('/workspace');
       },
     },
   );
-
   const deleteWorkspaceHandler = () => {
-    const confirm = window.confirm(
-      '정말로 이 워크스페이스를 삭제하시겠습니까?',
-    );
-    if (!confirm) return;
     // 현재 워크스페이스 ID를 사용하여 워크스페이스를 삭제
     if (currentWorkspace && currentWorkspace.workspace_id) {
       deleteWorkspaceMutation.mutate(currentWorkspace.workspace_id);
     }
   };
-
   // 파일 선택
   const handleAddButtonClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
-
   const handleImageUpload = (event: any) => {
     // 파일 선택
     const file = event.target.files[0];
     if (!file) return;
-
     // 파일 유형 확인
     if (!file.type.startsWith('image/')) {
       setFileError('이미지 파일만 업로드 가능합니다.');
@@ -151,27 +131,22 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
     }
     const targetSize = 300;
     const reader = new FileReader();
-
     reader.onload = async (e: ProgressEvent<FileReader>) => {
       if (e.target?.result && typeof e.target.result === 'string') {
         const img = document.createElement('img');
         img.src = e.target.result;
-
         img.onload = async () => {
           const canvas = document.createElement('canvas');
           canvas.width = targetSize;
           canvas.height = targetSize;
-
           // Pica 리사이징
           await pica().resize(img, canvas);
-
           canvas.toBlob(async resizedBlob => {
             if (resizedBlob) {
               setSelectedFile(
                 new File([resizedBlob], file.name, { type: 'image/jpeg' }),
               );
             }
-
             // 파일 미리보기 URL과 파일 이름 설정
             const previewUrl = URL.createObjectURL(file);
             setFilePreview(previewUrl);
@@ -181,7 +156,6 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
     };
     reader.readAsDataURL(file);
   };
-
   // 최종 POST 요청 두 가지 : file, 유저 name
   useImperativeHandle(ref, () => ({
     async handleUpdateAccount() {
@@ -214,7 +188,6 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
       }
     },
   }));
-
   // 떠나기 로직
   const leaveWorkspaceMutation = useMutation(
     async () => {
@@ -244,12 +217,52 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
       },
     },
   );
-
   const leaveWorkspaceHandler = () => {
-    const confirm = window.confirm('정말로 이 워크스페이스를 떠나시겠습니까?');
-    if (!confirm) return;
     leaveWorkspaceMutation.mutate();
   };
+  // 정말로 떠나시겠습니까? 확인 모달창
+  const ModalComponent = () => (
+    <div className="border-[1px] absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[366px] h-[232px] px-6 py-8 bg-white rounded-xl flex-col justify-start items-start gap-6 inline-flex">
+      <div className="self-stretch h-[168px] flex-col justify-start items-start gap-6 flex">
+        <div className="self-stretch h-24 flex-col justify-start items-start gap-3 flex">
+          <div className="self-stretch h-10 justify-start items-center gap-2.5 inline-flex">
+            <div className="justify-start items-center gap-2.5 flex">
+              <div className="text-neutral-600 text-base font-semibold leading-relaxed">
+                이 워크스페이스를 정말로 삭제하시겠습니까?
+              </div>
+            </div>
+          </div>
+          <div className="text-neutral-600 text-sm font-medium leading-snug">
+            워크스페이스를 삭제하면,
+            <br />
+            지금까지 작성한 투두리스트 및 데이터가 모두 사라집니다.
+          </div>
+        </div>
+        <div className="w-[318px] h-12 justify-start items-start gap-3 inline-flex">
+          <div className="grow shrink basis-0 flex-col justify-start items-end gap-3 inline-flex">
+            <button className="self-stretch h-12 px-3 py-1 bg-white rounded-lg border border-zinc-200 justify-center items-center gap-2.5 inline-flex">
+              <div
+                className="text-neutral-600 text-sm font-semibold leading-snug"
+                onClick={() => {
+                  setModalVisible(false);
+                  deleteWorkspaceHandler();
+                }}
+              >
+                삭제하기
+              </div>
+            </button>
+          </div>
+          <div className="grow shrink basis-0 self-stretch flex-col justify-start items-end gap-3 inline-flex">
+            <button className="self-stretch grow shrink basis-0 px-3 py-1 bg-blue-500 rounded-lg justify-center items-center gap-2.5 inline-flex">
+              <div className="text-white text-sm font-semibold leading-snug">
+                유지하기
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="text-black">
@@ -345,8 +358,17 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
                 <div>{user.nickname}</div>
               </div>
               {user.admin === true ? (
-                <div className="cursor-pointer">
+                <div
+                  className="cursor-pointer relative"
+                  onClick={() => toggleUserSettingsModal(user.userId)}
+                >
                   <Image src={ownerIcon} alt="owner" />
+                  {isUserSettingsModalVisible[user.userId] && (
+                    <UserSettingsModal
+                      userId={user.userId}
+                      admin={user.admin}
+                    />
+                  )}
                 </div>
               ) : (
                 <div
@@ -355,7 +377,10 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
                 >
                   <Image src={verticalSetting} alt="member" />
                   {isUserSettingsModalVisible[user.userId] && (
-                    <UserSettingsModal userId={user.userId} />
+                    <UserSettingsModal
+                      userId={user.userId}
+                      admin={user.admin}
+                    />
                   )}
                 </div>
               )}
@@ -372,9 +397,9 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
           </div>
         </div>
       </div>
+      {isModalVisible && <ModalComponent />}
     </div>
   );
 });
-
 WorkspaceOwnerSettings.displayName = 'WorkspaceSettings';
 export default WorkspaceOwnerSettings;
