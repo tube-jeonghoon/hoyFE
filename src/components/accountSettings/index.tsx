@@ -23,13 +23,13 @@ const AccountSettings = () => {
 
   return (
     <div className="text-black flex flex-col gap-[1.5rem]">
-      <div className="leading-[1.6rem]">내 프로필</div>
+      <div className="font-bold leading-[1.6rem]">내 프로필</div>
       <div className="flex justify-between">
         <div className="border-[#DFE0E8] rounded-[1.25rem] w-[3.75rem] h-[3.75rem]">
           <Image src={defaultUser} alt="defaultUser" />
         </div>
         <div className="flex flex-col gap-[0.62rem]">
-          <div>나의 이름</div>
+          <div className="text-[0.875rem] font-bold">나의 이름</div>
           <div
             className="w-[14.8rem] py-[0.25rem] px-[0.75rem] flex gap-[0.62rem]
             border-[1px] border-[#DFE0E8] rounded-[0.5rem] justify-between items-center"

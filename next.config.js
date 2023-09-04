@@ -6,11 +6,22 @@ const nextConfig = {
     API_URL: process.env.API_URL,
   },
   images: {
-    domains: ['lh3.googleusercontent.com', 'api.hoy.im'],
+    domains: [
+      'lh3.googleusercontent.com',
+      'api.hoy.im',
+      'localhost',
+      'test.hoy.im',
+    ],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+        port: '',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost:8000',
         pathname: '/**',
         port: '',
       },

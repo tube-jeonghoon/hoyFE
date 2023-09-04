@@ -42,15 +42,10 @@ import { selectedMenuState } from '@/store/atom/selectedMenuState';
 
 const SideBar = () => {
   const router = useRouter();
-  const queryClinet = useQueryClient();
+  const queryClient = useQueryClient();
 
-  const [workspaceId, setWorkspaceId] = useRecoilState(workspaceIdState);
-
-  const [currentUserData, setCurrentUserData] =
-    useRecoilState(currentUserDataState);
-  const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
-    currentHeaderNameState,
-  );
+  // === STATE ===
+  // ===== MODAL STATE =====
   const [workspaceSelectVisible, setWorkspaceSelectVisible] = useRecoilState(
     isSelectWorkspaceModalState,
   );
@@ -71,6 +66,15 @@ const SideBar = () => {
 
   const [updateSettingsVisible, setSettingsModalVisible] =
     useRecoilState(isSettingsModalState);
+  // ===== =====
+
+  const [workspaceId, setWorkspaceId] = useRecoilState(workspaceIdState);
+
+  const [currentUserData, setCurrentUserData] =
+    useRecoilState(currentUserDataState);
+  const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
+    currentHeaderNameState,
+  );
 
   const [currentFavoriteUserId, setCurrentFavoriteUserId] = useRecoilState(
     currentFavoriteUserIdState,
@@ -89,7 +93,9 @@ const SideBar = () => {
   const [isWorkspaceSelected, setIsWorkspaceSelected] = useState(false);
 
   const [selectedMenu, setSelectedMenu] = useRecoilState(selectedMenuState);
+  // === ===
 
+  // ===== MODAL HANDELR =====
   const toggleWorkspaceSelect = () => {
     setWorkspaceSelectVisible(!workspaceSelectVisible);
   };
@@ -113,6 +119,7 @@ const SideBar = () => {
   const toggleSettingsModal = () => {
     setSettingsModalVisible(!updateSettingsVisible);
   };
+  // ===== =====
 
   useEffect(() => {
     if (workspaceId) {
@@ -255,14 +262,14 @@ const SideBar = () => {
 
   // 유저 이름을 눌렀을 때 동작되는 함수
   const userDataHandler = () => {
-    queryClinet.invalidateQueries('taskList');
-    queryClinet.invalidateQueries('workspaceData');
-    queryClinet.invalidateQueries('todos');
-    queryClinet.invalidateQueries('favoriteUserList');
-    queryClinet.invalidateQueries('groupListData');
-    queryClinet.invalidateQueries('fetchUserData');
-    queryClinet.invalidateQueries('fetchGroupMember');
-    queryClinet.invalidateQueries('workspaceSidbarData');
+    queryClient.invalidateQueries('taskList');
+    queryClient.invalidateQueries('workspaceData');
+    queryClient.invalidateQueries('todos');
+    queryClient.invalidateQueries('favoriteUserList');
+    queryClient.invalidateQueries('groupListData');
+    queryClient.invalidateQueries('fetchUserData');
+    queryClient.invalidateQueries('fetchGroupMember');
+    queryClient.invalidateQueries('workspaceSidbarData');
 
     setSelectedMenu('userTask');
     // router.push는 쿼리의 상태에 따라 변경될 수 있습니다.
@@ -336,7 +343,7 @@ const SideBar = () => {
         </div>
         <div
           className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer
-              relative z-[100]"
+              relative z-[95]"
           onClick={toggleUpdateModal}
         >
           <div className="mr-[0.75rem]">

@@ -126,7 +126,7 @@ const WorkspaceSettings = () => {
   return (
     <div className="text-black">
       <div className="mb-[0.75rem] font-semibold leading-[1.6rem]">설정</div>
-      <div className="flex gap-[1.25rem] mb-[1.5rem]">
+      <div className="flex gap-[1.25rem] mb-[1.5rem] w-full">
         <div className="min-w-[3.75rem] min-h-[3.75rem]">
           <Image
             src={currentWorkspace.workspace_imgUrl || defaultUser}
@@ -135,18 +135,18 @@ const WorkspaceSettings = () => {
             alt="기본유저"
           />
         </div>
-        <div>
+        <div className="w-full">
           <div className="flex flex-col gap-[0.62rem]">
             <div className="text-[0.875rem] font-semibold">
               워크스페이스 이름
             </div>
             <div
               className="flex items-center border-[1px] border-gray-300 rounded-[0.5rem]
-              px-[0.75rem] py-[0.25rem]"
+              px-[0.75rem] py-[0.25rem] w-full justify-between"
             >
-              <div>
+              <div className="w-full">
                 <input
-                  className="focus:outline-none text-[0.875rem]"
+                  className="focus:outline-none text-[0.875rem] w-full"
                   type="text"
                   placeholder={currentWorkspace?.workspace_name}
                 />

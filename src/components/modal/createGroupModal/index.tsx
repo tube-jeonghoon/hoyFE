@@ -20,7 +20,7 @@ interface Member {
 }
 
 const CreateGroupModal = () => {
-  const queryClinet = useQueryClient();
+  const queryClient = useQueryClient();
   const [createGroupVisible, setCreateGroupVisible] = useRecoilState(
     isCreateGroupModalState,
   );
@@ -115,7 +115,7 @@ const CreateGroupModal = () => {
       // console.log(res.data);
       setCreateGroupVisible(false);
       // fetchGroupListData();
-      queryClinet.invalidateQueries('groupListData');
+      queryClient.invalidateQueries('groupListData');
     } catch (error) {
       console.error('그룹 만들기가 실패하였습니다. ❌', error);
     }

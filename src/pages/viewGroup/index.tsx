@@ -95,6 +95,7 @@ const ViewGroup = () => {
       // console.log('fetchGroupMember', dataWithSelectedDate);
       setViewGroupUserList(dataWithSelectedDate);
       // 반환된 멤버 리스트를 반환
+      console.log(dataWithSelectedDate);
       return dataWithSelectedDate;
     } catch (error) {
       console.error(error);
@@ -190,6 +191,7 @@ const ViewGroup = () => {
           const parsedDate = new Date(user.selectedDate);
           const dayofWeek = format(parsedDate, 'EEE', { locale: ko });
           const day = format(parsedDate, 'M/d');
+          console.log(viewGroupUserList);
           return (
             <div
               key={user.userId}

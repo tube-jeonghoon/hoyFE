@@ -24,7 +24,7 @@ interface WorkspaceList {
 
 const WorkspaceSelectModal = () => {
   const router = useRouter();
-  const queryClinet = useQueryClient();
+  const queryClient = useQueryClient();
   const [workspaceId, setWorkspaceId] = useRecoilState(workspaceIdState);
   const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
     currentWorkspaceState,
@@ -77,14 +77,14 @@ const WorkspaceSelectModal = () => {
     setCurrentWorkSpace(newCurrentWorkspace);
     console.log(newCurrentWorkspace);
 
-    queryClinet.invalidateQueries('taskList');
-    queryClinet.invalidateQueries('workspaceData');
-    queryClinet.invalidateQueries('todos');
-    queryClinet.invalidateQueries('favoriteUserList');
-    queryClinet.invalidateQueries('groupListData');
-    queryClinet.invalidateQueries('fetchUserData');
-    queryClinet.invalidateQueries('fetchGroupMember');
-    queryClinet.invalidateQueries('workspaceSidbarData');
+    queryClient.invalidateQueries('taskList');
+    queryClient.invalidateQueries('workspaceData');
+    queryClient.invalidateQueries('todos');
+    queryClient.invalidateQueries('favoriteUserList');
+    queryClient.invalidateQueries('groupListData');
+    queryClient.invalidateQueries('fetchUserData');
+    queryClient.invalidateQueries('fetchGroupMember');
+    queryClient.invalidateQueries('workspaceSidbarData');
 
     router.push(`/workspace/${workspaceId}`);
   };

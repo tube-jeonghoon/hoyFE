@@ -83,7 +83,7 @@ const SettingsModal = () => {
               </div>
               {/* <div>문의하기</div> */}
             </div>
-            <div className="py-[2rem] px-[1.5rem] w-[22.875rem]">
+            <div className="py-[2rem] px-[1.5rem] w-[22.875rem] h-[30rem]">
               {selectedSettingMenu === 'userSettings' && <AccountSettings />}
               {selectedSettingMenu === 'workspaceSettings' && (
                 <WorkspaceSettings />

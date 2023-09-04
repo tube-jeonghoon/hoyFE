@@ -14,6 +14,7 @@ import axios from 'axios';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
 import favoriteUserListState from '@/store/atom/favoriteUserListState';
+import { useQuery, useQueryClient } from 'react-query';
 
 interface SearchMemberList {
   userId: number;
@@ -29,6 +30,7 @@ interface FavoriteUserList {
 }
 
 const CreateFavoriteMemberModal = () => {
+  const queryClient = useQueryClient();
   const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
@@ -70,7 +72,7 @@ const CreateFavoriteMemberModal = () => {
     }
   };
 
-  const fetchUser = async () => {
+  const fetchFavoriteUser = async () => {
     const accessToken = Cookies.get('ACCESS_KEY');
     try {
       const res = await axios.get(
@@ -84,8 +86,17 @@ const CreateFavoriteMemberModal = () => {
 
       // console.log(res.data);
       setSearchMemberList(res.data);
-    } catch (error) {}
+      return res.data;
+    } catch (error) {
+      console.error('✨ ➤ fetchUser ➤ error:', error);
+    }
   };
+
+  const {
+    data: favoriteUserData,
+    isSuccess: favoriteUserSuccess,
+    isError: favoriteUserIsError,
+  } = useQuery('favoriteUser', fetchFavoriteUser);
 
   const toogleFavorite = async (userId: number) => {
     try {
@@ -100,7 +111,7 @@ const CreateFavoriteMemberModal = () => {
         },
       );
 
-      fetchUser();
+      fetchFavoriteUser();
       // console.log(res);
     } catch (error) {
       console.error(error);
@@ -108,7 +119,7 @@ const CreateFavoriteMemberModal = () => {
   };
 
   useEffect(() => {
-    fetchUser();
+    fetchFavoriteUser();
   }, []);
 
   return (

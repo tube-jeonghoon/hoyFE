@@ -158,7 +158,7 @@ const UpdateModal = () => {
 
   return (
     <div
-      className="absolute top-0 left-[13rem] flex items-center justify-center bg-white min-w-[24rem]"
+      className="absolute z-[95] top-0 left-[13rem] flex items-center justify-center bg-white min-w-[24rem]"
       onClick={handleOutsideClick}
     >
       <div
