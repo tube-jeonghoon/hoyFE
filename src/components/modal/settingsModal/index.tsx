@@ -1,5 +1,5 @@
-import WorkspaceSettings from '@/components/workspaceSettings';
-import React from 'react';
+import WorkspaceOwnerSettings from '@/components/workspaceOwnerSettings';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import workSpace from '../../../../public/img/workSpace.svg';
 import {
@@ -10,11 +10,24 @@ import { useRecoilState } from 'recoil';
 import AccountSettings from '@/components/accountSettings';
 import { selectedSettingMenuState } from '@/store/atom/selectedMenuState';
 import settingUser from '../../../../public/img/settingUser.svg';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import { useQuery } from 'react-query';
+import WorkspaceMemberSttings from '@/components/workspaceMemberSettings';
 
 const SettingsModal = () => {
   const [settingsVisible, SetSettingsVisible] =
     useRecoilState(isSettingsModalState);
 
+  const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
+    currentWorkspaceState,
+  );
+
+  const [currentUser, setCurrentUser] = useState('');
+
+  const accountRef = useRef();
+  const workspaceRef = useRef();
   const [inviteVisible, setInviteVisible] = useRecoilState(
     isInviteMemberModalState,
   );
@@ -23,10 +36,51 @@ const SettingsModal = () => {
     selectedSettingMenuState,
   );
 
+  // 현재 유저 확인
+  const fetchUser = async () => {
+    try {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      // workspace/{:workspaceId}/current-user
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/current-user`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const { data: fetchUserData, isSuccess: fetchUserIsSuccess } = useQuery(
+    'fetchUser',
+    fetchUser,
+  );
+
+  useEffect(() => {
+    if (fetchUserIsSuccess) {
+      console.log(fetchUserData);
+      setCurrentUser(fetchUserData);
+    }
+  }, [fetchUserIsSuccess, fetchUserData]);
+
   const handleOverlayClick = (e: any) => {
     if (e.target === e.currentTarget) {
       SetSettingsVisible(false);
       setInviteVisible(false);
+
+      if (accountRef?.current && selectedSettingMenu == 'userSettings') {
+        (accountRef.current as any).handleUpdateAccount();
+      } else if (
+        workspaceRef?.current &&
+        selectedSettingMenu == 'workspaceSettings'
+      ) {
+        (workspaceRef.current as any).handleUpdateAccount();
+      }
     }
   };
 
@@ -84,10 +138,15 @@ const SettingsModal = () => {
               {/* <div>문의하기</div> */}
             </div>
             <div className="py-[2rem] px-[1.5rem] w-[22.875rem] h-[30rem]">
-              {selectedSettingMenu === 'userSettings' && <AccountSettings />}
-              {selectedSettingMenu === 'workspaceSettings' && (
-                <WorkspaceSettings />
+              {selectedSettingMenu === 'userSettings' && (
+                <AccountSettings ref={accountRef} />
               )}
+              {selectedSettingMenu === 'workspaceSettings' &&
+                (fetchUserData.admin === true ? (
+                  <WorkspaceOwnerSettings ref={workspaceRef} />
+                ) : (
+                  <WorkspaceMemberSttings ref={workspaceRef} />
+                ))}
             </div>
           </div>
         </div>

@@ -12,6 +12,7 @@ const currentUserDataState = atom({
     userId: 0,
     nickname: '',
     imgUrl: '',
+    admin: false,
   },
 });
 
