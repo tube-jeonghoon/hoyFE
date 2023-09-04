@@ -40,6 +40,7 @@ const CommentEditModal = (Props: CommentEditModalProps) => {
       queryClient.invalidateQueries('todos');
       queryClient.invalidateQueries('commentList');
       queryClient.invalidateQueries('taskDetail');
+      queryClient.invalidateQueries('favoriteUserTodos');
     },
   });
 

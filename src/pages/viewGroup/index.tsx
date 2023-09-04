@@ -24,6 +24,7 @@ import { isDetailModalState } from '@/store/atom/modalStatus';
 import detailState from '@/store/atom/detailState';
 import { useQuery } from 'react-query';
 import DetailModal from '@/components/modal/detailModal';
+import { useRouter } from 'next/router';
 
 interface ViewGroupUserList {
   userId: number;
@@ -34,6 +35,7 @@ interface ViewGroupUserList {
 }
 
 const ViewGroup = () => {
+  const router = useRouter();
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [currentHeaderName, setCurrentHeaderName] = useRecoilState(
     currentHeaderNameState,
@@ -74,6 +76,37 @@ const ViewGroup = () => {
       }
     }
   }, [workspaceData]);
+
+  // viewGroup 유저 리스트 불러오기
+  // const { data: groupMemberData, isSuccess: groupMemberSuccess } = useQuery(
+  //   ['groupMember', currentGroupId],
+  //   async () => {
+  //     const accessToken = Cookies.get('ACCESS_KEY');
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/group/${currentGroupId}/members`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //         },
+  //       },
+  //     );
+  //     console.log(res.data);
+
+  //     const dataWithSelectedDate = res.data.map((user: ViewGroupUserList) => ({
+  //         ...user,
+  //         selectedDate: format(selectedDay, 'yyyy-MM-dd'),
+  //       }));
+
+  //       setViewGroupUserList(dataWithSelectedDate);
+
+  //     return dataWithSelectedDate;
+  //   },
+  // );
+  // useEffect(() => {
+  //   if (groupMemberSuccess) {
+  //     console.log(groupMemberData);
+  //   }
+  // }, [groupMemberData, groupMemberSuccess]);
 
   const fetchGroupMember = async () => {
     try {
@@ -174,14 +207,24 @@ const ViewGroup = () => {
       await updateTodosForUsers(members);
     };
     fetchAndUpdate();
-    // console.log('viewOtherGroup', currentGroupId);
-    // console.log('✨ ➤ useEffect ➤ viewGroupUserList:', viewGroupUserList);
   }, [currentGroupId]);
 
   const detailModal = (taskId: number) => {
     setIsDetailModalOpen(true);
     setIsDetailModal(taskId);
   };
+
+  useEffect(() => {
+    // 새로고침 시 workspace로 리다이렉션
+    if (currentWorkspace.workspace_id === 0) {
+      router.push('/workspace');
+    }
+
+    // accessToken이 없으면 로그인 페이지로 이동
+    if (!Cookies.get('ACCESS_KEY')) {
+      router.push('/login');
+    }
+  }, []);
 
   return (
     <div className="px-[5rem] py-[3.75rem] overflow-y-auto h-[48rem]">
@@ -211,9 +254,11 @@ const ViewGroup = () => {
                     {user.nickname}
                   </div>
                 </div>
-                <div className="w-[1.5rem] text-black cursor-pointer">
+                {/* 즐겨 찾기 추후 추가 */}
+                {/* <div className="w-[1.5rem] text-black cursor-pointer">
                   <Image src={star} alt="즐겨찾기" />
-                </div>
+                </div> */}
+                <div className="w-[1.5rem] text-black cursor-pointer"></div>
               </div>
               <div className="flex items-center px-[0.75rem] justify-between">
                 <div
@@ -252,9 +297,11 @@ const ViewGroup = () => {
                         )}
                         <div className="w-full text-[0.875rem] text-gray-4 mr-[0.62rem] flex">
                           <div className="line-through">{todo.title}</div>
-                          <div className="ml-[0.62rem] text-gray-4">
-                            [{todo.commentCount}]
-                          </div>
+                          {todo.commentCount > 0 && (
+                            <div className="ml-[0.62rem] text-gray-4">
+                              [{todo.commentCount}]
+                            </div>
+                          )}
                         </div>
                         <div
                           className="cursor-pointer"
@@ -278,9 +325,11 @@ const ViewGroup = () => {
                         )}
                         <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
                           {todo.title}
-                          <div className="ml-[0.62rem] text-gray-4">
-                            [{todo.commentCount}]
-                          </div>
+                          {todo.commentCount > 0 && (
+                            <div className="ml-[0.62rem] text-gray-4">
+                              [{todo.commentCount}]
+                            </div>
+                          )}
                         </div>
                         <div
                           className="cursor-pointer"

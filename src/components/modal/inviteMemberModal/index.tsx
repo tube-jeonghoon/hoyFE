@@ -87,7 +87,7 @@ const InviteMemberModal = () => {
     setInviteList(inviteList.filter(email => email !== emailToRemove));
   };
   return (
-    <div className="absolute top-[1.5rem] right-0">
+    <div className="absolute z-[95] top-[1.5rem] right-0">
       <div
         className="w-[24.375rem] bg-white border-[1px] rounded-[0.75rem] p-[1.5rem] flex flex-col gap-[0.75rem]
         text-black"

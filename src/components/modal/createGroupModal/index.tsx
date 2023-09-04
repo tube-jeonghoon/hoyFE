@@ -99,7 +99,6 @@ const CreateGroupModal = () => {
       name: groupTitle,
       memberIds,
     };
-    // console.log(paylaod);
 
     try {
       const res = await axios.post(
@@ -116,8 +115,11 @@ const CreateGroupModal = () => {
       setCreateGroupVisible(false);
       // fetchGroupListData();
       queryClient.invalidateQueries('groupListData');
-    } catch (error) {
+    } catch (error: any) {
       console.error('그룹 만들기가 실패하였습니다. ❌', error);
+      if (error.response.status === 400) {
+        alert('그룹 이름을 입력해주세요.');
+      }
     }
   };
 

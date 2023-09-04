@@ -28,6 +28,7 @@ import detailState from '@/store/atom/detailState';
 import selectedDateState from '@/store/atom/selectedDateState';
 import {
   currentFavoriteUserIdState,
+  currentHeaderNameState,
   currentWorkspaceState,
 } from '@/store/atom/userStatusState';
 import Cookies from 'js-cookie';
@@ -50,6 +51,7 @@ interface ViewFavoriteProps {
 
 const ViewFavorite = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [newTodoList, setNewTodoList] = useState<NewTodoItem[]>([]);
@@ -72,29 +74,6 @@ const ViewFavorite = () => {
   const beforeDate = useRecoilValue(formattedBeforeDateSelector);
   const currentDate = useRecoilValue(formattedCurrentDateSelector);
   const afterDate = useRecoilValue(formattedAfterDateSelector);
-
-  // const fetchDate = () => {
-  //   setNewTodoList(prev => [
-  //     {
-  //       date: beforeDate.formatDate,
-  //       dayOfWeek: beforeDate.dayOfWeek,
-  //       day: beforeDate.day,
-  //       tasks: [],
-  //     },
-  //     {
-  //       date: currentDate.formatDate,
-  //       dayOfWeek: currentDate.dayofWeek,
-  //       day: currentDate.day,
-  //       tasks: [],
-  //     },
-  //     {
-  //       date: afterDate.formatDate,
-  //       dayOfWeek: afterDate.dayOfWeek,
-  //       day: afterDate.day,
-  //       tasks: [],
-  //     },
-  //   ]);
-  // };
 
   const { data: workspaceData } = useQuery(
     'workspaceData',
@@ -186,6 +165,7 @@ const ViewFavorite = () => {
   );
 
   const detailModal = (taskId: number) => {
+    queryClient.invalidateQueries('taskDetail');
     setIsDetailModalOpen(true);
     setIstDetailModal(taskId);
   };
@@ -235,10 +215,15 @@ const ViewFavorite = () => {
     setNewTodoList(updatedTodoList);
   }, [todoList]);
 
-  // accessToken이 없으면 로그인 페이지로 이동
   useEffect(() => {
+    // 새로고침 시 workspace로 리다이렉션
+    if (currentWorkSpace.workspace_id === 0) {
+      router.push('/workspace');
+    }
+
+    // accessToken이 없으면 로그인 페이지로 이동
     if (!Cookies.get('ACCESS_KEY')) {
-      window.location.href = '/login';
+      router.push('/login');
     }
   }, []);
 

@@ -42,6 +42,7 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
   const [isUserSettingsModalVisible, setIsUserSettingsModalVisible] = useState<{
     [key: number]: boolean;
   }>({});
+
   // 특정 댓글 ID를 받아 상태를 업데이트하는 함수
   const toggleUserSettingsModal = (commentId: number) => {
     setIsUserSettingsModalVisible(prevState => ({
@@ -49,12 +50,15 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
       [commentId]: !prevState[commentId],
     }));
   };
+
   const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
+
   const [inViteMemberVisible, setInViteMemberVisible] = useRecoilState(
     isInviteMemberModalState,
   );
+
   const [modalMessage, setModalMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const toggleInviteMemberModal = () => {
@@ -78,12 +82,14 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
       return res.data;
     },
   );
+
   useEffect(() => {
     if (currentUserSuccess) {
       // console.log(currentUserData);
       setWorkspaceUserList(currentUserData);
     }
   }, [currentUserData, currentUserSuccess]);
+
   const deleteWorkspaceMutation = useMutation(
     async (workspaceId: number) => {
       const accessToken = Cookies.get('ACCESS_KEY');
@@ -106,18 +112,21 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
       },
     },
   );
+
   const deleteWorkspaceHandler = () => {
     // 현재 워크스페이스 ID를 사용하여 워크스페이스를 삭제
     if (currentWorkspace && currentWorkspace.workspace_id) {
       deleteWorkspaceMutation.mutate(currentWorkspace.workspace_id);
     }
   };
+
   // 파일 선택
   const handleAddButtonClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
+
   const handleImageUpload = (event: any) => {
     // 파일 선택
     const file = event.target.files[0];
@@ -129,8 +138,10 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
     } else {
       setFileError(null);
     }
+
     const targetSize = 300;
     const reader = new FileReader();
+
     reader.onload = async (e: ProgressEvent<FileReader>) => {
       if (e.target?.result && typeof e.target.result === 'string') {
         const img = document.createElement('img');
@@ -156,6 +167,7 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
     };
     reader.readAsDataURL(file);
   };
+
   // 최종 POST 요청 두 가지 : file, 유저 name
   useImperativeHandle(ref, () => ({
     async handleUpdateAccount() {
@@ -163,11 +175,14 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
       if (selectedFile) {
         formData.append('file', selectedFile);
       }
+
       // 유저 이름 정보를 formData에 추가
       const workspaceName = workspaceNameRef.current?.value;
+
       if (workspaceName) {
         formData.append('name', workspaceName);
       }
+
       try {
         const accessToken = Cookies.get('ACCESS_KEY');
         const response = await axios.post(
@@ -182,7 +197,7 @@ const WorkspaceOwnerSettings = forwardRef((props, ref) => {
         console.log('Workspace Profile updated', response.data);
         // setCreateWorkspaceVisible(false);
         // setSelectedFile(null);
-        window.location.reload();
+        router.push('/workspace');
       } catch (error) {
         console.error('Error updating user account:', error);
       }

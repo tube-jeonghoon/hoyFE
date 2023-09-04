@@ -25,16 +25,25 @@ import defaultUser from '../../../../public/img/defaultUser.png';
 import CommentEditModal from '../commentEditModal';
 import { DateTime } from 'luxon';
 
+interface CurrentUser {
+  admin: boolean;
+  imgUrl: string;
+  nickname: string;
+  id: number;
+}
+
 const DetailModal = (Props: DetailProps) => {
+  const { taskId } = Props;
   const queryClient = useQueryClient();
   const [commentStatus, setCommentStatus] = useState(true);
   const [commentBody, setCommentBody] = useState<CommentBody[]>([]);
-  const { taskId } = Props;
   const [title, setTitle] = useState<string>('');
   const [postUser, setPostUser] = useState<postUser>({
     nickname: '',
     imgUrl: '',
   });
+
+  const [currentUser, setCurrentUser] = useState<CurrentUser>();
   const [priority, setPriority] = useState<number>(0);
   const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
     currentWorkspaceState,
@@ -52,6 +61,28 @@ const DetailModal = (Props: DetailProps) => {
   const [newTitle, setNewTitle] = useState(''); // 새로운 제목을 저장
 
   const [commentText, setCommentText] = useState(''); // 작성할 댓글의 내용
+
+  // 현재 유저를 가져오는 쿼리
+  const { data: currentUserData, isSuccess: currentUserSuccess } = useQuery(
+    'currentUser',
+    async () => {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/current-user`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      console.log('✨ ➤ DetailModal ➤ currentUserData:', res.data);
+      setCurrentUser(res.data);
+      return res.data;
+    },
+    {
+      enabled: !!currentWorkSpace.workspace_id,
+    },
+  );
 
   // 특정 댓글 ID를 받아 상태를 업데이트하는 함수
   const toggleCommentEditModal = (commentId: number) => {
@@ -80,6 +111,7 @@ const DetailModal = (Props: DetailProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries(['taskDetail', taskId]); // 댓글 작성 후 쿼리 데이터를 갱신
       queryClient.invalidateQueries('todos');
+      queryClient.invalidateQueries('favoriteUserTodos');
     },
   });
 
@@ -96,19 +128,26 @@ const DetailModal = (Props: DetailProps) => {
   };
 
   // 제목 수정
-  const updateTitleMutation = useMutation(async (newTitle: string) => {
-    const accessToken = Cookies.get('ACCESS_KEY');
-    await axios.put(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/detail`,
-      { title: newTitle },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+  const updateTitleMutation = useMutation(
+    async (newTitle: string) => {
+      const accessToken = Cookies.get('ACCESS_KEY');
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/detail`,
+        { title: newTitle },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
+      );
+      queryClient.invalidateQueries('todos');
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('favoriteUserTodos');
       },
-    );
-    queryClient.invalidateQueries('todos');
-  });
+    },
+  );
 
   const handleTitleClick = () => {
     setNewTitle(title);
@@ -146,7 +185,7 @@ const DetailModal = (Props: DetailProps) => {
         },
       );
 
-      // console.log(res.data);
+      console.log(res.data);
       console.log('✨ ➤ res.data:', res.data.comments);
       setCommentBody(res.data.comments);
       return res.data;
@@ -187,13 +226,8 @@ const DetailModal = (Props: DetailProps) => {
   };
 
   // 글 삭제
-  const deleteTask = async (taskId: number) => {
-    const userConfirmed = window.confirm('정말로 이 글을 삭제하시겠습니까?');
-
-    if (!userConfirmed) {
-      return;
-    }
-    try {
+  const deleteTaskMutation = useMutation(
+    async (taskId: number) => {
       const accessToken = Cookies.get('ACCESS_KEY');
       await axios.delete(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}`,
@@ -203,13 +237,27 @@ const DetailModal = (Props: DetailProps) => {
           },
         },
       );
-      setIsDetailModalOpen(false);
-      // console.log(`${taskId}번 글 삭제 완료`);
+    },
+    {
+      onSuccess: () => {
+        setIsDetailModalOpen(false);
+        queryClient.invalidateQueries('todos');
+        queryClient.invalidateQueries('favoriteUserTodos');
+      },
+      onError: error => {
+        console.error(error);
+      },
+    },
+  );
 
-      queryClient.invalidateQueries('todos');
-    } catch (error) {
-      console.error(error);
+  const deleteTask = async (taskId: number) => {
+    const userConfirmed = window.confirm('정말로 이 글을 삭제하시겠습니까?');
+
+    if (!userConfirmed) {
+      return;
     }
+
+    deleteTaskMutation.mutate(taskId);
   };
 
   const handleOverlayClick = (e: any) => {
@@ -324,7 +372,7 @@ const DetailModal = (Props: DetailProps) => {
                     [{commentBody.length}]
                   </div>
                 </div>
-                <div className="flex flex-col gap-[1.25rem]">
+                <div className="flex flex-col gap-[1.25rem] h-[40rem] overflow-y-auto">
                   {commentBody.map(comment => (
                     <div key={comment.comment_id} className="flex flex-col">
                       <div className="flex gap-[0.62rem] w-full justify-between items-center mb-[0.62rem]">
@@ -424,11 +472,11 @@ const DetailModal = (Props: DetailProps) => {
             )}
             <div
               className="h-[3rem] flex items-center justify-between rounded-[0.5rem]
-              border-[1px] absolute w-[18.5rem] bottom-[1.5rem] p-[0.75rem]"
+              border-[1px] absolute w-[18.5rem] bottom-[1.5rem] p-[0.75rem] bg-white z-[95]"
             >
-              <div className="text-[0.75rem] leading-[1.4rem] w-full text-gray-4">
+              <div className="text-[0.75rem] leading-[1.4rem] w-full text-gray-4 ">
                 <input
-                  className="w-full focus:outline-none focus:text-black bg-transparent"
+                  className="w-full focus:outline-none focus:text-black "
                   type="textarea"
                   placeholder="코멘트 내용을 작성해 주세요."
                   value={commentText}

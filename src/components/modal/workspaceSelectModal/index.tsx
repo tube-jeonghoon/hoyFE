@@ -51,7 +51,10 @@ const WorkspaceSelectModal = () => {
 
   const handleCreateWorkspace = () => {
     setWorkspaceSelectVisible(false);
-    setCreateWorkspaceVisible(true);
+    alert(
+      `현재 워크스페이스는 초대를 통해서만 이용하실 수 있습니다. 추후 업데이트 예정입니다.`,
+    );
+    // setCreateWorkspaceVisible(true);
   };
 
   // 워크스페이스를 클릭했을 때 일어나는 함수

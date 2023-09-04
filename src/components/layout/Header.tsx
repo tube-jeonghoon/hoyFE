@@ -39,7 +39,7 @@ const Header = () => {
   };
 
   return (
-    <div className="w-[74rem] fixed top-0 z-[100] bg-white">
+    <div className="w-[74rem] fixed z-[90] top-0 bg-white">
       <div className="p-[3.75rem] pb-[2.5rem] w-full">
         <div className="flex gap-[0.38rem] items-center">
           <div className="text-gray-5">{currentHeaderName} 님의 투두리스트</div>
@@ -56,12 +56,13 @@ const Header = () => {
             </div>
           )}
         </div>
-        <div className="flex items-center text-[1.625rem] font-bold relative">
+        <div className="flex items-center text-[1.625rem] font-bold relative gap-[0.3rem]">
           <div>{calendarDate}</div>
-          {}
-          <button className="ml-[0.3rem]" onClick={toggleCalendar}>
-            <VscChevronDown />
-          </button>
+          {router.pathname === '/viewGroup' || (
+            <div className="cursor-pointer" onClick={toggleCalendar}>
+              <VscChevronDown />
+            </div>
+          )}
           {calendarVisible && (
             <div className="mt-4 absolute top-6 left-0">
               <DynamicMyCalendar />

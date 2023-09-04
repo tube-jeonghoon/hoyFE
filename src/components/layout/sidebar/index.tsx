@@ -250,8 +250,12 @@ const SideBar = () => {
     queryClient.invalidateQueries('fetchGroupMember');
     queryClient.invalidateQueries('workspaceSidbarData');
 
+    setCurrentHeaderName(currentUserData.nickname);
     setSelectedMenu('userTask');
     // router.push는 쿼리의 상태에 따라 변경될 수 있습니다.
+    if (router.pathname.startsWith('/workspace')) {
+      router.reload();
+    }
     if (!fetchUserDataLoading && !fetchUserDataError) {
       router.push(`/workspace/${workspaceId}`);
     }
@@ -318,7 +322,7 @@ const SideBar = () => {
         </div>
         <div
           className="flex items-center p-[0.75rem] hover:bg-gray-1 hover:rounded-[0.5rem] cursor-pointer
-              relative z-[95]"
+              relative"
           onClick={toggleUpdateModal}
         >
           <div className="mr-[0.75rem]">
