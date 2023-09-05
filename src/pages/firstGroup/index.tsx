@@ -1,16 +1,19 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
-import { useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import defaultWorkspace from '../../../public/img/defaultWorkspace.svg';
 import { useRouter } from 'next/router';
 import { useRecoilState } from 'recoil';
 import { isCreateWorkspaceModalState } from '@/store/atom/modalStatus';
 import Cookies from 'js-cookie';
 import pica from 'pica';
+import { workspaceIdState } from '@/store/atom/userStatusState';
 
 const FirstGroup = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const [workspaceId, setWorkspaceId] = useRecoilState(workspaceIdState);
   const [createWorkspaceVisible, setCreateWorkspaceVisible] = useRecoilState(
     isCreateWorkspaceModalState,
   );
@@ -20,6 +23,51 @@ const FirstGroup = () => {
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+
+  // 워크스페이스 데이터 로딩 있으면 리다이렉션
+  const {
+    data: workspaceData,
+    isLoading: workspaceIsLoading,
+    isSuccess: workspaceSuccess,
+  } = useQuery('workspaceData', async () => {
+    const accessToken = Cookies.get('ACCESS_KEY');
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    console.log(res.data);
+    return res.data;
+  });
+
+  useEffect(() => {
+    if (workspaceIsLoading) {
+      return; // 로딩 중일 때는 아무 동작도 하지 않습니다.
+    }
+
+    // 워크스페이스 데이터 로딩이 성공한 경우
+    if (workspaceSuccess) {
+      // 워크스페이스 데이터가 없는 경우
+      if (workspaceData.length === 0) {
+        router.push('/firstGroup');
+        return; // early return to avoid further execution
+      }
+
+      // 워크스페이스 데이터가 있는 경우
+      const newWorkspaceId = workspaceData[0]?.workspace_id;
+      if (newWorkspaceId !== workspaceId) {
+        setWorkspaceId(newWorkspaceId);
+      }
+
+      // 워크스페이스 페이지로 리다이렉션
+      if (newWorkspaceId) {
+        router.push(`/workspace/${newWorkspaceId}`);
+      }
+    }
+  }, [workspaceData, workspaceIsLoading, workspaceSuccess, workspaceId]);
 
   const handleImageUpload = async (event: any) => {
     const file = event.target.files[0];
@@ -101,7 +149,8 @@ const FirstGroup = () => {
         setFileName(null);
       }
 
-      router.push('/workspace');
+      queryClient.invalidateQueries('workspaceData');
+      router.push(`/workspace/${response.data.id}`);
     } catch (error) {
       console.error('Error creating workspace:', error);
     }

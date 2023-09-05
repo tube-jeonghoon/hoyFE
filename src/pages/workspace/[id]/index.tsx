@@ -409,6 +409,8 @@ const Workspace = () => {
           },
         },
       );
+      queryClient.invalidateQueries('todos');
+      queryClient.invalidateQueries(['taskDetail', taskId]);
       // console.log('Task date updated: ', response.data);
     } catch (error) {
       console.error('Error updating task date:', error);

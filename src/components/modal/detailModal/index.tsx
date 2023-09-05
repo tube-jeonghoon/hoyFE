@@ -375,7 +375,7 @@ const DetailModal = (Props: DetailProps) => {
                     [{commentBody.length}]
                   </div>
                 </div>
-                <div className="flex flex-col gap-[1.25rem] h-[40rem] overflow-y-auto">
+                <div className="flex flex-col gap-[1.25rem] h-[35rem] overflow-y-auto">
                   {commentBody.map(comment => (
                     <div key={comment.comment_id} className="flex flex-col">
                       <div className="flex gap-[0.62rem] w-full justify-between items-center mb-[0.62rem]">

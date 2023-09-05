@@ -11,47 +11,49 @@ const Workspace = () => {
   const queryClient = useQueryClient();
   const [workspaceId, setWorkspaceId] = useRecoilState(workspaceIdState);
 
-  const { data: workspaceData, isSuccess: workspaceSuccess } = useQuery(
-    'workspaceData',
-    async () => {
-      const accessToken = Cookies.get('ACCESS_KEY');
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+  const {
+    data: workspaceData,
+    isLoading: workspaceIsLoading,
+    isSuccess: workspaceSuccess,
+  } = useQuery('workspaceData', async () => {
+    const accessToken = Cookies.get('ACCESS_KEY');
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      );
-      console.log(res.data);
-      return res.data;
-    },
-  );
+      },
+    );
+    console.log(res.data);
+    return res.data;
+  });
 
-  // 로그인 후 워크스페이스 액션
   useEffect(() => {
-    queryClient.invalidateQueries('workspaceData');
-    if (workspaceData && workspaceData.length === 0) {
-      router.push('/firstGroup');
-      return;
+    if (workspaceIsLoading) {
+      return; // 로딩 중일 때는 아무 동작도 하지 않습니다.
     }
 
-    if (workspaceSuccess && workspaceData) {
-      const newWorkspaceData = workspaceData[0];
+    // 워크스페이스 데이터 로딩이 성공한 경우
+    if (workspaceSuccess) {
+      // 워크스페이스 데이터가 없는 경우
+      if (workspaceData.length === 0) {
+        router.push('/firstGroup');
+        return; // early return to avoid further execution
+      }
 
-      if (newWorkspaceData && 'workspace_id' in newWorkspaceData) {
-        const newWorkspaceId = newWorkspaceData.workspace_id;
+      // 워크스페이스 데이터가 있는 경우
+      const newWorkspaceId = workspaceData[0]?.workspace_id;
+      if (newWorkspaceId !== workspaceId) {
+        setWorkspaceId(newWorkspaceId);
+      }
 
-        if (newWorkspaceId !== workspaceId) {
-          setWorkspaceId(newWorkspaceId);
-        }
-
-        if (newWorkspaceId) {
-          router.push(`/workspace/${newWorkspaceId}`);
-        }
+      // 워크스페이스 페이지로 리다이렉션
+      if (newWorkspaceId) {
+        router.push(`/workspace/${newWorkspaceId}`);
       }
     }
-  }, [workspaceSuccess, workspaceData, workspaceId]);
+  }, [workspaceData, workspaceIsLoading, workspaceSuccess, workspaceId]);
 
   return (
     <div className="h-screen flex items-center justify-center">
