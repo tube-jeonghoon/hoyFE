@@ -200,6 +200,7 @@ const SideBar = () => {
         },
       );
 
+      console.log(res.data);
       return res.data;
     },
   );

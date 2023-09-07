@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import editIcon from '../../../../public/img/editBtn.svg';
 import removeIcon from '../../../../public/img/removeBtn.svg';
-import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import {
+  currentCommentIdState,
+  currentWorkspaceState,
+} from '@/store/atom/userStatusState';
 import { useRecoilState } from 'recoil';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useMutation, useQueryClient } from 'react-query';
+import { iscommentSettingModalState } from '@/store/atom/modalStatus';
 
 interface CommentEditModalProps {
   taskId: number;
@@ -19,6 +23,19 @@ const CommentEditModal = (Props: CommentEditModalProps) => {
   const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
+  const [isEditModalOpen, setEditModalOpen] = useRecoilState(
+    iscommentSettingModalState,
+  );
+  const [newComment, setNewComment] = useState('');
+
+  const [openCommentId, setOpenCommentId] = useRecoilState(
+    currentCommentIdState,
+  );
+
+  const editHandler = () => {
+    setEditModalOpen(true);
+    setOpenCommentId(commentId);
+  };
 
   // 댓글 삭제 API 호출 함수
   const deleteComment = async () => {
@@ -44,6 +61,7 @@ const CommentEditModal = (Props: CommentEditModalProps) => {
     },
   });
 
+  // 삭제 버튼 클릭 시ㅣ
   const handleCommentDelete = () => {
     const userConfirmed = window.confirm('정말로 이 댓글을 삭제하시겠습니까?');
     if (userConfirmed) {
@@ -57,16 +75,35 @@ const CommentEditModal = (Props: CommentEditModalProps) => {
         className="border-[1px] bg-white border-[#EAEEF3] p-[0.75rem] rounded-[0.75rem]
         w-[144px]"
       >
-        {/* <div className="flex gap-[0.75rem] items-center p-[0.75rem] hover:bg-gray-2 rounded-[0.5rem]">
-          <div>
-            <Image src={editIcon} alt="수정" />
+        <div className="flex gap-[0.75rem] items-center p-[0.75rem] hover:bg-gray-2 rounded-[0.5rem] relative">
+          <div
+            className="flex gap-[0.75rem] items-center"
+            onClick={editHandler}
+          >
+            <div>
+              <Image src={editIcon} alt="수정" />
+            </div>
+            <div>수정</div>
           </div>
-          <div onClick={() => alert(`현재 댓글 수정은 업데이트중입니다.`)}>
-            수정
-          </div>
-        </div> */}
+          {/* 댓글 수정 모달 */}
+          {/* {isEditModalOpen && (
+            <div className="w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-white p-4 rounded">
+                <h2>댓글 수정</h2>
+                <textarea
+                  value={newComment}
+                  onChange={e => setNewComment(e.target.value)}
+                  rows={4}
+                  className="w-full border p-2 rounded"
+                ></textarea>
+                <button onClick={handleCommentEdit}>수정하기</button>
+                <button onClick={() => setEditModalOpen(false)}>취소</button>
+              </div>
+            </div>
+          )} */}
+        </div>
         <div
-          className="flex gap-[0.75rem] items-center p-[0.75rem] hover:bg-gray-2 rounded-[0.5rem]"
+          className="flex gap-[0.75rem] items-center p-[0.75rem] hover:bg-g ray-2 rounded-[0.5rem]"
           onClick={handleCommentDelete}
         >
           <div>

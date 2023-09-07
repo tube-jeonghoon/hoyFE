@@ -45,6 +45,11 @@ const currentFavoriteUserIdState = atom<number>({
   default: 0,
 });
 
+const currentCommentIdState = atom<number | null>({
+  key: 'currentCommentIdState',
+  default: null,
+});
+
 export {
   currentUserDataState,
   currentHeaderNameState,
@@ -52,4 +57,5 @@ export {
   currentGroupState,
   currentFavoriteUserIdState,
   workspaceIdState,
+  currentCommentIdState,
 };

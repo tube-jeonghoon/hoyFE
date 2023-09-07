@@ -43,7 +43,7 @@ const Header = () => {
       <div className="p-[3.75rem] pb-[2.5rem] w-full">
         <div className="flex gap-[0.38rem] items-center">
           {router.pathname === '/viewGroup' ? (
-            <div className="text-gray-5">{currentHeaderName} 의 투두리스트</div>
+            <div className="text-gray-5">{currentHeaderName} 투두리스트</div>
           ) : (
             <div className="text-gray-5">
               {currentHeaderName} 님의 투두리스트

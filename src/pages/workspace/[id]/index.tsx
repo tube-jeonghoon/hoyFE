@@ -135,7 +135,7 @@ const Workspace = () => {
 
   // 워크스페이스의 시작값이 0일때 첫번째 워크스페이스를 선택
   useEffect(() => {
-    if (currentWorkspace?.workspace_id === 0) {
+    if (currentWorkspace.workspace_id === 0) {
       if (workspaceData) {
         setCurrentWorkspace(workspaceData[0]);
       }
@@ -409,8 +409,6 @@ const Workspace = () => {
           },
         },
       );
-      queryClient.invalidateQueries('todos');
-      queryClient.invalidateQueries(['taskDetail', taskId]);
       // console.log('Task date updated: ', response.data);
     } catch (error) {
       console.error('Error updating task date:', error);
@@ -460,189 +458,196 @@ const Workspace = () => {
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="todos grid grid-cols-3 ">
           {newTodoList.map((todo, idx) => (
-            <Droppable droppableId={String(todo.date)} key={idx}>
-              {provided => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="todo mr-[3.12rem] desktop:w-[11.5rem] desktopL:w-[19rem]"
-                >
-                  <div
-                    className={`todo-date flex items-center mb-[1.125rem] py-[1.125rem] ${
-                      idx === 0
-                        ? 'justify-start'
-                        : idx === 1
-                        ? 'justify-center'
-                        : idx === 2
-                        ? 'justify-end'
-                        : ''
-                    }`}
-                  >
-                    <div className="flex gap-[5rem] h-[2.5rem]">
-                      {idx === 0 && (
-                        <div
-                          onClick={moveDateBackward}
-                          className="p-[0.8rem] bg-gray-1 rounded-[0.5rem] w-[2.5rem] h-[2.5rem] cursor-pointer"
-                        >
-                          <Image
-                            src={arrowLeft}
-                            width={24}
-                            height={24}
-                            alt="화살표"
-                          />
-                        </div>
-                      )}
-                      <div className="flex items-center">
-                        <div
-                          className={`mr-[0.5rem] text-[1.125rem] font-bold ${
-                            idx === Math.floor(newTodoList.length / 2)
-                              ? 'text-primary-blue'
-                              : ''
-                          }`}
-                        >
-                          {todo.dayOfWeek}
-                        </div>
-                        <div className="text-gray-5">{todo.day}</div>
-                      </div>
-                      {idx === newTodoList.length - 1 && (
-                        <div
-                          onClick={moveDateForward}
-                          className="p-[0.8rem] bg-gray-1 rounded-[0.5rem] w-[2.5rem] h-[2.5rem] cursor-pointer"
-                        >
-                          <Image
-                            src={arrowRight}
-                            width={24}
-                            height={24}
-                            alt="화살표"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div
-                    className="flex items-center mb-[1.12rem] h-[3rem] p-[0.62rem]
-                          border-b-[0.1rem]"
-                  >
+            <div
+              className="todo mr-[3.12rem] desktop:w-[11.5rem] desktopL:w-[19rem]"
+              key={idx}
+            >
+              <div
+                className={`todo-date flex items-center mb-[1.125rem] py-[1.125rem] ${
+                  idx === 0
+                    ? 'justify-start'
+                    : idx === 1
+                    ? 'justify-center'
+                    : idx === 2
+                    ? 'justify-end'
+                    : ''
+                }`}
+              >
+                <div className="flex gap-[5rem] h-[2.5rem]">
+                  {idx === 0 && (
                     <div
-                      className="mr-[0.6rem] text-gray-3 cursor-pointer"
-                      onClick={() => {
-                        const title = inputTitles[todo.date];
-                        if (title) {
-                          const newTask = {
-                            title: inputTitles,
-                            date: todo.date,
-                          };
-                          // console.log(newTask);
-                          addMutation.mutate(newTask);
-                        }
-                      }}
+                      onClick={moveDateBackward}
+                      className="p-[0.8rem] bg-gray-1 rounded-[0.5rem] w-[2.5rem] h-[2.5rem] cursor-pointer"
                     >
-                      <AiOutlinePlus />
+                      <Image
+                        src={arrowLeft}
+                        width={24}
+                        height={24}
+                        alt="화살표"
+                      />
                     </div>
-                    <input
-                      type="text"
-                      className="outline-none text-[0.875rem] text-gray-4 border-gray-4
-                            focus:text-black w-full"
-                      placeholder="리스트를 작성해 주세요."
-                      onChange={e => {
-                        setInputTitles({
-                          ...inputTitles,
-                          [todo.date]: e.target.value,
-                        });
-                      }}
-                      onKeyPress={e => handleKeyDown(e, todo.date)}
-                      value={inputTitles[todo.date] || ''}
-                    />
-                  </div>
-                  {todo.tasks.map((task, taskIdx) => (
-                    <Draggable
-                      key={task.id}
-                      draggableId={String(task.id)}
-                      index={taskIdx}
+                  )}
+                  <div className="flex items-center">
+                    <div
+                      className={`mr-[0.5rem] text-[1.125rem] font-bold ${
+                        idx === Math.floor(newTodoList.length / 2)
+                          ? 'text-primary-blue'
+                          : ''
+                      }`}
                     >
-                      {provided => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="todo-list"
-                        >
-                          {task.status ? (
-                            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-                              <div
-                                className="mr-[0.62rem] cursor-pointer text-primary-blue w-[1.5rem]"
-                                onClick={() => toggleTaskCompletion(task.id)}
-                              >
-                                <Image src={fillCheckBox} alt="체크박스" />
+                      {todo.dayOfWeek}
+                    </div>
+                    <div className="text-gray-5">{todo.day}</div>
+                  </div>
+                  {idx === newTodoList.length - 1 && (
+                    <div
+                      onClick={moveDateForward}
+                      className="p-[0.8rem] bg-gray-1 rounded-[0.5rem] w-[2.5rem] h-[2.5rem] cursor-pointer"
+                    >
+                      <Image
+                        src={arrowRight}
+                        width={24}
+                        height={24}
+                        alt="화살표"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div
+                className="flex items-center mb-[1.12rem] h-[3rem] p-[0.62rem]
+                      border-b-[0.1rem]"
+              >
+                <div
+                  className="mr-[0.6rem] text-gray-3 cursor-pointer"
+                  onClick={() => {
+                    const title = inputTitles[todo.date];
+                    if (title) {
+                      const newTask = {
+                        title: inputTitles,
+                        date: todo.date,
+                      };
+                      // console.log(newTask);
+                      addMutation.mutate(newTask);
+                    }
+                  }}
+                >
+                  <AiOutlinePlus />
+                </div>
+                <input
+                  type="text"
+                  className="outline-none text-[0.875rem] text-gray-4 border-gray-4
+                        focus:text-black w-full"
+                  placeholder="리스트를 작성해 주세요."
+                  onChange={e => {
+                    setInputTitles({
+                      ...inputTitles,
+                      [todo.date]: e.target.value,
+                    });
+                  }}
+                  onKeyPress={e => handleKeyDown(e, todo.date)}
+                  value={inputTitles[todo.date] || ''}
+                />
+              </div>
+              <Droppable droppableId={String(todo.date)} key={idx}>
+                {provided => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="todo droppable each item overflow-auto"
+                    style={{ minHeight: '10rem' }}
+                  >
+                    {todo.tasks.map((task, taskIdx) => (
+                      <Draggable
+                        key={task.id}
+                        draggableId={String(task.id)}
+                        index={taskIdx}
+                      >
+                        {provided => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="todo-list"
+                          >
+                            {task.status ? (
+                              <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
+                                <div
+                                  className="mr-[0.62rem] cursor-pointer text-primary-blue w-[1.5rem]"
+                                  onClick={() => toggleTaskCompletion(task.id)}
+                                >
+                                  <Image src={fillCheckBox} alt="체크박스" />
+                                </div>
+                                <div className="flex items-center mr-[0.62rem]">
+                                  {task.priority === 1 && (
+                                    <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
+                                  )}
+                                </div>
+                                <div className="w-full text-[0.875rem] text-gray-4 mr-[0.62rem] flex">
+                                  <div className="line-through">
+                                    {task.title}
+                                  </div>
+                                  <div>
+                                    {task.commentCount !== 0 && (
+                                      <div className="ml-[0.62rem] text-gray-4">
+                                        [{task.commentCount}]
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() => detailModal(task.id)}
+                                >
+                                  <IoEllipsisVertical />
+                                </div>
+                                {isDetailModalOpen &&
+                                  isDetailModal === task.id && (
+                                    <DetailModal taskId={task.id} />
+                                  )}
                               </div>
-                              <div className="flex items-center mr-[0.62rem]">
-                                {task.priority === 1 && (
-                                  <div className="w-[0.375rem] h-[0.375rem] border-none rounded-[5rem] bg-primary-red"></div>
-                                )}
-                              </div>
-                              <div className="w-full text-[0.875rem] text-gray-4 mr-[0.62rem] flex">
-                                <div className="line-through">{task.title}</div>
-                                <div>
+                            ) : (
+                              <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
+                                <div
+                                  className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]"
+                                  onClick={() => toggleTaskCompletion(task.id)}
+                                >
+                                  <Image src={checkBoxIcon} alt="체크박스" />
+                                </div>
+                                <div className="flex items-center mr-[0.62rem]">
+                                  {task.priority === 1 && (
+                                    <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
+                                  )}
+                                </div>
+                                <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
+                                  {task.title}
                                   {task.commentCount !== 0 && (
                                     <div className="ml-[0.62rem] text-gray-4">
                                       [{task.commentCount}]
                                     </div>
                                   )}
                                 </div>
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() => detailModal(task.id)}
+                                >
+                                  <IoEllipsisVertical />
+                                </div>
+                                {isDetailModalOpen &&
+                                  isDetailModal === task.id && (
+                                    <DetailModal taskId={task.id} />
+                                  )}
                               </div>
-                              <div
-                                className="cursor-pointer"
-                                onClick={() => detailModal(task.id)}
-                              >
-                                <IoEllipsisVertical />
-                              </div>
-                              {isDetailModalOpen &&
-                                isDetailModal === task.id && (
-                                  <DetailModal taskId={task.id} />
-                                )}
-                            </div>
-                          ) : (
-                            <div className="todo border-[0.1rem] p-[0.75rem] rounded-[0.5rem] flex items-center mb-[0.62rem]">
-                              <div
-                                className="text-black mr-[0.62rem] cursor-pointer w-[1.5rem]"
-                                onClick={() => toggleTaskCompletion(task.id)}
-                              >
-                                <Image src={checkBoxIcon} alt="체크박스" />
-                              </div>
-                              <div className="flex items-center mr-[0.62rem]">
-                                {task.priority === 1 && (
-                                  <div className="w-[0.375rem] h-[0.375rem] border rounded-[5rem] bg-[#ff4b4b]"></div>
-                                )}
-                              </div>
-                              <div className="w-full text-[0.875rem] text-black mr-[0.62rem] flex">
-                                {task.title}
-                                {task.commentCount !== 0 && (
-                                  <div className="ml-[0.62rem] text-gray-4">
-                                    [{task.commentCount}]
-                                  </div>
-                                )}
-                              </div>
-                              <div
-                                className="cursor-pointer"
-                                onClick={() => detailModal(task.id)}
-                              >
-                                <IoEllipsisVertical />
-                              </div>
-                              {isDetailModalOpen &&
-                                isDetailModal === task.id && (
-                                  <DetailModal taskId={task.id} />
-                                )}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+                            )}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </div>
           ))}
         </div>
       </DragDropContext>

@@ -1,17 +1,16 @@
-import { isCreateGroupModalState } from '@/store/atom/modalStatus';
+import { isEditGroupModalState } from '@/store/atom/modalStatus';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import cancelImg from '../../../public/img/cancel.svg';
+import searchImg from '../../../public/img/search.png';
+import membercheckImg from '../../../public/img/memberCheck.svg';
+import fillMemberCheckImg from '../../../public/img/fillMemberCheck.svg';
 import Image from 'next/image';
-import cancelImg from '../../../../public/img/cancel.svg';
-import searchImg from '../../../../public/img/search.png';
-import membercheckImg from '../../../../public/img/memberCheck.svg';
-import fillMemberCheckImg from '../../../../public/img/fillMemberCheck.svg';
-import userImg from '../../../../public/img/defaultUser.png';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useQuery } from 'react-query';
 import { currentWorkspaceState } from '@/store/atom/userStatusState';
-import groupListState from '@/store/atom/groupListState';
-import { useQuery, useQueryClient } from 'react-query';
+import { group } from 'console';
 
 interface Member {
   userId: number;
@@ -19,25 +18,34 @@ interface Member {
   imgUrl: string;
 }
 
-const CreateGroupModal = () => {
-  const queryClient = useQueryClient();
-  const [createGroupVisible, setCreateGroupVisible] = useRecoilState(
-    isCreateGroupModalState,
+const EditGroupModal = () => {
+  const [editGroupVisible, setEditGroupVisible] = useRecoilState(
+    isEditGroupModalState,
   );
-  const [workspaceMembers, setWorkspaceMembers] = useState([]);
+  const [currentWorkspace, setCurrentWorkspace] = useState({
+    workspace_id: 59,
+  });
+  // const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
+  //   currentWorkspaceState,
+  // );
+
   const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
+  const [workspaceMembers, setWorkspaceMembers] = useState([]);
   const [groupTitle, setGroupTitle] = useState('');
-  const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
-    currentWorkspaceState,
-  );
-  const [groupList, setGroupList] = useRecoilState(groupListState);
+
+  const handleOverlayClick = (e: any) => {
+    if (e.target === e.currentTarget) {
+      setEditGroupVisible(false);
+    }
+  };
 
   // 유저 정보 받아오기
   const { data: groupFetchUserData, isSuccess: groupFetchUserSuccess } =
     useQuery('groupFetchUserData', async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/group/available-users`,
+        //workspace/{:workspaceId}/group/{:groupId}/available-users
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/group/12/available-users`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -45,6 +53,7 @@ const CreateGroupModal = () => {
         },
       );
 
+      console.log(res.data.workspaceMembers);
       return res.data.workspaceMembers;
     });
 
@@ -54,58 +63,10 @@ const CreateGroupModal = () => {
     }
   }, [groupFetchUserSuccess, groupFetchUserData]);
 
-  const createGroup = async () => {
-    const accessToken = Cookies.get('ACCESS_KEY');
-    const memberIds = selectedMembers.map(member => member.userId);
-
-    const paylaod = {
-      name: groupTitle,
-      memberIds,
-    };
-
-    try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/group`,
-        paylaod,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-
-      // console.log(res.data);
-      setCreateGroupVisible(false);
-      // fetchGroupListData();
-      queryClient.invalidateQueries('groupListData');
-    } catch (error: any) {
-      console.error('그룹 만들기가 실패하였습니다. ❌', error);
-      if (error.response.status === 400) {
-        alert('그룹 이름을 입력해주세요.');
-      }
-    }
-  };
-
-  const handleOverlayClick = (e: any) => {
-    if (e.target === e.currentTarget) {
-      setCreateGroupVisible(false);
-    }
-  };
-
-  const toggleMemberSelection = (member: Member) => {
-    if (selectedMembers.some(m => m.userId === member.userId)) {
-      setSelectedMembers(prevMembers =>
-        prevMembers.filter(m => m.userId !== member.userId),
-      );
-    } else {
-      setSelectedMembers(prevMembers => [...prevMembers, member]);
-    }
-  };
-
   return (
     <div
-      className={`modalContainer fixed inset-0 flex items-center justify-center z-[101] ${
-        createGroupVisible ? 'visible' : 'hidden'
+      className={`modalContainer fixed inset-0 flex items-center justify-center z-[101]${
+        editGroupVisible ? 'visible' : 'hidden'
       }`}
     >
       <div
@@ -131,12 +92,14 @@ const CreateGroupModal = () => {
                     value={groupTitle}
                     onChange={e => setGroupTitle(e.target.value)}
                   />
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => setGroupTitle('')}
-                  >
-                    <Image src={cancelImg} alt="취소" />
-                  </div>
+                  {groupTitle.length > 0 && (
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => setGroupTitle('')}
+                    >
+                      <Image src={cancelImg} alt="취소" />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col gap-[1rem]">
@@ -149,7 +112,7 @@ const CreateGroupModal = () => {
                   </div>
                 </div>
                 <div className="flex gap-[0.38rem] flex-wrap">
-                  {selectedMembers.map((member: Member) => (
+                  {/* {selectedMembers.map((member: Member) => (
                     <div
                       key={member.userId}
                       className="border border-gray-300 px-[1rem] rounded-[6.25rem] bg-gray-1 py-[0.5rem]
@@ -167,7 +130,7 @@ const CreateGroupModal = () => {
                         />
                       </div>
                     </div>
-                  ))}
+                  ))} */}
                 </div>
                 <div className="flex border-[1px] p-[0.75rem] rounded-[0.5rem] items-center gap-[0.62rem]">
                   <div>
@@ -187,7 +150,7 @@ const CreateGroupModal = () => {
                       key={member.userId}
                       className="flex gap-[0.75rem] items-center justify-between p-[0.75rem]
                       hover:bg-gray-2 rounded-[0.5rem] cursor-pointer"
-                      onClick={() => toggleMemberSelection(member)}
+                      // onClick={() => toggleMemberSelection(member)}
                     >
                       <div className="flex gap-[0.75rem] items-center ">
                         <div>
@@ -222,14 +185,14 @@ const CreateGroupModal = () => {
                 <div
                   className="border-[1px] rounded-[0.75rem] px-[2rem] py-[0.5rem] h-[3rem] w-[9.5rem]
                   flex items-center justify-center text-[0.875rem] cursor-pointer"
-                  onClick={() => setCreateGroupVisible(false)}
+                  onClick={() => setEditGroupVisible(false)}
                 >
                   취소
                 </div>
                 <div
                   className="border-[1px] rounded-[0.75rem] px-[2rem] py-[0.5rem] h-[3rem] w-[9.5rem]
                   flex items-center justify-center bg-primary-blue cursor-pointer text-white text-[0.875rem]"
-                  onClick={createGroup}
+                  onClick={editGroup}
                 >
                   완료
                 </div>
@@ -242,4 +205,4 @@ const CreateGroupModal = () => {
   );
 };
 
-export default CreateGroupModal;
+export default EditGroupModal;

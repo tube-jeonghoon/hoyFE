@@ -17,9 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
     router.pathname === '/firstGroup' ||
     router.pathname === '/searchMember' ||
     router.pathname === '/settings' ||
-    router.pathname === '/createGroupModal' ||
-    router.pathname === '/createFavoriteMemberModal' ||
-    router.pathname === '/updateModal'
+    router.pathname === '/editGroupModal'
   ) {
     return (
       <GoogleOAuthProvider

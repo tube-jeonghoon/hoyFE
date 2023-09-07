@@ -12,10 +12,13 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useRecoilState } from 'recoil';
 import {
   isDetailModalState,
-  iscommentEditModalState,
+  iscommentSettingModalState,
 } from '@/store/atom/modalStatus';
 import Cookies from 'js-cookie';
-import { currentWorkspaceState } from '@/store/atom/userStatusState';
+import {
+  currentCommentIdState,
+  currentWorkspaceState,
+} from '@/store/atom/userStatusState';
 import { DetailProps, postUser } from './types';
 import detailFillCheck from '../../../../public/img/detailFillCheck.svg';
 import { IoEllipsisVertical } from 'react-icons/io5';
@@ -43,19 +46,25 @@ const DetailModal = (Props: DetailProps) => {
     imgUrl: '',
   });
 
+  const [isEditModalOpen, setEditModalOpen] = useRecoilState(
+    iscommentSettingModalState,
+  );
+
   const [currentUser, setCurrentUser] = useState<CurrentUser>();
   const [priority, setPriority] = useState<number>(0);
-  const [currentWorkSpace, setCurrentWorkSpace] = useRecoilState(
+  const [currentWorkspace, setCurrentWorkspace] = useRecoilState(
     currentWorkspaceState,
   );
   const [isDetailModalOpen, setIsDetailModalOpen] =
     useRecoilState(isDetailModalState);
 
   // const [iscommentEditModalVisible, setIscommentEditModalVisible] =
-  //   useRecoilState(iscommentEditModalState);
-  const [iscommentEditModalVisible, setIscommentEditModalVisible] = useState<{
-    [key: number]: boolean;
-  }>({});
+  //   useRecoilState(iscommentSettingModalState);
+
+  const [iscommentSettingModalVisible, setIscommentSettingModalVisible] =
+    useState<{
+      [key: number]: boolean;
+    }>({});
 
   const [isEditing, setIsEditing] = useState(false); // 제목 편집 여부를 저장
   const [newTitle, setNewTitle] = useState(''); // 새로운 제목을 저장
@@ -68,7 +77,7 @@ const DetailModal = (Props: DetailProps) => {
     async () => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/current-user`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/current-user`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -80,13 +89,13 @@ const DetailModal = (Props: DetailProps) => {
       return res.data;
     },
     {
-      enabled: !!currentWorkSpace.workspace_id,
+      enabled: !!currentWorkspace.workspace_id,
     },
   );
 
   // 특정 댓글 ID를 받아 상태를 업데이트하는 함수
   const toggleCommentEditModal = (commentId: number) => {
-    setIscommentEditModalVisible(prevState => ({
+    setIscommentSettingModalVisible(prevState => ({
       ...prevState,
       [commentId]: !prevState[commentId],
     }));
@@ -96,7 +105,7 @@ const DetailModal = (Props: DetailProps) => {
   const postComment = async (commentText: string) => {
     const accessToken = Cookies.get('ACCESS_KEY');
     await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/comment`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/tasks/${taskId}/comment`,
       { text: commentText },
       {
         headers: {
@@ -132,7 +141,7 @@ const DetailModal = (Props: DetailProps) => {
     async (newTitle: string) => {
       const accessToken = Cookies.get('ACCESS_KEY');
       await axios.put(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/detail`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/tasks/${taskId}/detail`,
         { title: newTitle },
         {
           headers: {
@@ -177,7 +186,7 @@ const DetailModal = (Props: DetailProps) => {
       const accessToken = Cookies.get('ACCESS_KEY');
 
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/tasks/${taskId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -199,7 +208,7 @@ const DetailModal = (Props: DetailProps) => {
       const accessToken = Cookies.get('ACCESS_KEY');
       const res = await axios.put(
         // workspace/{:workspaceId}/tasks/{:taskId}/priority
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}/priority`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/tasks/${taskId}/priority`,
         {},
         {
           headers: {
@@ -230,7 +239,7 @@ const DetailModal = (Props: DetailProps) => {
     async (taskId: number) => {
       const accessToken = Cookies.get('ACCESS_KEY');
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkSpace.workspace_id}/tasks/${taskId}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/workspace/${currentWorkspace.workspace_id}/tasks/${taskId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -366,7 +375,7 @@ const DetailModal = (Props: DetailProps) => {
         <div>
           <div className="p-[2rem]">
             {commentBody.length > 0 ? (
-              <div>
+              <div className="">
                 <div className="flex gap-[0.5rem] mb-[1.5rem]">
                   <div className="text-black font-bold leading-[1.6rem]">
                     코멘트
@@ -435,7 +444,9 @@ const DetailModal = (Props: DetailProps) => {
                             }
                           >
                             <IoEllipsisVertical />
-                            {iscommentEditModalVisible[comment.comment_id] && (
+                            {iscommentSettingModalVisible[
+                              comment.comment_id
+                            ] && (
                               <CommentEditModal
                                 taskId={taskId}
                                 commentId={comment.comment_id}
@@ -477,7 +488,7 @@ const DetailModal = (Props: DetailProps) => {
               className="h-[3rem] flex items-center justify-between rounded-[0.5rem]
               border-[1px] absolute w-[18.5rem] bottom-[1.5rem] p-[0.75rem] bg-white z-[95]"
             >
-              <div className="text-[0.75rem] leading-[1.4rem] w-full text-gray-4 ">
+              <div className="text-[0.75rem] leading-[1.4rem] w-full text-gray-4">
                 <input
                   className="w-full focus:outline-none focus:text-black "
                   type="textarea"
