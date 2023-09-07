@@ -192,7 +192,7 @@ const EditGroupModal = () => {
                 <div
                   className="border-[1px] rounded-[0.75rem] px-[2rem] py-[0.5rem] h-[3rem] w-[9.5rem]
                   flex items-center justify-center bg-primary-blue cursor-pointer text-white text-[0.875rem]"
-                  onClick={editGroup}
+                  // onClick={editGroup}
                 >
                   완료
                 </div>
